@@ -2,6 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
+<script>
+(function(){
+
+function getCookie(name){
+var cookies=document.cookie.split(";");
+for(var i=0;i<cookies.length;i++){
+var c=cookies[i].trim();
+if(c.indexOf(name+"=")===0){
+return decodeURIComponent(c.substring((name+"=").length));
+}
+}
+return null;
+}
+
+var blocked=getCookie("interphyr_nation_status")==="invalid";
+var registered=getCookie("interphyr_registered_nation");
+var adminSession=getCookie("interphyr_admin_session")==="1";
+
+if(blocked||(!registered&&!adminSession)){
+location.replace("../");
+}
+
+})();
+</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zapadiya People's Republic - InterPhyr.net - Microsoft Internet Explorer</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">

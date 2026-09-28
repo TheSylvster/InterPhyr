@@ -3,26 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kingdom of Rendale - InterPhyr.net</title>
+<title>Kingdom of Rendale - InterPhyr.net - Microsoft Internet Explorer</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
 
 <style>
 *{box-sizing:border-box}
-html,body{width:100%;min-height:100%;margin:0;padding:0}
-body{background:#008080;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#000;display:flex;align-items:center;justify-content:center;padding:24px}
-
+html,body{width:100%;height:100%;margin:0;padding:0}
+body{overflow:hidden;background:#c0c0c0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#000}
 .win98-16bit{filter:url(#rgb565)}
 
-.nation-window{width:100%;max-width:480px}
+.browser-window{position:fixed;left:0;top:0;width:100vw;height:100vh;min-width:760px;min-height:500px;margin:0;z-index:10}
+.browser-window>.title-bar{height:22px;min-height:22px}
+.browser-window .title-bar-text{font-family:Arial,Helvetica,sans-serif;font-size:11px}
 
-.nation-heading{display:flex;align-items:center;gap:14px;margin-bottom:10px}
-.nation-logo{width:56px;height:56px;object-fit:contain;flex-shrink:0}
-.nation-name{margin:0;font-family:"Times New Roman",Times,serif;font-size:22px;color:#000080}
+.ie-menu{height:21px;min-height:21px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:0 7px;gap:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;user-select:none}
+.ie-menu span{white-space:nowrap}
 
-.nation-info p{margin:6px 0;font-size:12px;line-height:16px}
+.ie-toolbar{height:34px;min-height:34px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:2px 4px;gap:2px;overflow:hidden}
+.ie-toolbar button{height:28px;min-width:54px;padding:1px 5px;display:flex;align-items:center;justify-content:center;gap:3px;font-family:Arial,Helvetica,sans-serif;font-size:10px;white-space:nowrap}
+.ie-toolbar-icon{width:17px;flex-shrink:0;font-family:"Arial Unicode MS",Arial,sans-serif;font-size:17px;line-height:17px;text-align:center}
+.ie-toolbar-label{line-height:14px}
+.ie-dropdown{font-size:7px;margin-left:-1px}
+.ie-grip{width:6px;height:23px;flex-shrink:0;margin-right:2px;border-left:1px solid #808080;border-right:1px solid #fff;background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,#808080 2px,#808080 3px)}
 
-.back-row{margin-top:14px;padding-top:8px;border-top:1px solid #808080}
-.back-link{font-size:11px}
+.ie-address-row{height:27px;min-height:27px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;gap:4px;padding:2px 5px}
+.ie-address-label{font-size:11px;margin-right:2px}
+.ie-address-icon{width:16px;height:16px;object-fit:contain;flex-shrink:0}
+.ie-address-input{height:20px!important;min-width:0;flex:1;padding:1px 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px}
+.ie-go{height:21px!important;min-width:37px;padding:1px 7px!important;font-size:10px!important}
+
+.ie-links{height:23px;min-height:23px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;padding:1px 5px;gap:1px;overflow:hidden}
+.ie-links .ie-grip{height:17px}
+.ie-links-label{font-size:10px;margin:0 5px 0 2px}
+.ie-links a{display:inline-block;color:#000080;font-size:10px;text-decoration:underline;padding:2px 7px;white-space:nowrap}
+
+.ie-main{display:flex;height:calc(100% - 148px);min-height:0;background:#fff}
+
+.ie-explorer{width:205px;min-width:205px;height:100%;overflow-y:auto;overflow-x:hidden;background:#d4d0c8;border-right:2px solid #808080;padding:4px}
+.explorer-header{height:25px;padding:4px 6px;color:#fff;font-weight:bold;font-size:11px;background:linear-gradient(to right,#000080 0%,#000080 55%,#1084d7 100%);border:1px solid #000;user-select:none}
+.explorer-body{padding-top:5px}
+.explorer-tree{width:100%;margin:0;padding:5px;background:#fff;border:1px solid #808080}
+.explorer-tree li{font-size:11px;line-height:16px}
+.explorer-tree a{color:#000080;text-decoration:none}
+.explorer-tree a:hover{text-decoration:underline}
+
+.explorer-box{margin-top:6px}
+.explorer-box fieldset{margin:0;padding:5px;min-height:63px;background:#d4d0c8}
+.explorer-box legend{font-size:10px;padding:0 3px}
+
+.explorer-logo,.nation-logo{display:block;width:auto;height:auto;max-width:48px;max-height:48px;object-fit:contain;object-position:center;flex-shrink:0}
+.explorer-logo.zpr,.nation-logo.zpr{width:48px;height:48px}
+.explorer-logo.astralyia,.explorer-logo.rendale,.nation-logo.astralyia,.nation-logo.rendale{width:auto;height:auto;max-width:48px;max-height:48px}
+.explorer-logo{margin:1px auto}
+
+.ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
+.webpage{min-height:100%;padding:12px 18px 30px 18px}
+
+.webpage-loading>*{visibility:hidden}
+.webpage-loading.page-stage-1 .site-header{visibility:visible}
+.webpage-loading.page-stage-2 #nation-profile{visibility:visible}
+.webpage-loading.page-stage-3 #related{visibility:visible}
+.webpage-loading.page-stage-4 hr,.webpage-loading.page-stage-4 .small{visibility:visible}
+
+.site-header{padding-bottom:5px;margin-bottom:10px;border-bottom:1px solid #808080}
+.site-title{margin:0;display:inline-block;font-family:Georgia,"Times New Roman",Times,serif;font-size:40px;font-weight:900;letter-spacing:-2.5px;color:#e00000;text-shadow:2px 2px 0 #800000;line-height:42px}
+.site-title .letter{position:relative;display:inline-block}
+.site-title .letter:nth-child(1){top:3px}.site-title .letter:nth-child(2){top:2px}.site-title .letter:nth-child(3){top:1px}.site-title .letter:nth-child(4){top:0}.site-title .letter:nth-child(5){top:-1px}.site-title .letter:nth-child(6){top:-2px}.site-title .letter:nth-child(7){top:-3px}.site-title .letter:nth-child(8){top:-4px}.site-title .letter:nth-child(9){top:-5px}.site-title .letter:nth-child(10){top:-7px}
+.site-title .domain{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal;letter-spacing:0;color:#0000a0;text-shadow:none;margin-left:2px}
+
+.small{font-size:10px}
+.content-section{margin-top:15px}
+.content-section h2{margin:0 0 5px;padding-bottom:2px;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080;border-bottom:1px solid #808080}
+.content-section p{margin:5px 0;line-height:1.35}
+.content-section ul{margin-top:5px;padding-left:25px}
+
+a{color:#0000ff!important}
+a:visited{color:#0000ff!important}
+a:hover{color:#ff0000!important}
+a:active{color:#800080!important}
+
+.nation{margin-top:6px;padding-top:8px}
+.nation-heading{display:flex;align-items:center;gap:8px;min-height:48px;margin-bottom:5px}
+.nation-name{margin:0;font-family:"Times New Roman",Times,serif;font-size:17px;color:#000080}
+.nation-info{margin-left:56px}
+
+hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
+
+.ie-status{height:21px;min-height:21px;display:flex;background:#c0c0c0;border-top:1px solid #fff;padding:2px}
+.ie-status-field{height:17px;display:flex;align-items:center;padding:0 5px;background:#c0c0c0;border:1px solid #808080;border-right-color:#fff;border-bottom-color:#fff;font-size:10px}
+.ie-status-main{flex:1}
+.ie-status-icon{width:16px;height:16px;object-fit:contain;margin-right:3px}
+
+/* =========================================================
+   KLIPPY
+   ========================================================= */
+
+#klippy{position:fixed;right:24px;bottom:24px;z-index:99999;width:140px;cursor:pointer;user-select:none;-webkit-user-select:none;animation:klippy-bob 2.6s ease-in-out infinite}
+#klippy:focus-visible{outline:2px dotted #000;outline-offset:3px}
+.klippy-face{display:block;width:100%;height:auto;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.35))}
+
+.klippy-bubble{position:absolute;right:0;bottom:106px;min-width:150px;max-width:210px;background:#ffffe1;border:1px solid #000;box-shadow:2px 2px 0 rgba(0,0,0,.4);padding:7px 9px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:14px;color:#000;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s ease,transform .15s ease}
+.klippy-bubble::after{content:"";position:absolute;right:71px;bottom:-7px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #000}
+.klippy-bubble::before{content:"";position:absolute;right:72px;bottom:-5.5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #ffffe1;z-index:1}
+.klippy-bubble.klippy-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+
+@keyframes klippy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 </style>
 </head>
 
@@ -38,20 +123,107 @@ body{background:#008080;font-family:Arial,Helvetica,sans-serif;font-size:11px;co
 </filter>
 </svg>
 
-<div class="window nation-window">
+<div class="window browser-window">
 
 <div class="title-bar">
-<div class="title-bar-text">Kingdom of Rendale - InterPhyr.net</div>
+<div class="title-bar-text">Kingdom of Rendale - InterPhyr.net - Microsoft Internet Explorer</div>
 <div class="title-bar-controls">
-<button type="button" aria-label="Close" onclick="location.href='../'"></button>
+<button aria-label="Minimize"></button>
+<button aria-label="Maximize"></button>
+<button aria-label="Close"></button>
 </div>
 </div>
 
-<div class="window-body">
+<div class="ie-menu">
+<span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Favorites</span><span>Tools</span><span>Help</span>
+</div>
+
+<div class="ie-toolbar">
+<div class="ie-grip"></div>
+
+<button onclick="location.href='../'"><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">⛒</span><span class="ie-toolbar-label">Stop</span></button>
+<button onclick="location.reload()"><span class="ie-toolbar-icon">↺</span><span class="ie-toolbar-label">Refresh</span></button>
+<button onclick="location.href='../'"><span class="ie-toolbar-icon">⌂</span><span class="ie-toolbar-label">Home</span></button>
+
+<div class="ie-grip"></div>
+
+<button><span class="ie-toolbar-icon">⌕</span><span class="ie-toolbar-label">Search</span></button>
+<button><span class="ie-toolbar-icon">★</span><span class="ie-toolbar-label">Favorites</span></button>
+<button><span class="ie-toolbar-icon">◷</span><span class="ie-toolbar-label">History</span></button>
+<button><span class="ie-toolbar-icon">✉</span><span class="ie-toolbar-label">Mail</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">▣</span><span class="ie-toolbar-label">Print</span></button>
+</div>
+
+<div class="ie-address-row">
+<span class="ie-address-label">Address</span>
+<img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
+<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/rendale">
+<button id="ie-go" class="ie-go" type="button" onclick="location.reload()">Go</button>
+</div>
+
+<div class="ie-links">
+<div class="ie-grip"></div>
+<span class="ie-links-label">Links</span>
+<a href="../">InterPhyr.net</a>
+<a href="../#nations">Nations</a>
+<a href="../#goals">Goals</a>
+<a href="../#doctrines">Doctrines</a>
+<a href="../#contact">Contact</a>
+</div>
+
+<div class="ie-main">
+
+<aside class="ie-explorer">
+
+<div class="explorer-header">InterPhyr</div>
+
+<div class="explorer-body">
+
+<ul class="tree-view explorer-tree">
+
+<li><a href="../#home">Information</a></li>
+<li><a href="../#goals">Goals</a></li>
+
+<li>Nations
+<ul>
+<li><a href="../Astralyia/">Astralyia Republic</a></li>
+<li><a href="../ZPR/">Zapadiya People's Republic</a></li>
+<li><a href="./">Kingdom of Rendale</a></li>
+</ul>
+</li>
+
+<li><a href="../#doctrines">Doctrines</a></li>
+
+</ul>
+
+<div class="explorer-box">
+<fieldset>
+<legend>Kingdom of Rendale</legend>
+<img class="explorer-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="Kingdom of Rendale">
+</fieldset>
+</div>
+
+</div>
+</aside>
+
+<main class="ie-page">
+
+<div class="webpage webpage-loading" id="home">
+
+<header class="site-header">
+<h1 class="site-title">
+<span class="letter">I</span><span class="letter">n</span><span class="letter">t</span><span class="letter">e</span><span class="letter">r</span><span class="letter">P</span><span class="letter">h</span><span class="letter">y</span><span class="letter">r</span><span class="letter">!</span>
+<span class="domain">.net</span>
+</h1>
+</header>
+
+<section id="nation-profile" class="content-section nation">
 
 <div class="nation-heading">
-<img class="nation-logo win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="Kingdom of Rendale">
-<h1 class="nation-name">Kingdom of Rendale</h1>
+<img class="nation-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="Kingdom of Rendale">
+<h2 class="nation-name">Kingdom of Rendale</h2>
 </div>
 
 <div class="nation-info">
@@ -63,12 +235,150 @@ body{background:#008080;font-family:Arial,Helvetica,sans-serif;font-size:11px;co
 
 </div>
 
-<div class="back-row">
-<a class="back-link" href="../">&larr; Back to InterPhyr.net</a>
+</section>
+
+<section id="related" class="content-section">
+
+<h2>Related</h2>
+
+<ul>
+<li><a href="../Astralyia/">Astralyia Republic</a></li>
+<li><a href="../ZPR/">Zapadiya People's Republic</a></li>
+<li><a href="../#doctrines">Political &amp; Economic Profiles</a></li>
+<li><a href="../">Back to InterPhyr.net</a></li>
+</ul>
+
+</section>
+
+<hr>
+
+<p class="small">
+InterPhyr.net &copy; 199X&ndash;199X
+&nbsp;|&nbsp;
+Hosted by ZapadTelecom&copy;
+</p>
+
+</div>
+</main>
+</div>
+
+<div class="ie-status">
+
+<div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
+
+<div class="ie-status-field">
+<img class="ie-status-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-1.png" alt="">
+Internet
 </div>
 
 </div>
 </div>
+
+<div id="klippy" role="button" tabindex="0" aria-label="Klippy the assistant">
+<div id="klippy-bubble" class="klippy-bubble" role="status" aria-live="polite"></div>
+<img class="klippy-face" src="../images/klippy.png" alt="Klippy" draggable="false">
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded",function(){
+
+
+/* =========================================================
+   KLIPPY
+   ========================================================= */
+
+const klippy=document.getElementById("klippy");
+const klippyBubble=document.getElementById("klippy-bubble");
+
+const klippyLines=[
+"It looks like you're reading about Rendale. Would you like help?",
+"Fun fact: I have not been updated since 1997.",
+"Tip: closing this window will not uninstall me.",
+"Did you know? Real diplomacy takes longer than a 56k connection.",
+"You clicked me. That's it. That's the whole feature.",
+"Still here. Still a paperclip."
+];
+
+let klippyLastLine=-1;
+let klippyHideTimer=null;
+
+function klippySpeak(){
+
+let index=Math.floor(Math.random()*klippyLines.length);
+
+if(klippyLines.length>1&&index===klippyLastLine){
+index=(index+1)%klippyLines.length;
+}
+
+klippyLastLine=index;
+
+klippyBubble.textContent=klippyLines[index];
+klippyBubble.classList.add("klippy-visible");
+
+clearTimeout(klippyHideTimer);
+
+klippyHideTimer=setTimeout(function(){
+klippyBubble.classList.remove("klippy-visible");
+},4500);
+
+}
+
+klippy.addEventListener("click",klippySpeak);
+
+klippy.addEventListener("keydown",function(event){
+
+if(event.key==="Enter"||event.key===" "){
+event.preventDefault();
+klippySpeak();
+}
+
+});
+
+
+/* =========================================================
+   PAGE LOADING
+   ========================================================= */
+
+const webpage=document.querySelector(".webpage");
+const statusText=document.getElementById("ie-status-text");
+
+function startPageLoading(){
+
+webpage.className="webpage webpage-loading";
+
+statusText.textContent="Opening http://www.interphyr.net/rendale...";
+
+setTimeout(function(){
+webpage.classList.add("page-stage-1");
+statusText.textContent="Receiving document...";
+},250);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-2");
+statusText.textContent="Receiving picture...";
+},650);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-3");
+statusText.textContent="Receiving document...";
+},1050);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-4");
+statusText.textContent="Done";
+},1450);
+
+setTimeout(function(){
+webpage.className="webpage";
+statusText.textContent="Done";
+},1500);
+
+}
+
+startPageLoading();
+
+});
+</script>
 
 </body>
 </html>

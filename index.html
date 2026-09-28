@@ -796,20 +796,23 @@ return getCookie("interphyr_registered_nation");
 
 function isWebsiteBlocked(){
 
-return getCookie("interphyr_blocked")==="1";
+return getCookie("interphyr_nation_status")==="invalid";
 
 }
 
 
-function setBlockedCookie(){
+function setNationStatusCookie(nation){
 
 /*
- * This is the ONLY cookie created
- * when a blocked nation is detected.
+ * Always saved on registration, as either
+ * "valid" or "invalid" (invalid = any
+ * variant of "Swissland").
  */
 
+const status=isBlockedNation(nation)?"invalid":"valid";
+
 document.cookie=
-"interphyr_blocked=1; max-age=31536000; path=/";
+"interphyr_nation_status="+status+"; max-age=31536000; path=/";
 
 }
 
@@ -900,14 +903,9 @@ return;
 
 }
 
+setNationStatusCookie(nation);
+
 if(isBlockedNation(nation)){
-
-/*
- * Swissland creates a separate
- * blocking cookie.
- */
-
-setBlockedCookie();
 
 showBlockedRegion();
 
@@ -1441,9 +1439,9 @@ this.classList.add("clicked");
    ========================================================= */
 
 /*
- * BLOCK COOKIE CHECK HAPPENS FIRST.
+ * NATION STATUS COOKIE CHECK HAPPENS FIRST.
  *
- * If interphyr_blocked=1 exists,
+ * If interphyr_nation_status=invalid,
  * the registration and dial-up are skipped.
  */
 
@@ -1462,10 +1460,10 @@ if(isBlockedNation(registeredNation)){
 /*
  * Safety check:
  * if the nation cookie says Swissland,
- * create the blocking cookie as well.
+ * mark the status cookie invalid as well.
  */
 
-setBlockedCookie();
+setNationStatusCookie(registeredNation);
 
 showBlockedRegion();
 

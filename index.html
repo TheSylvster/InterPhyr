@@ -1662,14 +1662,6 @@ this.classList.add("clicked");
    INITIAL STARTUP
    ========================================================= */
 
-/*
- * A hard refresh of THIS page clears the admin
- * session cookie, so the bypass has to be typed
- * again. Navigating here from another InterPhyr
- * page (a normal link click) does not count as
- * a refresh, so the session survives that.
- */
-
 let navType="navigate";
 
 try{
@@ -1679,31 +1671,52 @@ navType=navEntries.length?navEntries[0].type:"navigate";
 
 }catch(e){}
 
-if(navType==="reload"){
+/*
+ * True only when this load came from clicking a
+ * link on another InterPhyr page (or the browser's
+ * Back/Forward). A typed URL, bookmark, or refresh
+ * is false - a reload keeps re-sending the ORIGINAL
+ * referrer, hence the navType check. Compared
+ * against the site root (not just the origin) so
+ * other github.io sites don't count.
+ */
+
+const siteRoot=new URL("./",location.href).href;
+const cameFromInterPhyr=navType==="back_forward"||(navType!=="reload"&&document.referrer.indexOf(siteRoot)===0);
+
+/*
+ * Back/Forward can restore this page from cache
+ * with the site already revealed and without
+ * re-running this startup, so if the session has
+ * ended since, reload to go through login again.
+ */
+
+window.addEventListener("pageshow",function(event){
+
+if(!event.persisted)return;
+
+const loggedIn=
+getCookie("interphyr_admin_session")==="1"||
+getCookie("interphyr_connected")==="1";
+
+if(!loggedIn){
+location.reload();
+}
+
+});
+
+/*
+ * Any visit that isn't an in-site link click ends
+ * the session, so the admin bypass has to be typed
+ * again and a registered nation has to dial up again.
+ */
+
+if(!cameFromInterPhyr){
 
 document.cookie="interphyr_admin_session=; max-age=0; path=/";
 document.cookie="interphyr_connected=; max-age=0; path=/";
 
 }
-
-/*
- * True when this load was reached by clicking a
- * link from another page on this site (e.g. a
- * nation sub-page's "Back to InterPhyr.net"),
- * rather than a fresh visit, bookmark, or typed
- * URL (which have no same-origin referrer). Used
- * to skip replaying the dial-up screen for someone
- * who was already logged in.
- *
- * A reload keeps re-sending the ORIGINAL referrer
- * (whatever page you first arrived from), so without
- * the navType check here, hitting refresh right after
- * following an in-site link would be mistaken for
- * "came from another InterPhyr page" and skip the
- * dial-up replay a genuine refresh is supposed to show.
- */
-
-const cameFromInterPhyr=navType!=="reload"&&document.referrer.indexOf(location.origin)===0;
 
 /*
  * NATION STATUS COOKIE CHECK HAPPENS FIRST.
@@ -1739,12 +1752,15 @@ showBlockedRegion();
 registrationScreen.style.display="none";
 registrationErrorScreen.style.display="none";
 
-if(cameFromInterPhyr){
+if(cameFromInterPhyr&&getCookie("interphyr_connected")==="1"){
 
 /*
  * Came back from another InterPhyr page while
- * already logged in - skip the dial-up replay
- * and go straight to the loaded site.
+ * already connected - skip the dial-up replay
+ * and go straight to the loaded site. The cookie
+ * check matters: a sub-page that bounces an
+ * unauthorized visitor here also sends an in-site
+ * referrer, but it clears the cookie first.
  */
 
 revealWebsite();

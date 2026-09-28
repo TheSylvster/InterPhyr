@@ -6,6 +6,17 @@
 <script>
 (function(){
 
+/*
+ * Login gate. You only stay logged in when you
+ * arrive here by clicking a link on another
+ * InterPhyr page. A typed URL, bookmark, or
+ * refresh ends the session and sends you back
+ * to registration/dial-up.
+ *
+ * Fails closed: if anything throws, the visitor
+ * is treated as not logged in and redirected.
+ */
+
 function getCookie(name){
 var cookies=document.cookie.split(";");
 for(var i=0;i<cookies.length;i++){
@@ -17,33 +28,50 @@ return decodeURIComponent(c.substring((name+"=").length));
 return null;
 }
 
-var blocked=getCookie("interphyr_nation_status")==="invalid";
-var registered=getCookie("interphyr_registered_nation");
-var adminSession=getCookie("interphyr_admin_session")==="1";
-var connected=getCookie("interphyr_connected")==="1";
+function isLoggedIn(){
+try{
+if(getCookie("interphyr_nation_status")==="invalid")return false;
+if(getCookie("interphyr_admin_session")==="1")return true;
+return !!getCookie("interphyr_registered_nation")&&getCookie("interphyr_connected")==="1";
+}catch(e){
+return false;
+}
+}
 
-/*
- * Reload detection is best-effort only - if it
- * throws for any reason, the login check above
- * must still run and still redirect. Never let
- * this be the reason the gate fails open.
- */
+var fromSite=false;
 
 try{
 
-var navEntries=performance.getEntriesByType("navigation");
-var navType=navEntries.length?navEntries[0].type:"navigate";
+var siteRoot=new URL("../",location.href).href;
+fromSite=document.referrer.indexOf(siteRoot)===0;
 
-if(navType==="reload"){
-document.cookie="interphyr_admin_session=; max-age=0; path=/";
-adminSession=false;
+var navEntries=performance.getEntriesByType("navigation");
+if(navEntries.length&&navEntries[0].type==="reload"){
+fromSite=false;
 }
 
 }catch(e){}
 
-if(blocked||!(adminSession||(registered&&connected))){
+if(!fromSite){
+document.cookie="interphyr_admin_session=; max-age=0; path=/";
+document.cookie="interphyr_connected=; max-age=0; path=/";
+}
+
+if(!isLoggedIn()){
 location.replace("../");
 }
+
+/*
+ * Browser Back/Forward can restore this page from
+ * cache without re-running the check above, so
+ * re-check when that happens.
+ */
+
+window.addEventListener("pageshow",function(event){
+if(event.persisted&&!isLoggedIn()){
+location.replace("../");
+}
+});
 
 })();
 </script>
@@ -217,7 +245,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <span class="ie-address-label">Address</span>
 <img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
 <input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/news">
-<button id="ie-go" class="ie-go" type="button" onclick="location.reload()">Go</button>
+<button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
 </div>
 
 <div class="ie-links">

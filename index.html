@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>InterPhyr.net - ZapadTelecom Interweb Surfer</title>
+<title>InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
 
 <style>
@@ -361,7 +361,7 @@ pointer-events:auto;
 <div class="window registration-window" role="dialog" aria-label="ZapadTelecom Nation Registration">
 
 <div class="title-bar">
-<div class="title-bar-text">ZapadTelecom Nation Registration</div>
+<div class="title-bar-text">ZapadTelecom Nation Registration©</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Close" id="registration-close"></button>
 </div>
@@ -369,10 +369,10 @@ pointer-events:auto;
 
 <div class="window-body registration-body">
 
-<b>Welcome to the ZapadTelecom network.</b>
+<b>Welcome to the ZapadTelecom© network.</b>
 
 <div class="registration-description">
-Before connecting to InterPhyr.net, please register your nation with ZapadTelecom.
+Before connecting to InterPhyr.net, please register your nation with ZapadTelecom©.
 </div>
 
 <label for="nation-name">Nation name:</label>
@@ -389,7 +389,7 @@ spellcheck="false"
 >
 
 <div class="registration-note">
-Your registered nation is stored locally on this computer for future ZapadTelecom connections.
+Your registered nation is stored locally on this computer for future ZapadTelecom© connections.
 </div>
 
 <div class="registration-buttons">
@@ -410,7 +410,7 @@ Your registered nation is stored locally on this computer for future ZapadTeleco
 <div class="window registration-error-window" role="dialog" aria-label="ZapadTelecom Access Denied">
 
 <div class="title-bar">
-<div class="title-bar-text">ZapadTelecom - Access Denied</div>
+<div class="title-bar-text">ZapadTelecom© - Access Denied</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Close" id="registration-error-close"></button>
 </div>
@@ -441,7 +441,7 @@ InterPhyr.net cannot be accessed from the registered region.
 <div class="window dialup-window" role="dialog" aria-label="ZapadTelecom Network Connection">
 
 <div class="title-bar">
-<div class="title-bar-text">ZapadTelecom Network Connection</div>
+<div class="title-bar-text">ZapadTelecom Network Connection©</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Minimize"></button>
 <button type="button" aria-label="Close"></button>
@@ -497,7 +497,7 @@ InterPhyr.net cannot be accessed from the registered region.
 <div class="window browser-window">
 
 <div class="title-bar">
-<div class="title-bar-text">InterPhyr.net - ZapadTelecom Interweb Surfer</div>
+<div class="title-bar-text">InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
 <div class="title-bar-controls">
 <button aria-label="Minimize"></button>
 <button aria-label="Maximize"></button>
@@ -571,7 +571,7 @@ InterPhyr.net cannot be accessed from the registered region.
 </li>
 
 <li><a href="#doctrines">Doctrines</a></li>
-<li><a href="ZapadTelecom/">ZapadTelecom</a></li>
+<li><a href="ZapadTelecom/">ZapadTelecom©</a></li>
 <li><a href="News/">The Zapadiyan Daily</a></li>
 
 </ul>
@@ -785,7 +785,7 @@ Council-Type Monarchy with a peaceful democratic economy.
 <a href="https://discord.gg/5362UGaDSM" target="_blank" rel="noopener">interphyr@zapadtelecom.net</a>
 </p>
 
-<p class="small">Electronic mail is available through the ZapadTelecom network.</p>
+<p class="small">Electronic mail is available through the ZapadTelecom© network.</p>
 
 </section>
 
@@ -819,7 +819,7 @@ Internet
 </div>
 
 <<script>
-document.addEventListener("DOMContentLoaded",function(){
+(function(){
 
 
 /* =========================================================
@@ -844,7 +844,7 @@ const klippyLines=[
 "It looks like you're checking the Member Nations table. They're all very nice, mostly.",
 "This website is currently under construction. So am I, emotionally.",
 "Looking for the Contact section? I'm not authorized to give out my email.",
-"Ah, ZapadTelecom Interweb Surfer. A choice."
+"Ah, ZapadTelecom Interweb Surfer©. A choice."
 ];
 
 let klippyLastLine=-1;
@@ -1485,7 +1485,7 @@ line3.textContent="Access granted.";
 
 line1.textContent="Assigning network address...";
 line2.textContent="IP address: "+assignedIP;
-line3.textContent="DNS server: ZapadTelecom";
+line3.textContent="DNS server: ZapadTelecom©";
 
 }else if(elapsed<27){
 
@@ -1682,7 +1682,7 @@ navType=navEntries.length?navEntries[0].type:"navigate";
  */
 
 const siteRoot=new URL("./",location.href).href;
-const cameFromInterPhyr=navType==="back_forward"||(navType!=="reload"&&document.referrer.indexOf(siteRoot)===0);
+const cameFromInterPhyr=(window.interphyrSoftNav&&window.interphyrSoftNav.active)||navType==="back_forward"||(navType!=="reload"&&document.referrer.indexOf(siteRoot)===0);
 
 /*
  * Back/Forward can restore this page from cache
@@ -1809,7 +1809,7 @@ showRegistration();
 
 }
 
-});
+})();
 </script>
 
 function resetDialup(){
@@ -2520,6 +2520,7 @@ var navEntries=performance.getEntriesByType("navigation");
 if(navEntries.length)navType=navEntries[0].type;
 }catch(e){}
 var fromSite=navType==="back_forward"||(navType!=="reload"&&document.referrer.indexOf(new URL("./",location.href).href)===0);
+if(window.interphyrSoftNav&&window.interphyrSoftNav.active)fromSite=true;
 if(fromSite)return;
 function goFullscreen(){
 var el=document.documentElement;
@@ -2535,6 +2536,153 @@ document.removeEventListener(evt,goFullscreen);
 ["click","keydown","touchstart"].forEach(function(evt){
 document.addEventListener(evt,goFullscreen,{once:true});
 });
+})();
+</script>
+
+<script>
+(function(){
+
+/*
+ * Browsers always drop fullscreen when a new document
+ * loads. So while in fullscreen, links between InterPhyr
+ * pages fetch the next page and swap it into THIS document
+ * (updating the URL and history) instead of navigating.
+ * Outside fullscreen, links navigate normally.
+ *
+ * This script re-runs after every swap, so it only
+ * installs itself once.
+ */
+
+if(window.interphyrSoftNav)return;
+
+var state={active:false,redirecting:false};
+window.interphyrSoftNav=state;
+
+var siteRoot=new URL("./",location.href).href;
+var shownPath=location.pathname;
+
+function isFullscreen(){
+return !!(document.fullscreenElement||document.webkitFullscreenElement);
+}
+
+function scrollToHash(hash){
+if(!hash)return;
+var el=document.getElementById(decodeURIComponent(hash.slice(1)));
+if(el)el.scrollIntoView();
+}
+
+function runInline(source,parent){
+var s=document.createElement("script");
+s.textContent=source;
+parent.appendChild(s);
+return s;
+}
+
+function swapIn(href,push){
+
+fetch(href,{credentials:"same-origin"}).then(function(response){
+
+if(!response.ok)throw new Error("HTTP "+response.status);
+return response.text();
+
+}).then(function(html){
+
+var doc=new DOMParser().parseFromString(html,"text/html");
+
+if(push)history.pushState({interphyr:true},"",href);
+shownPath=location.pathname;
+
+state.active=true;
+state.redirecting=false;
+
+try{
+
+/* The new page's login gate. */
+doc.head.querySelectorAll("script").forEach(function(s){
+runInline(s.textContent,document.head).remove();
+});
+
+if(state.redirecting)return;
+
+document.title=doc.title;
+
+var oldStyle=document.head.querySelector("style");
+var newStyle=doc.head.querySelector("style");
+if(oldStyle&&newStyle)oldStyle.textContent=newStyle.textContent;
+
+Array.prototype.slice.call(document.body.attributes).forEach(function(a){
+document.body.removeAttribute(a.name);
+});
+Array.prototype.slice.call(doc.body.attributes).forEach(function(a){
+document.body.setAttribute(a.name,a.value);
+});
+
+document.body.innerHTML=doc.body.innerHTML;
+
+document.body.querySelectorAll("script").forEach(function(old){
+var s=document.createElement("script");
+s.textContent=old.textContent;
+old.parentNode.replaceChild(s,old);
+});
+
+}finally{
+state.active=false;
+}
+
+scrollToHash(new URL(href).hash);
+
+}).catch(function(){
+location.href=href;
+});
+
+}
+
+/* Also used by the toolbar's Back/Home buttons. */
+window.interphyrGo=function(relative){
+var url=new URL(relative,location.href);
+if(isFullscreen()&&url.href.indexOf(siteRoot)===0){
+swapIn(url.href,true);
+}else{
+location.href=url.href;
+}
+};
+
+document.addEventListener("click",function(event){
+
+if(!isFullscreen())return;
+if(event.defaultPrevented||event.button!==0)return;
+if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+
+var link=event.target.closest?event.target.closest("a[href]"):null;
+if(!link)return;
+if(link.target&&link.target!=="_self")return;
+if(link.hasAttribute("download"))return;
+
+var url=new URL(link.href,location.href);
+if(url.href.indexOf(siteRoot)!==0)return;
+
+/* Same-page #anchor links keep their normal behavior. */
+if(url.pathname===location.pathname&&url.hash)return;
+
+event.preventDefault();
+swapIn(url.href,true);
+
+});
+
+/*
+ * History entries created above belong to this one
+ * document, so Back/Forward between them must swap
+ * the content too - even after leaving fullscreen.
+ */
+
+window.addEventListener("popstate",function(){
+if(location.pathname!==shownPath){
+swapIn(location.href,false);
+}else{
+scrollToHash(location.hash);
+}
+});
+
 })();
 </script>
 

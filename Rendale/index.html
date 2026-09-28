@@ -46,11 +46,15 @@ var siteRoot=new URL("../",location.href).href;
 fromSite=document.referrer.indexOf(siteRoot)===0;
 
 var navEntries=performance.getEntriesByType("navigation");
-if(navEntries.length&&navEntries[0].type==="reload"){
-fromSite=false;
-}
+var navType=navEntries.length?navEntries[0].type:"navigate";
+if(navType==="reload")fromSite=false;
+if(navType==="back_forward")fromSite=true;
 
 }catch(e){}
+
+if(window.interphyrSoftNav&&window.interphyrSoftNav.active){
+fromSite=true;
+}
 
 if(!fromSite){
 document.cookie="interphyr_admin_session=; max-age=0; path=/";
@@ -58,6 +62,7 @@ document.cookie="interphyr_connected=; max-age=0; path=/";
 }
 
 if(!isLoggedIn()){
+if(window.interphyrSoftNav)window.interphyrSoftNav.redirecting=true;
 location.replace("../");
 }
 
@@ -77,7 +82,7 @@ location.replace("../");
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kingdom of Rendale - InterPhyr.net - ZapadTelecom Interweb Surfer</title>
+<title>Kingdom of Rendale - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
 
 <style>
@@ -207,7 +212,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="window browser-window">
 
 <div class="title-bar">
-<div class="title-bar-text">Kingdom of Rendale - InterPhyr.net - ZapadTelecom Interweb Surfer</div>
+<div class="title-bar-text">Kingdom of Rendale - InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
 <div class="title-bar-controls">
 <button aria-label="Minimize"></button>
 <button aria-label="Maximize"></button>
@@ -222,11 +227,11 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="ie-toolbar">
 <div class="ie-grip"></div>
 
-<button onclick="location.href='../'"><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button onclick="interphyrGo('../')"><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
 <button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
 <button id="ie-refresh"><img class="ie-toolbar-icon" src="../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
-<button onclick="location.href='../'"><img class="ie-toolbar-icon" src="../images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>
+<button onclick="interphyrGo('../')"><img class="ie-toolbar-icon" src="../images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>
 
 <div class="ie-grip"></div>
 
@@ -281,7 +286,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 </li>
 
 <li><a href="../#doctrines">Doctrines</a></li>
-<li><a href="../ZapadTelecom/">ZapadTelecom</a></li>
+<li><a href="../ZapadTelecom/">ZapadTelecom©</a></li>
 <li><a href="../News/">The Zapadiyan Daily</a></li>
 
 </ul>
@@ -395,7 +400,7 @@ Internet
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded",function(){
+(function(){
 
 
 /* =========================================================
@@ -513,7 +518,154 @@ startPageLoading();
 
 startPageLoading();
 
+})();
+</script>
+
+<script>
+(function(){
+
+/*
+ * Browsers always drop fullscreen when a new document
+ * loads. So while in fullscreen, links between InterPhyr
+ * pages fetch the next page and swap it into THIS document
+ * (updating the URL and history) instead of navigating.
+ * Outside fullscreen, links navigate normally.
+ *
+ * This script re-runs after every swap, so it only
+ * installs itself once.
+ */
+
+if(window.interphyrSoftNav)return;
+
+var state={active:false,redirecting:false};
+window.interphyrSoftNav=state;
+
+var siteRoot=new URL("../",location.href).href;
+var shownPath=location.pathname;
+
+function isFullscreen(){
+return !!(document.fullscreenElement||document.webkitFullscreenElement);
+}
+
+function scrollToHash(hash){
+if(!hash)return;
+var el=document.getElementById(decodeURIComponent(hash.slice(1)));
+if(el)el.scrollIntoView();
+}
+
+function runInline(source,parent){
+var s=document.createElement("script");
+s.textContent=source;
+parent.appendChild(s);
+return s;
+}
+
+function swapIn(href,push){
+
+fetch(href,{credentials:"same-origin"}).then(function(response){
+
+if(!response.ok)throw new Error("HTTP "+response.status);
+return response.text();
+
+}).then(function(html){
+
+var doc=new DOMParser().parseFromString(html,"text/html");
+
+if(push)history.pushState({interphyr:true},"",href);
+shownPath=location.pathname;
+
+state.active=true;
+state.redirecting=false;
+
+try{
+
+/* The new page's login gate. */
+doc.head.querySelectorAll("script").forEach(function(s){
+runInline(s.textContent,document.head).remove();
 });
+
+if(state.redirecting)return;
+
+document.title=doc.title;
+
+var oldStyle=document.head.querySelector("style");
+var newStyle=doc.head.querySelector("style");
+if(oldStyle&&newStyle)oldStyle.textContent=newStyle.textContent;
+
+Array.prototype.slice.call(document.body.attributes).forEach(function(a){
+document.body.removeAttribute(a.name);
+});
+Array.prototype.slice.call(doc.body.attributes).forEach(function(a){
+document.body.setAttribute(a.name,a.value);
+});
+
+document.body.innerHTML=doc.body.innerHTML;
+
+document.body.querySelectorAll("script").forEach(function(old){
+var s=document.createElement("script");
+s.textContent=old.textContent;
+old.parentNode.replaceChild(s,old);
+});
+
+}finally{
+state.active=false;
+}
+
+scrollToHash(new URL(href).hash);
+
+}).catch(function(){
+location.href=href;
+});
+
+}
+
+/* Also used by the toolbar's Back/Home buttons. */
+window.interphyrGo=function(relative){
+var url=new URL(relative,location.href);
+if(isFullscreen()&&url.href.indexOf(siteRoot)===0){
+swapIn(url.href,true);
+}else{
+location.href=url.href;
+}
+};
+
+document.addEventListener("click",function(event){
+
+if(!isFullscreen())return;
+if(event.defaultPrevented||event.button!==0)return;
+if(event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+
+var link=event.target.closest?event.target.closest("a[href]"):null;
+if(!link)return;
+if(link.target&&link.target!=="_self")return;
+if(link.hasAttribute("download"))return;
+
+var url=new URL(link.href,location.href);
+if(url.href.indexOf(siteRoot)!==0)return;
+
+/* Same-page #anchor links keep their normal behavior. */
+if(url.pathname===location.pathname&&url.hash)return;
+
+event.preventDefault();
+swapIn(url.href,true);
+
+});
+
+/*
+ * History entries created above belong to this one
+ * document, so Back/Forward between them must swap
+ * the content too - even after leaving fullscreen.
+ */
+
+window.addEventListener("popstate",function(){
+if(location.pathname!==shownPath){
+swapIn(location.href,false);
+}else{
+scrollToHash(location.hash);
+}
+});
+
+})();
 </script>
 
 </body>

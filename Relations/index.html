@@ -149,6 +149,14 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .relations-table th{background:#c0c0c0}
 .relations-table img{display:block;height:24px;width:auto;border:1px solid #808080}
 .doctrine-users{margin:0 0 4px;font-size:10px;font-style:italic;color:#404040}
+.nation-heading .no-flag{margin:0}
+img[src*="images/flags/"]{cursor:pointer}
+a img[src*="images/flags/"]{cursor:inherit}
+.flag-viewer-backdrop{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25)}
+.flag-viewer{max-width:90vw}
+.flag-viewer .window-body{margin:8px;text-align:center}
+.flag-viewer-image{display:block;max-width:80vw;max-height:70vh;width:auto;height:auto;min-width:120px;margin:0 auto;border:1px solid #808080;background:#fff}
+.flag-viewer-caption{margin-top:6px;font-size:11px}
 
 .ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
 .webpage{min-height:100%;padding:12px 18px 30px 18px}
@@ -272,7 +280,8 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <a href="../">InterPhyr.net</a>
 <a href="../#nations">Nations</a>
 <a href="../#goals">Goals</a>
-<a href="../#doctrines">Doctrines</a>
+<a href="../Doctrines/">Doctrines</a>
+<a href="../Relations/">Outside Relations</a>
 <a href="../News/">News</a>
 <a href="../#contact">Contact</a>
 </div>
@@ -290,16 +299,16 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li><a href="../#home">Information</a></li>
 <li><a href="../#goals">Goals</a></li>
 
-<li>Nations
+<li><details><summary>Nations</summary>
 <ul>
 <li><a href="../Astralyia/">The Astralyian Republic</a></li>
 <li><a href="../ZPR/">The Zapadiyan People's Republic</a></li>
 <li><a href="../Rendale/">The Kingdom of Rendale</a></li>
 </ul>
-</li>
+</details></li>
 
 <li><a href="../Doctrines/">Doctrines</a></li>
-<li><a href="../Relations/">Outside Relations</a>
+<li><details open><summary><a href="../Relations/">Outside Relations</a></summary>
 <ul>
 <li><a href="../Relations/Eisenreich/">The Eisenreich</a></li>
 <li><a href="../Relations/Pancake/">The Royal Kingdom of Pancake</a></li>
@@ -308,7 +317,8 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li><a href="../Relations/MerchantsUnion/">Merchants' Union</a></li>
 <li><a href="../Relations/Frostborn/">The Frostborn</a></li>
 </ul>
-</li>
+</details></li>
+
 <li><a href="../ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="../News/">The Zapadiyan Daily</a></li>
 
@@ -713,5 +723,58 @@ scrollToHash(location.hash);
 })();
 </script>
 
+<script>
+(function(){
+
+/*
+ * Flag viewer. Clicking a flag (that isn't a link)
+ * opens it larger in a small picture-viewer window.
+ * Installed once; survives fullscreen page swaps.
+ */
+
+if(window.interphyrFlagViewer)return;
+window.interphyrFlagViewer=true;
+
+function closeViewer(){
+var v=document.getElementById("flag-viewer");
+if(v)v.parentNode.removeChild(v);
+}
+
+document.addEventListener("click",function(event){
+
+var img=event.target.closest?event.target.closest('img[src*="images/flags/"]'):null;
+if(!img||img.closest("a")||img.closest("#flag-viewer"))return;
+
+event.preventDefault();
+closeViewer();
+
+var title=img.alt||"Flag";
+
+var backdrop=document.createElement("div");
+backdrop.id="flag-viewer";
+backdrop.className="flag-viewer-backdrop";
+backdrop.innerHTML='<div class="window flag-viewer" role="dialog" aria-modal="true"><div class="title-bar"><div class="title-bar-text"></div><div class="title-bar-controls"><button aria-label="Close"></button></div></div><div class="window-body"><img class="flag-viewer-image win98-16bit" alt=""><div class="flag-viewer-caption"></div></div></div>';
+
+backdrop.querySelector(".title-bar-text").textContent=title+" - Picture Viewer";
+var big=backdrop.querySelector(".flag-viewer-image");
+big.src=img.src;
+big.alt=title;
+backdrop.querySelector(".flag-viewer-caption").textContent=title;
+
+backdrop.addEventListener("click",function(e){
+if(e.target===backdrop||e.target.closest('[aria-label="Close"]'))closeViewer();
+});
+
+document.body.appendChild(backdrop);
+backdrop.querySelector('[aria-label="Close"]').focus();
+
+});
+
+document.addEventListener("keydown",function(event){
+if(event.key==="Escape")closeViewer();
+});
+
+})();
+</script>
 </body>
 </html>

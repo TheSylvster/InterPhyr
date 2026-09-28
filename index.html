@@ -245,6 +245,128 @@ font-size:10px;
 color:#404040;
 }
 
+/* =========================================================
+   KLIPPY
+   ========================================================= */
+
+#klippy{
+position:fixed;
+right:18px;
+bottom:18px;
+z-index:99999;
+width:64px;
+height:64px;
+cursor:pointer;
+user-select:none;
+-webkit-user-select:none;
+animation:klippy-bob 2.6s ease-in-out infinite;
+}
+
+#klippy:focus-visible{
+outline:2px dotted #000;
+outline-offset:3px;
+}
+
+.klippy-face{
+font-size:52px;
+line-height:1;
+text-align:center;
+transform:scaleX(-1);
+filter:drop-shadow(1px 2px 1px rgba(0,0,0,.35));
+}
+
+.klippy-eyes{
+position:absolute;
+top:14px;
+left:0;
+width:100%;
+display:flex;
+justify-content:center;
+gap:10px;
+pointer-events:none;
+}
+
+.klippy-eye{
+width:9px;
+height:9px;
+background:#fff;
+border:1px solid #000;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+animation:klippy-blink 4.2s infinite;
+}
+
+.klippy-eye::after{
+content:"";
+width:4px;
+height:4px;
+background:#000;
+border-radius:50%;
+}
+
+.klippy-bubble{
+position:absolute;
+right:0;
+bottom:76px;
+min-width:150px;
+max-width:210px;
+background:#ffffe1;
+border:1px solid #000;
+box-shadow:2px 2px 0 rgba(0,0,0,.4);
+padding:7px 9px;
+font-family:Arial,Helvetica,sans-serif;
+font-size:11px;
+line-height:14px;
+color:#000;
+opacity:0;
+transform:translateY(4px);
+pointer-events:none;
+transition:opacity .15s ease,transform .15s ease;
+}
+
+.klippy-bubble::after{
+content:"";
+position:absolute;
+right:22px;
+bottom:-7px;
+width:0;
+height:0;
+border-left:7px solid transparent;
+border-right:7px solid transparent;
+border-top:7px solid #000;
+}
+
+.klippy-bubble::before{
+content:"";
+position:absolute;
+right:23px;
+bottom:-5.5px;
+width:0;
+height:0;
+border-left:6px solid transparent;
+border-right:6px solid transparent;
+border-top:6px solid #ffffe1;
+z-index:1;
+}
+
+.klippy-bubble.klippy-visible{
+opacity:1;
+transform:translateY(0);
+pointer-events:auto;
+}
+
+@keyframes klippy-bob{
+0%,100%{transform:translateY(0)}
+50%{transform:translateY(-5px)}
+}
+
+@keyframes klippy-blink{
+0%,92%,100%{transform:scaleY(1)}
+96%{transform:scaleY(.15)}
+}
+
 </style>
 </head>
 
@@ -717,8 +839,71 @@ Internet
 </div>
 </div>
 
+<div id="klippy" role="button" tabindex="0" aria-label="Klippy the assistant">
+<div id="klippy-bubble" class="klippy-bubble" role="status" aria-live="polite"></div>
+<div class="klippy-face">📎</div>
+<div class="klippy-eyes">
+<div class="klippy-eye"></div>
+<div class="klippy-eye"></div>
+</div>
+</div>
+
 <<script>
 document.addEventListener("DOMContentLoaded",function(){
+
+
+/* =========================================================
+   KLIPPY
+   ========================================================= */
+
+const klippy=document.getElementById("klippy");
+const klippyBubble=document.getElementById("klippy-bubble");
+
+const klippyLines=[
+"It looks like you're registering a nation. Would you like help?",
+"Fun fact: I have not been updated since 1997.",
+"Tip: closing this window will not uninstall me.",
+"Did you know? Real diplomacy takes longer than a 56k connection.",
+"I see you're browsing InterPhyr.net. Need any tips? ...No? Okay.",
+"You clicked me. That's it. That's the whole feature.",
+"Still here. Still a paperclip.",
+"It looks like you're trying to connect to the internet. Bold of you."
+];
+
+let klippyLastLine=-1;
+let klippyHideTimer=null;
+
+function klippySpeak(){
+
+let index=Math.floor(Math.random()*klippyLines.length);
+
+if(klippyLines.length>1&&index===klippyLastLine){
+index=(index+1)%klippyLines.length;
+}
+
+klippyLastLine=index;
+
+klippyBubble.textContent=klippyLines[index];
+klippyBubble.classList.add("klippy-visible");
+
+clearTimeout(klippyHideTimer);
+
+klippyHideTimer=setTimeout(function(){
+klippyBubble.classList.remove("klippy-visible");
+},4500);
+
+}
+
+klippy.addEventListener("click",klippySpeak);
+
+klippy.addEventListener("keydown",function(event){
+
+if(event.key==="Enter"||event.key===" "){
+event.preventDefault();
+klippySpeak();
+}
+
+});
 
 
 /* =========================================================

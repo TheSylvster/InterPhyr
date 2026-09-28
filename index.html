@@ -1278,8 +1278,6 @@ promise.catch(function(){});
 
 function startPageLoading(){
 
-if(webpage.classList.contains("webpage-loading"))return;
-
 webpage.className="webpage webpage-loading";
 
 statusText.textContent="Opening http://www.interphyr.net/...";
@@ -1637,7 +1635,18 @@ event.stopPropagation();
 });
 
 refreshButton.addEventListener("click",function(){
+
+/*
+ * Ignored while the page is still hidden - that
+ * covers both a load-in already in progress and
+ * the pre-connection state, so Refresh can never
+ * reveal the site before registration/dial-up.
+ */
+
+if(!webpage.classList.contains("webpage-loading")){
 startPageLoading();
+}
+
 });
 
 document.querySelectorAll("a").forEach(function(link){

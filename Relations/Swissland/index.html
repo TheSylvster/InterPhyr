@@ -150,8 +150,7 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .relations-table img{display:block;height:24px;width:auto;border:1px solid #808080}
 .doctrine-users{margin:0 0 4px;font-size:10px;font-style:italic;color:#404040}
 .nation-heading .no-flag{margin:0}
-img[src*="images/flags/"]{cursor:pointer}
-a img[src*="images/flags/"]{cursor:inherit}
+img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{cursor:pointer}
 .flag-viewer-backdrop{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25)}
 .flag-viewer{max-width:90vw}
 .flag-viewer .window-body{margin:8px;text-align:center}
@@ -689,8 +688,9 @@ scrollToHash(location.hash);
 (function(){
 
 /*
- * Flag viewer. Clicking a flag (that isn't a link)
- * opens it larger in a small picture-viewer window.
+ * Picture viewer. Clicking a roundel, logo or flag
+ * (that isn't a link) opens it larger in a small
+ * picture-viewer window.
  * Installed once; survives fullscreen page swaps.
  */
 
@@ -704,7 +704,7 @@ if(v)v.parentNode.removeChild(v);
 
 document.addEventListener("click",function(event){
 
-var img=event.target.closest?event.target.closest('img[src*="images/flags/"]'):null;
+var img=event.target.closest?event.target.closest('img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]'):null;
 if(!img||img.closest("a")||img.closest("#flag-viewer"))return;
 
 event.preventDefault();

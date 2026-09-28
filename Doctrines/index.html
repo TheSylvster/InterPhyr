@@ -150,8 +150,7 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .relations-table img{display:block;height:24px;width:auto;border:1px solid #808080}
 .doctrine-users{margin:0 0 4px;font-size:10px;font-style:italic;color:#404040}
 .nation-heading .no-flag{margin:0}
-img[src*="images/flags/"]{cursor:pointer}
-a img[src*="images/flags/"]{cursor:inherit}
+img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{cursor:pointer}
 .flag-viewer-backdrop{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25)}
 .flag-viewer{max-width:90vw}
 .flag-viewer .window-body{margin:8px;text-align:center}
@@ -333,14 +332,14 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="explorer-box">
 <fieldset>
 <legend>The Astralyian Republic</legend>
-<img class="explorer-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="The Astralyian Republic">
+<img class="explorer-logo astralyia win98-16bit" src="../images/roundels/astralyia.png" alt="The Astralyian Republic">
 </fieldset>
 </div>
 
 <div class="explorer-box">
 <fieldset>
 <legend>The Kingdom of Rendale</legend>
-<img class="explorer-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="The Kingdom of Rendale">
+<img class="explorer-logo rendale win98-16bit" src="../images/roundels/rendale.png" alt="The Kingdom of Rendale">
 </fieldset>
 </div>
 
@@ -372,7 +371,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 
 <div class="nation">
 <div class="nation-heading">
-<img class="nation-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="The Astralyian Republic">
+<img class="nation-logo astralyia win98-16bit" src="../images/roundels/astralyia.png" alt="The Astralyian Republic">
 <h2 class="nation-name"><a href="../Astralyia/">The Astralyian Republic</a></h2>
 </div>
 <div class="nation-info">
@@ -394,7 +393,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 </div>
 <div class="nation">
 <div class="nation-heading">
-<img class="nation-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="The Kingdom of Rendale">
+<img class="nation-logo rendale win98-16bit" src="../images/roundels/rendale.png" alt="The Kingdom of Rendale">
 <h2 class="nation-name"><a href="../Rendale/">The Kingdom of Rendale</a></h2>
 </div>
 <div class="nation-info">
@@ -763,8 +762,9 @@ scrollToHash(location.hash);
 (function(){
 
 /*
- * Flag viewer. Clicking a flag (that isn't a link)
- * opens it larger in a small picture-viewer window.
+ * Picture viewer. Clicking a roundel, logo or flag
+ * (that isn't a link) opens it larger in a small
+ * picture-viewer window.
  * Installed once; survives fullscreen page swaps.
  */
 
@@ -778,7 +778,7 @@ if(v)v.parentNode.removeChild(v);
 
 document.addEventListener("click",function(event){
 
-var img=event.target.closest?event.target.closest('img[src*="images/flags/"]'):null;
+var img=event.target.closest?event.target.closest('img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]'):null;
 if(!img||img.closest("a")||img.closest("#flag-viewer"))return;
 
 event.preventDefault();

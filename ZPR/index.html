@@ -20,6 +20,7 @@ return null;
 var blocked=getCookie("interphyr_nation_status")==="invalid";
 var registered=getCookie("interphyr_registered_nation");
 var adminSession=getCookie("interphyr_admin_session")==="1";
+var connected=getCookie("interphyr_connected")==="1";
 
 /*
  * Reload detection is best-effort only - if it
@@ -40,7 +41,7 @@ adminSession=false;
 
 }catch(e){}
 
-if(blocked||(!registered&&!adminSession)){
+if(blocked||!(adminSession||(registered&&connected))){
 location.replace("../");
 }
 

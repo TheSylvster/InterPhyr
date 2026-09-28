@@ -358,10 +358,10 @@ pointer-events:auto;
 
 <div id="registration-screen" class="registration-screen">
 
-<div class="window registration-window" role="dialog" aria-label="InterPhyr Nation Registration">
+<div class="window registration-window" role="dialog" aria-label="ZapadCom Nation Registration">
 
 <div class="title-bar">
-<div class="title-bar-text">InterPhyr Nation Registration</div>
+<div class="title-bar-text">ZapadCom Nation Registration</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Close" id="registration-close"></button>
 </div>
@@ -407,10 +407,10 @@ Your registered nation is stored locally on this computer for future InterPhyr c
 
 <div id="registration-error-screen" class="registration-error-screen" style="display:none;">
 
-<div class="window registration-error-window" role="dialog" aria-label="InterPhyr Access Denied">
+<div class="window registration-error-window" role="dialog" aria-label="ZapadCom Access Denied">
 
 <div class="title-bar">
-<div class="title-bar-text">InterPhyr - Access Denied</div>
+<div class="title-bar-text">ZapadCom - Access Denied</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Close" id="registration-error-close"></button>
 </div>
@@ -1342,6 +1342,16 @@ playWelcomeSound();
 
 function revealWebsite(){
 
+/*
+ * Session-only marker that an actual connection
+ * (dial-up or admin bypass) happened in THIS
+ * session. Sub-pages require this before allowing
+ * direct access, so typing a sub-page URL without
+ * ever connecting on this page does not work.
+ */
+
+document.cookie="interphyr_connected=1; path=/";
+
 screen.style.display="none";
 
 document.body.classList.remove("dialup-loading");
@@ -1654,6 +1664,7 @@ navType=navEntries.length?navEntries[0].type:"navigate";
 if(navType==="reload"){
 
 document.cookie="interphyr_admin_session=; max-age=0; path=/";
+document.cookie="interphyr_connected=; max-age=0; path=/";
 
 }
 

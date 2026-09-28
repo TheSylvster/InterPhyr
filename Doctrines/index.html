@@ -82,7 +82,7 @@ location.replace("../");
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Zapadiyan People's Republic - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
+<title>Doctrines - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
 
 <style>
@@ -137,6 +137,18 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .explorer-logo.astralyia,.explorer-logo.rendale,.nation-logo.astralyia,.nation-logo.rendale{width:auto;height:auto;max-width:48px;max-height:48px}
 .explorer-logo{margin:1px auto}
 .explorer-box .explorer-logo{width:auto;height:56px;max-width:none;max-height:none}
+.nation-flag{display:block;height:48px;width:auto;max-width:96px;border:1px solid #808080;flex-shrink:0}
+.explorer-box .nation-flag{height:56px;max-width:none;margin:1px auto}
+.no-flag{display:flex;align-items:center;justify-content:center;width:72px;height:48px;margin:1px auto;background:#fff;border:1px dashed #808080;font-size:9px;line-height:11px;color:#808080;text-align:center;flex-shrink:0}
+.explorer-box .no-flag{width:84px;height:56px}
+.flag-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.flag-grid img{display:block;height:24px;width:auto;border:1px solid #808080}
+.flag-grid .no-flag,.relations-table .no-flag{width:36px;height:24px;margin:0;font-size:7px;line-height:8px}
+.relations-table{width:100%;border-collapse:collapse;margin-top:6px}
+.relations-table th,.relations-table td{border:1px solid #808080;padding:4px 6px;text-align:left;vertical-align:middle;font-size:11px}
+.relations-table th{background:#c0c0c0}
+.relations-table img{display:block;height:24px;width:auto;border:1px solid #808080}
+.doctrine-users{margin:0 0 4px;font-size:10px;font-style:italic;color:#404040}
 
 .ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
 .webpage{min-height:100%;padding:12px 18px 30px 18px}
@@ -213,7 +225,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="window browser-window">
 
 <div class="title-bar">
-<div class="title-bar-text">The Zapadiyan People's Republic - InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
+<div class="title-bar-text">Doctrines - InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
 <div class="title-bar-controls">
 <button aria-label="Minimize"></button>
 <button aria-label="Maximize"></button>
@@ -250,7 +262,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="ie-address-row">
 <span class="ie-address-label">Address</span>
 <img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
-<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/zpr">
+<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/doctrines">
 <button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
 </div>
 
@@ -260,8 +272,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <a href="../">InterPhyr.net</a>
 <a href="../#nations">Nations</a>
 <a href="../#goals">Goals</a>
-<a href="../Doctrines/">Doctrines</a>
-<a href="../Relations/">Outside Relations</a>
+<a href="../#doctrines">Doctrines</a>
 <a href="../News/">News</a>
 <a href="../#contact">Contact</a>
 </div>
@@ -282,7 +293,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li>Nations
 <ul>
 <li><a href="../Astralyia/">The Astralyian Republic</a></li>
-<li><a href="./">The Zapadiyan People's Republic</a></li>
+<li><a href="../ZPR/">The Zapadiyan People's Republic</a></li>
 <li><a href="../Rendale/">The Kingdom of Rendale</a></li>
 </ul>
 </li>
@@ -298,15 +309,28 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li><a href="../Relations/Frostborn/">The Frostborn</a></li>
 </ul>
 </li>
-<li><a href="../ZapadTelecom/">ZapadTelecom©</a></li>
+<li><a href="../ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="../News/">The Zapadiyan Daily</a></li>
 
 </ul>
-
 <div class="explorer-box">
 <fieldset>
 <legend>The Zapadiyan People's Republic</legend>
 <img class="explorer-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="The Zapadiyan People's Republic">
+</fieldset>
+</div>
+
+<div class="explorer-box">
+<fieldset>
+<legend>The Astralyian Republic</legend>
+<img class="explorer-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="The Astralyian Republic">
+</fieldset>
+</div>
+
+<div class="explorer-box">
+<fieldset>
+<legend>The Kingdom of Rendale</legend>
+<img class="explorer-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="The Kingdom of Rendale">
 </fieldset>
 </div>
 
@@ -326,74 +350,90 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 
 <section id="information" class="content-section">
 
-<h2>Information</h2>
+<h2>Doctrines</h2>
 
-<p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
-
-<p>This website provides information about the federation and its participating member nations.</p>
-
-<div class="notice">
-<b>NOTICE:</b>
-This website is currently under construction.
-</div>
+<p>This page provides an overview of the political and economic systems of the Phyrrian Astral Federation's member nations, along with an explanation of each doctrine.</p>
 
 </section>
 
-<section id="nation-profile" class="content-section nation">
+<section id="nation-profile" class="content-section">
 
+<h2>Member Nation Profiles</h2>
+
+<div class="nation">
+<div class="nation-heading">
+<img class="nation-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="The Astralyian Republic">
+<h2 class="nation-name"><a href="../Astralyia/">The Astralyian Republic</a></h2>
+</div>
+<div class="nation-info">
+<p><b>Political Ideology:</b> Democracy</p>
+<p><b>Economic Ideology:</b> Mixed-Market Economy</p>
+<p><b>Alignment:</b> Socialist Democracy &#x1F339;</p>
+</div>
+</div>
+<div class="nation">
 <div class="nation-heading">
 <img class="nation-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="The Zapadiyan People's Republic">
-<h2 class="nation-name">The Zapadiyan People's Republic</h2>
+<h2 class="nation-name"><a href="../ZPR/">The Zapadiyan People's Republic</a></h2>
 </div>
-
 <div class="nation-info">
-
-<p>Member of the Phyrrian Astral Federation.</p>
-
 <p><b>Political Ideology:</b> Popular Socialism</p>
 <p><b>Economic Ideology:</b> Collectivism</p>
 <p><b>Alignment:</b> Titoism</p>
-
 </div>
-
-</section>
-
-<section id="members" class="content-section">
-
-<h2>Leadership &amp; Members</h2>
-
-<h3>First Secretary of the Red Front Party</h3>
-<ul>
-<li>First Secretary AldAz</li>
-</ul>
-
-<h3>Ministers</h3>
-<ul>
-<li>Prime Minister someone_useless</li>
-<li>People's Information Minister TheSylvster_</li>
-</ul>
-
-<h3>Citizens</h3>
-<ul>
-<li>ToGaff</li>
-</ul>
-
-<p>The Zapadiyan People's Republic welcomes men, women, and everyone in between.</p>
-
+</div>
+<div class="nation">
+<div class="nation-heading">
+<img class="nation-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="The Kingdom of Rendale">
+<h2 class="nation-name"><a href="../Rendale/">The Kingdom of Rendale</a></h2>
+</div>
+<div class="nation-info">
+<p><b>Political Ideology:</b> Council-Type Monarchy</p>
+<p><b>Economic Ideology:</b> Peaceful Democracy</p>
+<p><b>Alignment:</b> Constitutional Monarchy</p>
+</div>
+</div>
 </section>
 
 <section id="explainer" class="content-section">
 
-<h2>What Does This Mean?</h2>
+<h2>Glossary of Doctrines</h2>
+
+<h3>Democracy</h3>
+<p class="doctrine-users">Political ideology of The Astralyian Republic</p>
+<p>A system of government in which power is vested in the people, who rule either directly or through freely elected representatives.</p>
 
 <h3>Popular Socialism</h3>
+<p class="doctrine-users">Political ideology of The Zapadiyan People's Republic</p>
 <p>A form of socialism rooted in mass participation, in which the means of production are owned or regulated by the community or state and political life is organized around the working people and their party, aiming for a more equal distribution of wealth and resources.</p>
 
+<h3>Council-Type Monarchy</h3>
+<p class="doctrine-users">Political ideology of The Kingdom of Rendale</p>
+<p>A system of government in which a monarch shares ruling authority with an elected or appointed council, which advises and checks the crown's power.</p>
+
+<h3>Mixed-Market Economy</h3>
+<p class="doctrine-users">Economic ideology of The Astralyian Republic</p>
+<p>An economic system that blends private enterprise with government regulation and intervention, combining elements of capitalism and planned economies.</p>
+
 <h3>Collectivism</h3>
+<p class="doctrine-users">Economic ideology of The Zapadiyan People's Republic</p>
 <p>An economic approach that emphasizes group ownership and cooperative control of resources and production over individual private ownership.</p>
 
+<h3>Peaceful Democracy</h3>
+<p class="doctrine-users">Economic ideology of The Kingdom of Rendale</p>
+<p>A governing approach that blends democratic decision-making with a strong emphasis on negotiated, non-violent policy-making and social stability.</p>
+
+<h3>Socialist Democracy</h3>
+<p class="doctrine-users">Alignment of The Astralyian Republic</p>
+<p>A political alignment that pairs democratic governance with policies aimed at social welfare, public services, and reducing economic inequality.</p>
+
 <h3>Titoism</h3>
+<p class="doctrine-users">Alignment of The Zapadiyan People's Republic</p>
 <p>A form of socialism associated with Josip Broz Tito, marked by worker self-management, decentralized planning, and staying non-aligned with either major bloc in a divided world.</p>
+
+<h3>Constitutional Monarchy</h3>
+<p class="doctrine-users">Alignment of The Kingdom of Rendale</p>
+<p>A system in which a monarch serves as head of state within limits set by a constitution, with the crown's authority bound by established law and exercised alongside other institutions of government.</p>
 
 </section>
 
@@ -403,12 +443,14 @@ This website is currently under construction.
 
 <ul>
 <li><a href="../Astralyia/">The Astralyian Republic</a></li>
+<li><a href="../ZPR/">The Zapadiyan People's Republic</a></li>
 <li><a href="../Rendale/">The Kingdom of Rendale</a></li>
-<li><a href="../Doctrines/">Political &amp; Economic Profiles</a></li>
+<li><a href="../Relations/">Outside Relations</a></li>
 <li><a href="../">Back to InterPhyr.net</a></li>
 </ul>
 
 </section>
+
 
 <hr>
 
@@ -451,17 +493,15 @@ const klippy=document.getElementById("klippy");
 const klippyBubble=document.getElementById("klippy-bubble");
 
 const klippyLines=[
-"It looks like you're reading about Zapadiya. Would you like help?",
-"Popular Socialism, huh? Bold choice for a browser assistant to comment on.",
-"Zapadiya: collectivist economy, individualist paperclip.",
+"It looks like you're reading about doctrines. Would you like help?",
+"Socialism and monarchy sharing a webpage. Bold.",
+"Nine doctrines, three nations, one paperclip.",
 "Titoism: non-aligned in world politics, aligned in this table.",
 "Fun fact: I have not been updated since 1997.",
 "Tip: closing this window will not uninstall me.",
 "Did you know? Real diplomacy takes longer than a 56k connection.",
 "You clicked me. That's it. That's the whole feature.",
-"Still here. Still a paperclip.",
-"Checking the Related nations? ZPR gets along with everyone. Mostly.",
-"This page loaded slower than dial-up but faster than real bureaucracy."
+"Still here. Still a paperclip."
 ];
 
 let klippyLastLine=-1;
@@ -512,7 +552,7 @@ function startPageLoading(){
 
 webpage.className="webpage webpage-loading";
 
-statusText.textContent="Opening http://www.interphyr.net/zpr...";
+statusText.textContent="Opening http://www.interphyr.net/doctrines...";
 
 setTimeout(function(){
 webpage.classList.add("page-stage-1");

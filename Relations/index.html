@@ -82,7 +82,7 @@ location.replace("../");
 </script>
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Zapadiyan People's Republic - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
+<title>Outside Relations - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
 
 <style>
@@ -137,6 +137,18 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .explorer-logo.astralyia,.explorer-logo.rendale,.nation-logo.astralyia,.nation-logo.rendale{width:auto;height:auto;max-width:48px;max-height:48px}
 .explorer-logo{margin:1px auto}
 .explorer-box .explorer-logo{width:auto;height:56px;max-width:none;max-height:none}
+.nation-flag{display:block;height:48px;width:auto;max-width:96px;border:1px solid #808080;flex-shrink:0}
+.explorer-box .nation-flag{height:56px;max-width:none;margin:1px auto}
+.no-flag{display:flex;align-items:center;justify-content:center;width:72px;height:48px;margin:1px auto;background:#fff;border:1px dashed #808080;font-size:9px;line-height:11px;color:#808080;text-align:center;flex-shrink:0}
+.explorer-box .no-flag{width:84px;height:56px}
+.flag-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+.flag-grid img{display:block;height:24px;width:auto;border:1px solid #808080}
+.flag-grid .no-flag,.relations-table .no-flag{width:36px;height:24px;margin:0;font-size:7px;line-height:8px}
+.relations-table{width:100%;border-collapse:collapse;margin-top:6px}
+.relations-table th,.relations-table td{border:1px solid #808080;padding:4px 6px;text-align:left;vertical-align:middle;font-size:11px}
+.relations-table th{background:#c0c0c0}
+.relations-table img{display:block;height:24px;width:auto;border:1px solid #808080}
+.doctrine-users{margin:0 0 4px;font-size:10px;font-style:italic;color:#404040}
 
 .ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
 .webpage{min-height:100%;padding:12px 18px 30px 18px}
@@ -213,7 +225,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="window browser-window">
 
 <div class="title-bar">
-<div class="title-bar-text">The Zapadiyan People's Republic - InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
+<div class="title-bar-text">Outside Relations - InterPhyr.net - ZapadTelecom Interweb Surfer©</div>
 <div class="title-bar-controls">
 <button aria-label="Minimize"></button>
 <button aria-label="Maximize"></button>
@@ -250,7 +262,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="ie-address-row">
 <span class="ie-address-label">Address</span>
 <img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
-<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/zpr">
+<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/relations">
 <button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
 </div>
 
@@ -260,8 +272,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <a href="../">InterPhyr.net</a>
 <a href="../#nations">Nations</a>
 <a href="../#goals">Goals</a>
-<a href="../Doctrines/">Doctrines</a>
-<a href="../Relations/">Outside Relations</a>
+<a href="../#doctrines">Doctrines</a>
 <a href="../News/">News</a>
 <a href="../#contact">Contact</a>
 </div>
@@ -282,7 +293,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li>Nations
 <ul>
 <li><a href="../Astralyia/">The Astralyian Republic</a></li>
-<li><a href="./">The Zapadiyan People's Republic</a></li>
+<li><a href="../ZPR/">The Zapadiyan People's Republic</a></li>
 <li><a href="../Rendale/">The Kingdom of Rendale</a></li>
 </ul>
 </li>
@@ -298,15 +309,21 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <li><a href="../Relations/Frostborn/">The Frostborn</a></li>
 </ul>
 </li>
-<li><a href="../ZapadTelecom/">ZapadTelecom©</a></li>
+<li><a href="../ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="../News/">The Zapadiyan Daily</a></li>
 
 </ul>
-
 <div class="explorer-box">
 <fieldset>
-<legend>The Zapadiyan People's Republic</legend>
-<img class="explorer-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="The Zapadiyan People's Republic">
+<legend>Outside Relations</legend>
+<div class="flag-grid">
+<a href="Eisenreich/" title="The Eisenreich"><img class=" win98-16bit" src="../images/flags/eisenreich.png" alt="Flag of The Eisenreich"></a>
+<a href="Pancake/" title="The Royal Kingdom of Pancake"><img class=" win98-16bit" src="../images/flags/pancake.png" alt="Flag of The Royal Kingdom of Pancake"></a>
+<a href="Swissland/" title="Swissland"><img class=" win98-16bit" src="../images/flags/swissland.png" alt="Flag of Swissland"></a>
+<a href="Luminara/" title="Luminara"><img class=" win98-16bit" src="../images/flags/luminara.png" alt="Flag of Luminara"></a>
+<a href="MerchantsUnion/" title="Merchants' Union"><img class=" win98-16bit" src="../images/flags/merchants-union.png" alt="Flag of Merchants' Union"></a>
+<a href="Frostborn/" title="The Frostborn"><div class="no-flag">No flag<br>on file</div></a>
+</div>
 </fieldset>
 </div>
 
@@ -326,74 +343,64 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 
 <section id="information" class="content-section">
 
-<h2>Information</h2>
+<h2>Outside Relations</h2>
 
-<p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
-
-<p>This website provides information about the federation and its participating member nations.</p>
-
-<div class="notice">
-<b>NOTICE:</b>
-This website is currently under construction.
-</div>
+<p>The following nations are not members of the Phyrrian Astral Federation. This section records the Federation's relations with each of them.</p>
 
 </section>
 
-<section id="nation-profile" class="content-section nation">
+<section id="nation-profile" class="content-section">
 
-<div class="nation-heading">
-<img class="nation-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="The Zapadiyan People's Republic">
-<h2 class="nation-name">The Zapadiyan People's Republic</h2>
-</div>
+<h2>Nations Outside the Federation</h2>
 
-<div class="nation-info">
-
-<p>Member of the Phyrrian Astral Federation.</p>
-
-<p><b>Political Ideology:</b> Popular Socialism</p>
-<p><b>Economic Ideology:</b> Collectivism</p>
-<p><b>Alignment:</b> Titoism</p>
-
-</div>
-
-</section>
-
-<section id="members" class="content-section">
-
-<h2>Leadership &amp; Members</h2>
-
-<h3>First Secretary of the Red Front Party</h3>
-<ul>
-<li>First Secretary AldAz</li>
-</ul>
-
-<h3>Ministers</h3>
-<ul>
-<li>Prime Minister someone_useless</li>
-<li>People's Information Minister TheSylvster_</li>
-</ul>
-
-<h3>Citizens</h3>
-<ul>
-<li>ToGaff</li>
-</ul>
-
-<p>The Zapadiyan People's Republic welcomes men, women, and everyone in between.</p>
-
-</section>
-
-<section id="explainer" class="content-section">
-
-<h2>What Does This Mean?</h2>
-
-<h3>Popular Socialism</h3>
-<p>A form of socialism rooted in mass participation, in which the means of production are owned or regulated by the community or state and political life is organized around the working people and their party, aiming for a more equal distribution of wealth and resources.</p>
-
-<h3>Collectivism</h3>
-<p>An economic approach that emphasizes group ownership and cooperative control of resources and production over individual private ownership.</p>
-
-<h3>Titoism</h3>
-<p>A form of socialism associated with Josip Broz Tito, marked by worker self-management, decentralized planning, and staying non-aligned with either major bloc in a divided world.</p>
+<table class="relations-table">
+<thead>
+<tr>
+<th>Flag</th>
+<th>Nation</th>
+<th>Status</th>
+<th>Relation to the PAF</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img class=" win98-16bit" src="../images/flags/eisenreich.png" alt="Flag of The Eisenreich"></td>
+<td><a href="Eisenreich/">The Eisenreich</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+<tr>
+<td><img class=" win98-16bit" src="../images/flags/pancake.png" alt="Flag of The Royal Kingdom of Pancake"></td>
+<td><a href="Pancake/">The Royal Kingdom of Pancake</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+<tr>
+<td><img class=" win98-16bit" src="../images/flags/swissland.png" alt="Flag of Swissland"></td>
+<td><a href="Swissland/">Swissland</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+<tr>
+<td><img class=" win98-16bit" src="../images/flags/luminara.png" alt="Flag of Luminara"></td>
+<td><a href="Luminara/">Luminara</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+<tr>
+<td><img class=" win98-16bit" src="../images/flags/merchants-union.png" alt="Flag of Merchants' Union"></td>
+<td><a href="MerchantsUnion/">Merchants' Union</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+<tr>
+<td><div class="no-flag">No flag<br>on file</div></td>
+<td><a href="Frostborn/">The Frostborn</a></td>
+<td>Non-member</td>
+<td><i>Awaiting assessment</i></td>
+</tr>
+</tbody>
+</table>
 
 </section>
 
@@ -402,13 +409,13 @@ This website is currently under construction.
 <h2>Related</h2>
 
 <ul>
-<li><a href="../Astralyia/">The Astralyian Republic</a></li>
-<li><a href="../Rendale/">The Kingdom of Rendale</a></li>
-<li><a href="../Doctrines/">Political &amp; Economic Profiles</a></li>
+<li><a href="../Doctrines/">Doctrines</a></li>
+<li><a href="../#nations">Member Nations</a></li>
 <li><a href="../">Back to InterPhyr.net</a></li>
 </ul>
 
 </section>
+
 
 <hr>
 
@@ -451,17 +458,14 @@ const klippy=document.getElementById("klippy");
 const klippyBubble=document.getElementById("klippy-bubble");
 
 const klippyLines=[
-"It looks like you're reading about Zapadiya. Would you like help?",
-"Popular Socialism, huh? Bold choice for a browser assistant to comment on.",
-"Zapadiya: collectivist economy, individualist paperclip.",
-"Titoism: non-aligned in world politics, aligned in this table.",
+"It looks like you're reading about foreign relations. Would you like help?",
+"Foreign affairs! My favourite topic after paperclips.",
+"Six nations outside the Federation. I'm told the phone lines still reach them.",
 "Fun fact: I have not been updated since 1997.",
 "Tip: closing this window will not uninstall me.",
 "Did you know? Real diplomacy takes longer than a 56k connection.",
 "You clicked me. That's it. That's the whole feature.",
-"Still here. Still a paperclip.",
-"Checking the Related nations? ZPR gets along with everyone. Mostly.",
-"This page loaded slower than dial-up but faster than real bureaucracy."
+"Still here. Still a paperclip."
 ];
 
 let klippyLastLine=-1;
@@ -512,7 +516,7 @@ function startPageLoading(){
 
 webpage.className="webpage webpage-loading";
 
-statusText.textContent="Opening http://www.interphyr.net/zpr...";
+statusText.textContent="Opening http://www.interphyr.net/relations...";
 
 setTimeout(function(){
 webpage.classList.add("page-stage-1");

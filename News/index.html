@@ -178,8 +178,9 @@ a:active{color:#800080!important}
 .news-more>summary::-webkit-details-marker{display:none}
 .news-more>summary:active{box-shadow:inset -1px -1px #fff,inset 1px 1px #0a0a0a,inset -2px -2px #dfdfdf,inset 2px 2px #808080}
 .news-more>summary:focus-visible{outline:1px dotted #000;outline-offset:-4px}
-.news-more-open,.news-more[open] .news-more-closed{display:none}
-.news-more[open] .news-more-open{display:inline}
+.news-more-open,.news-more[open]>summary .news-more-closed{display:none}
+.news-more[open]>summary .news-more-open{display:inline}
+.news-older{margin-top:14px}
 
 hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 
@@ -532,6 +533,24 @@ const importantList=document.getElementById("important-list");
 document.querySelectorAll("#articles .news-important").forEach(function(story){
 importantList.appendChild(story.cloneNode(true));
 });
+
+/* Only the newest 3 stories show; the rest sit behind "Show more stories". */
+
+const latestStories=document.querySelectorAll("#articles > .news-story");
+
+if(latestStories.length>3){
+
+const older=document.createElement("details");
+older.className="news-more news-older";
+older.innerHTML='<summary><span class="news-more-closed">&#9660; Show more stories</span><span class="news-more-open">&#9650; Show fewer stories</span></summary>';
+
+latestStories[3].parentNode.insertBefore(older,latestStories[3]);
+
+for(let i=3;i<latestStories.length;i++){
+older.appendChild(latestStories[i]);
+}
+
+}
 
 
 const webpage=document.querySelector(".webpage");

@@ -172,6 +172,13 @@ a:active{color:#800080!important}
 .news-story:first-of-type{border-top:none}
 .news-headline{margin:0 0 3px;font-family:"Times New Roman",Times,serif;font-size:17px;color:#000}
 .news-byline{margin:0 0 6px;font-size:10px;color:#404040;font-style:italic}
+.news-more{margin-top:4px}
+.news-more>summary{display:inline-block;list-style:none;cursor:pointer;user-select:none;padding:3px 10px;margin:2px 0 4px;font-size:10px;background:#c0c0c0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
+.news-more>summary::-webkit-details-marker{display:none}
+.news-more>summary:active{box-shadow:inset -1px -1px #fff,inset 1px 1px #0a0a0a,inset -2px -2px #dfdfdf,inset 2px 2px #808080}
+.news-more>summary:focus-visible{outline:1px dotted #000;outline-offset:-4px}
+.news-more-open,.news-more[open] .news-more-closed{display:none}
+.news-more[open] .news-more-open{display:inline}
 
 hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 
@@ -335,37 +342,59 @@ This website is currently under construction.
 
 </section>
 
-<!-- To add a new story, copy one of the <article class="news-story"> blocks below and edit its headline, byline, and paragraph(s). Newest stories go first. -->
+<!-- To add a new story, copy one of the <article class="news-story"> blocks below. Put the first sentence in "news-lead" and the rest in paragraphs after the <summary>. Newest stories go first. -->
 
 <section id="articles" class="content-section">
 
 <h2>Latest Stories</h2>
 
 <article class="news-story">
-<h3 class="news-headline">InterPhyr Network Marks Another Year of Uninterrupted Service</h3>
-<p class="news-byline">Staff Correspondent &mdash; 1998</p>
-<p>The Ministry is pleased to report that InterPhyr.net has remained continuously operational for the entirety of the past year, aside from scheduled maintenance, unscheduled maintenance, and several afternoons that were not maintenance but resembled it closely.</p>
+<h3 class="news-headline">InterPhyr.net Marks Another Year of Uninterrupted Service</h3>
+<p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 12.11.1998</p>
+<p class="news-lead">The Ministry is pleased to report that InterPhyr.net has remained continuously operational for the entirety of the past year, aside from scheduled maintenance, unscheduled maintenance, and several afternoons that were not maintenance but resembled it closely.</p>
+<details class="news-more">
+<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
+<p>According to figures released by ZapadTelecom&copy;, the site was reachable on more than three hundred days of the year, a result the Ministry describes as "a triumph of socialist engineering" and independent observers describe as "about what you would expect."</p>
+<p>Citizens of all three member nations logged on in record numbers, with the Member Nations table remaining the most visited page for the second year running. The Doctrines section came a close second, largely thanks to visitors who clicked on it by accident while looking for the Contact section.</p>
+<p>Asked about the brief outage in August, a ZapadTelecom&copy; spokesperson explained that a technician had unplugged the main server to boil a kettle. The technician has since been reassigned to a role with fewer plugs. Service is expected to continue uninterrupted in the coming year, subject to the availability of electricity, telephone lines, and kettles.</p>
+</details>
 </article>
 
 <article class="news-story">
 <h3 class="news-headline">Zapadiya People's Republic Reaffirms Commitment to Collective Progress</h3>
-<p class="news-byline">Staff Correspondent &mdash; 1998</p>
-<p>Officials in the Zapadiya People's Republic have reaffirmed their commitment to collective progress, describing the year's achievements as "substantial, numerous, and difficult to independently verify."</p>
+<p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 01.05.1998</p>
+<p class="news-lead">Officials in the Zapadiya People's Republic have reaffirmed their commitment to collective progress, describing the year's achievements as "substantial, numerous, and difficult to independently verify."</p>
+<details class="news-more">
+<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
+<p>Speaking at the May Day parade in the capital, First Secretary AldAz praised the workers of the republic for exceeding the production targets of the current plan, noting that several of the targets had been revised downward in advance to make exceeding them more achievable.</p>
+<p>Highlights of the year include the opening of a new tractor factory, the completion of a second tractor factory to supply parts to the first, and a record grain harvest that the Central Committee has promised to count properly once the tractors are finished.</p>
+<p>The First Secretary closed the parade by thanking the republic's partners in the Phyrrian Astral Federation, and reminded citizens that further progress will require patience, discipline, and a continued willingness to read The Zapadiyan Daily.</p>
+</details>
 </article>
 
 <article class="news-story">
 <h3 class="news-headline">ZapadTelecom© Announces Modest Improvements to Dial-Up Infrastructure</h3>
-<p class="news-byline">Staff Correspondent &mdash; 1997</p>
-<p>ZapadTelecom© has announced modest improvements to its dial-up infrastructure, promising subscribers "the same reliable connection speeds you have come to expect, and possibly one or two more."</p>
+<p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 17.03.1997</p>
+<p class="news-lead">ZapadTelecom© has announced modest improvements to its dial-up infrastructure, promising subscribers "the same reliable connection speeds you have come to expect, and possibly one or two more."</p>
+<details class="news-more">
+<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
+<p>The upgrade programme will replace a number of ageing telephone exchanges across the federation, some of which date back to a period the company refers to only as "before." Engineers will also install new modems at the central data centre, bringing the total number of modems at the central data centre to four.</p>
+<p>Subscribers are advised that the "line busy" error may appear more often while the work is carried out. ZapadTelecom&copy; reminds customers that this is normal, that the line is not in fact busy, and that the problem can usually be resolved by clicking Retry and thinking about something else.</p>
+<p>The company has also confirmed that the ZapadTelecom Interweb Surfer&copy; will be updated to a new version later this year, which it says will be identical to the current version in every respect except the version number.</p>
+</details>
 </article>
 
 <article class="news-story">
 <h3 class="news-headline">First Secretary AldAz Secures the Frontier!</h3>
 <p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 26.09.1996</p>
-<p>Yesterday, the Central Committee announced the formal ratification of the historic pact between the Zapadiyan People's Republic and the Phyrrian Astral Federation (PAF). This monumental diplomatic achievement, secured through the unyielding resolve of First Secretary AldAz, Chairperson of the Central Committee, establishes the sovereign borders of the ZPR and marks a decisive victory for the working class over external imperialist pressure.</p>
+<p class="news-lead">Yesterday, the Central Committee announced the formal ratification of the historic pact between the Zapadiyan People's Republic and the Phyrrian Astral Federation (PAF).</p>
+<details class="news-more">
+<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
+<p>This monumental diplomatic achievement, secured through the unyielding resolve of First Secretary AldAz, Chairperson of the Central Committee, establishes the sovereign borders of the ZPR and marks a decisive victory for the working class over external imperialist pressure.</p>
 <p>The agreement was finalized following intense negotiations between First Secretary AldAz and President Zwariowany, the leader of the Astralyia Republic. For months, reactionary elements abroad predicted the containment of our young republic, yet the iron solidarity of the Zapadiyan proletariat has forced the PAF leadership to recognize the permanence of our socialist state.</p>
 <p>By decree of First Secretary AldAz, all heavy industry, transport networks, and private banking institutions are declared the property of the state. To restore economic life and combat the sabotage of class enemies, the Council of People's Commissars has initiated an immediate program of socialist construction. Labor detachments are already moving into the coal districts to restore production, while regional committees have begun the redistribution of confiscated estates to the landless peasantry.</p>
 <p>First Secretary AldAz emphasized that strict revolutionary discipline must be maintained in all sectors to ensure the supply of bread to the industrial centers and to frustrate the efforts of speculators and black-marketeers.</p>
+</details>
 </article>
 
 </section>

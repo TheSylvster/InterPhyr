@@ -1,0 +1,2199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InterPhyr.net - Microsoft Internet Explorer</title>
+<link rel="stylesheet" href="https://unpkg.com/98.css">
+
+<style>
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;padding:0}
+body{overflow:hidden;background:#c0c0c0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#000}
+.win98-16bit{filter:url(#rgb565)}
+
+.browser-window{position:fixed;left:0;top:0;width:100vw;height:100vh;min-width:760px;min-height:500px;margin:0;z-index:10}
+.browser-window>.title-bar{height:22px;min-height:22px}
+.browser-window .title-bar-text{font-family:Arial,Helvetica,sans-serif;font-size:11px}
+
+.ie-menu{height:21px;min-height:21px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:0 7px;gap:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;user-select:none}
+.ie-menu span{white-space:nowrap}
+
+.ie-toolbar{height:34px;min-height:34px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:2px 4px;gap:2px;overflow:hidden}
+.ie-toolbar button{height:28px;min-width:54px;padding:1px 5px;display:flex;align-items:center;justify-content:center;gap:3px;font-family:Arial,Helvetica,sans-serif;font-size:10px;white-space:nowrap}
+.ie-toolbar-icon{width:17px;flex-shrink:0;font-family:"Arial Unicode MS",Arial,sans-serif;font-size:17px;line-height:17px;text-align:center}
+.ie-toolbar-label{line-height:14px}
+.ie-dropdown{font-size:7px;margin-left:-1px}
+.ie-grip{width:6px;height:23px;flex-shrink:0;margin-right:2px;border-left:1px solid #808080;border-right:1px solid #fff;background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,#808080 2px,#808080 3px)}
+
+.ie-address-row{height:27px;min-height:27px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;gap:4px;padding:2px 5px}
+.ie-address-label{font-size:11px;margin-right:2px}
+.ie-address-icon{width:16px;height:16px;object-fit:contain;flex-shrink:0}
+.ie-address-input{height:20px!important;min-width:0;flex:1;padding:1px 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px}
+.ie-go{height:21px!important;min-width:37px;padding:1px 7px!important;font-size:10px!important}
+
+.ie-links{height:23px;min-height:23px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;padding:1px 5px;gap:1px;overflow:hidden}
+.ie-links .ie-grip{height:17px}
+.ie-links-label{font-size:10px;margin:0 5px 0 2px}
+.ie-links a{display:inline-block;color:#000080;font-size:10px;text-decoration:underline;padding:2px 7px;white-space:nowrap}
+
+.ie-main{display:flex;height:calc(100% - 148px);min-height:0;background:#fff}
+
+.ie-explorer{width:205px;min-width:205px;height:100%;overflow-y:auto;overflow-x:hidden;background:#d4d0c8;border-right:2px solid #808080;padding:4px}
+.explorer-header{height:25px;padding:4px 6px;color:#fff;font-weight:bold;font-size:11px;background:linear-gradient(to right,#000080 0%,#000080 55%,#1084d7 100%);border:1px solid #000;user-select:none}
+.explorer-body{padding-top:5px}
+.explorer-tree{width:100%;margin:0;padding:5px;background:#fff;border:1px solid #808080}
+.explorer-tree li{font-size:11px;line-height:16px}
+.explorer-tree a{color:#000080;text-decoration:none}
+.explorer-tree a:hover{text-decoration:underline}
+
+.explorer-box{margin-top:6px}
+.explorer-box fieldset{margin:0;padding:5px;min-height:63px;background:#d4d0c8}
+.explorer-box legend{font-size:10px;padding:0 3px}
+
+.explorer-logo,.nation-logo{display:block;width:auto;height:auto;max-width:48px;max-height:48px;object-fit:contain;object-position:center;flex-shrink:0}
+.explorer-logo.zpr,.nation-logo.zpr{width:48px;height:48px}
+.explorer-logo.astralyia,.explorer-logo.rendale,.nation-logo.astralyia,.nation-logo.rendale{width:auto;height:auto;max-width:48px;max-height:48px}
+.explorer-logo{margin:1px auto}
+
+.ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
+.webpage{min-height:100%;padding:12px 18px 30px 18px}
+
+.webpage-loading>*{visibility:hidden}
+.webpage-loading.page-stage-1 .site-header{visibility:visible}
+.webpage-loading.page-stage-2 .page-intro{visibility:visible}
+.webpage-loading.page-stage-3 #goals{visibility:visible}
+.webpage-loading.page-stage-4 #nations{visibility:visible}
+.webpage-loading.page-stage-5 #astralyia{visibility:visible}
+.webpage-loading.page-stage-6 #zpr{visibility:visible}
+.webpage-loading.page-stage-7 #rendale{visibility:visible}
+.webpage-loading.page-stage-8 #doctrines{visibility:visible}
+.webpage-loading.page-stage-9 #contact{visibility:visible}
+.webpage-loading.page-stage-10 hr,.webpage-loading.page-stage-10 .small{visibility:visible}
+
+.site-header{padding-bottom:5px;margin-bottom:10px;border-bottom:1px solid #808080}
+.site-title{margin:0;display:inline-block;font-family:Georgia,"Times New Roman",Times,serif;font-size:40px;font-weight:900;letter-spacing:-2.5px;color:#e00000;text-shadow:2px 2px 0 #800000;line-height:42px}
+.site-title .letter{position:relative;display:inline-block}
+.site-title .letter:nth-child(1){top:3px}.site-title .letter:nth-child(2){top:2px}.site-title .letter:nth-child(3){top:1px}.site-title .letter:nth-child(4){top:0}.site-title .letter:nth-child(5){top:-1px}.site-title .letter:nth-child(6){top:-2px}.site-title .letter:nth-child(7){top:-3px}.site-title .letter:nth-child(8){top:-4px}.site-title .letter:nth-child(9){top:-5px}.site-title .letter:nth-child(10){top:-7px}
+.site-title .domain{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal;letter-spacing:0;color:#0000a0;text-shadow:none;margin-left:2px}
+
+.page-intro{margin-bottom:13px;font-size:11px}
+.page-intro p{margin:5px 0}
+.small{font-size:10px}
+.content-section{margin-top:15px}
+.content-section h2{margin:0 0 5px;padding-bottom:2px;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080;border-bottom:1px solid #808080}
+.content-section h3{margin:12px 0 4px;font-family:"Times New Roman",Times,serif;font-size:15px;color:#800000}
+.content-section p{margin:5px 0;line-height:1.35}
+.content-section ul{margin-top:5px;padding-left:25px}
+
+a{color:#0000ff!important}
+a:visited{color:#0000ff!important}
+a:hover{color:#ff0000!important}
+a:active{color:#800080!important}
+a.clicked{color:#800080!important}
+
+.notice{margin:10px 0;padding:5px 7px;background:#ffffcc;border:1px solid #808080;font-size:10px}
+
+.nations-table{width:100%;border-collapse:collapse;margin-top:7px;font-size:11px}
+.nations-table th{background:#c0c0c0;color:#000;text-align:left;font-weight:bold;padding:3px 5px;border:1px solid #808080}
+.nations-table td{padding:3px 5px;border:1px solid #c0c0c0;background:#fff}
+.nations-table tbody tr:nth-child(even) td{background:#f0f0f0}
+
+.nation{margin-top:18px;padding-top:8px;border-top:1px solid #808080}
+.nation-heading{display:flex;align-items:center;gap:8px;min-height:48px;margin-bottom:5px}
+.nation-name{margin:0;font-family:"Times New Roman",Times,serif;font-size:17px;color:#000080}
+.nation-info{margin-left:56px}
+
+hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
+
+.ie-status{height:21px;min-height:21px;display:flex;background:#c0c0c0;border-top:1px solid #fff;padding:2px}
+.ie-status-field{height:17px;display:flex;align-items:center;padding:0 5px;background:#c0c0c0;border:1px solid #808080;border-right-color:#fff;border-bottom-color:#fff;font-size:10px}
+.ie-status-main{flex:1}
+.ie-status-icon{width:16px;height:16px;object-fit:contain;margin-right:3px}
+
+.dialup-screen{position:fixed;inset:0;z-index:9999;background:#008080;display:flex;align-items:center;justify-content:center}
+.dialup-window{width:410px;max-width:calc(100vw - 30px);margin:0}
+.dialup-connection{display:flex;align-items:center;justify-content:center;padding:3px 0 7px}
+.dialup-icon-box{width:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:10px}
+.dialup-icon{width:32px;height:32px;object-fit:contain;margin-bottom:3px}
+
+.dialup-blocks{width:65px;height:32px;display:flex;align-items:center;justify-content:center;gap:3px}
+.dialup-blocks span{width:7px;height:7px;background:#808080;border:1px solid #404040;box-shadow:inset 1px 1px #c0c0c0;animation:dialup-cube-blink 1s steps(1) infinite;animation-play-state:paused}
+.dialup-blocks.active span{animation-play-state:running}
+.dialup-blocks span:nth-child(1){animation-delay:0s}
+.dialup-blocks span:nth-child(2){animation-delay:.25s}
+.dialup-blocks span:nth-child(3){animation-delay:.5s}
+.dialup-blocks span:nth-child(4){animation-delay:.75s}
+
+@keyframes dialup-cube-blink{
+0%,9%{background:#808080;box-shadow:inset 1px 1px #c0c0c0}
+10%,34%{background:#ffff00;box-shadow:inset 1px 1px #ffff80,inset -1px -1px #808000}
+35%,100%{background:#808080;box-shadow:inset 1px 1px #c0c0c0}
+}
+
+.dialup-status-text{margin-top:2px;text-align:center;font-size:11px;font-weight:bold}
+.dialup-sub-status{min-height:16px;margin-top:2px;text-align:center;font-family:"Courier New",monospace;font-size:10px;line-height:14px}
+
+.dialup-progress-frame{width:100%;height:17px;margin-top:7px;padding:2px;background:#c0c0c0;border:1px solid #808080;border-right-color:#fff;border-bottom-color:#fff;overflow:hidden}
+.dialup-progress{width:100%;height:100%;display:flex;align-items:stretch;gap:2px;overflow:hidden}
+.dialup-progress span{flex:1;min-width:0;height:100%;background:#c0c0c0}
+.dialup-progress span.filled{background:#000080}
+.dialup-progress.error span.filled{background:#800000}
+
+.dialup-percent{height:12px;margin-top:2px;text-align:right;font-family:"Courier New",monospace;font-size:9px}
+.dialup-button-row{display:flex;justify-content:flex-end;gap:5px;margin-top:8px}
+.dialup-button{min-width:75px}
+.dialup-button.pressed{border-top-color:#808080;border-left-color:#808080;border-right-color:#fff;border-bottom-color:#fff;box-shadow:inset 1px 1px #808080,inset -1px -1px #fff;padding-top:2px;padding-left:2px}
+
+.dialup-blink{animation:dialup-blink .8s steps(1) infinite}
+@keyframes dialup-blink{
+0%,49%{visibility:visible}
+50%,100%{visibility:hidden}
+}
+
+.dialup-error{margin-top:6px;padding:5px;background:#fff;border:1px solid #808080;font-family:Arial,Helvetica,sans-serif;font-size:10px;line-height:13px;text-align:left}
+
+body.dialup-loading .browser-window{visibility:hidden}
+
+
+/* =========================================================
+   NATION REGISTRATION
+   ========================================================= */
+
+.registration-screen{
+position:fixed;
+inset:0;
+z-index:10000;
+background:#008080;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.registration-window{
+width:410px;
+max-width:calc(100vw - 30px);
+margin:0;
+}
+
+.registration-body{
+font-size:11px;
+}
+
+.registration-description{
+margin:6px 0 10px;
+line-height:14px;
+}
+
+.registration-input{
+width:100%;
+height:21px!important;
+padding:1px 4px;
+font-family:Arial,Helvetica,sans-serif;
+font-size:11px;
+}
+
+.registration-note{
+margin-top:6px;
+font-size:10px;
+color:#404040;
+line-height:13px;
+}
+
+.registration-buttons{
+display:flex;
+justify-content:flex-end;
+margin-top:10px;
+}
+
+.registration-error-screen{
+position:fixed;
+inset:0;
+z-index:11000;
+background:#008080;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+.registration-error-window{
+width:410px;
+max-width:calc(100vw - 30px);
+margin:0;
+}
+
+.registration-error-body{
+padding:12px;
+font-size:11px;
+text-align:center;
+}
+
+.registration-error-icon{
+width:32px;
+height:32px;
+margin-bottom:8px;
+}
+
+.registration-error-text{
+font-weight:bold;
+line-height:15px;
+margin-bottom:8px;
+}
+
+.registration-error-subtext{
+font-size:10px;
+color:#404040;
+}
+
+</style>
+</head>
+
+<body class="dialup-loading">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<filter id="rgb565" color-interpolation-filters="sRGB">
+<feComponentTransfer>
+<feFuncR type="discrete" tableValues="0 .032258 .064516 .096774 .129032 .161290 .193548 .225806 .258064 .290322 .322580 .354838 .387096 .419354 .451612 .483870 .516129 .548387 .580645 .612903 .645161 .677419 .709677 .741935 .774193 .806451 .838709 .870967 .903225 .935483 .967741 1"></feFuncR>
+<feFuncG type="discrete" tableValues="0 .015873 .031746 .047619 .063492 .079365 .095238 .111111 .126984 .142857 .158730 .174603 .190476 .206349 .222222 .238095 .253968 .269841 .285714 .301587 .317460 .333333 .349206 .365079 .380952 .396825 .412698 .428571 .444444 .460317 .476190 .492063 .507936 .523809 .539682 .555555 .571428 .587301 .603174 .619047 .634920 .650793 .666666 .682539 .698412 .714285 .730158 .746031 .761904 .777777 .793650 .809523 .825396 .841269 .857142 .873015 .888888 .904761 .920634 .936507 .952380 .968253 .984126 1"></feFuncG>
+<feFuncB type="discrete" tableValues="0 .032258 .064516 .096774 .129032 .161290 .193548 .225806 .258064 .290322 .322580 .354838 .387096 .419354 .451612 .483870 .516129 .548387 .580645 .612903 .645161 .677419 .709677 .741935 .774193 .806451 .838709 .870967 .903225 .935483 .967741 1"></feFuncB>
+</feComponentTransfer>
+</filter>
+</svg>
+
+<audio id="dialup-audio" preload="auto" src="https://archive.org/download/the-sound-of-dial-up-internet-62402/the-sound-of-dial-up-internet-6240%282%29.mp3"></audio>
+<audio id="dialup-error-audio" preload="auto" src="https://www.myinstants.com/media/sounds/windows-98-error.mp3"></audio>
+<audio id="dialup-welcome-audio" preload="auto" src="https://www.myinstants.com/media/sounds/welcome_aYqx3Y2.mp3"></audio>
+
+
+<!-- =====================================================
+     NATION REGISTRATION
+     THIS IS BEFORE THE DIAL-UP SCREEN
+     ===================================================== -->
+
+<div id="registration-screen" class="registration-screen">
+
+<div class="window registration-window" role="dialog" aria-label="InterPhyr Nation Registration">
+
+<div class="title-bar">
+<div class="title-bar-text">InterPhyr Nation Registration</div>
+<div class="title-bar-controls">
+<button type="button" aria-label="Close" id="registration-close"></button>
+</div>
+</div>
+
+<div class="window-body registration-body">
+
+<b>Welcome to the InterPhyr network.</b>
+
+<div class="registration-description">
+Before connecting to InterPhyr.net, please register your nation with the InterPhyr information service.
+</div>
+
+<label for="nation-name">Nation name:</label>
+
+<br>
+
+<input
+id="nation-name"
+class="registration-input"
+type="text"
+maxlength="80"
+autocomplete="off"
+spellcheck="false"
+>
+
+<div class="registration-note">
+Your registered nation is stored locally on this computer for future InterPhyr connections.
+</div>
+
+<div class="registration-buttons">
+<button id="nation-register" type="button">Register</button>
+</div>
+
+</div>
+</div>
+</div>
+
+
+<!-- =====================================================
+     BLOCKED REGION SCREEN
+     ===================================================== -->
+
+<div id="registration-error-screen" class="registration-error-screen" style="display:none;">
+
+<div class="window registration-error-window" role="dialog" aria-label="InterPhyr Access Denied">
+
+<div class="title-bar">
+<div class="title-bar-text">InterPhyr - Access Denied</div>
+<div class="title-bar-controls">
+<button type="button" aria-label="Close" id="registration-error-close"></button>
+</div>
+</div>
+
+<div class="window-body registration-error-body">
+
+<img
+class="registration-error-icon win98-16bit"
+src="https://win98icons.alexmeub.com/icons/png/msg_error-0.png"
+alt=""
+>
+
+<div class="registration-error-text">
+This page is blocked in your region due to geopolitical reasons
+</div>
+
+<div class="registration-error-subtext">
+InterPhyr.net cannot be accessed from the registered region.
+</div>
+
+</div>
+</div>
+</div>
+
+
+<div id="dialup-screen" class="dialup-screen">
+<div class="window dialup-window" role="dialog" aria-label="InterPhyr Network Connection">
+
+<div class="title-bar">
+<div class="title-bar-text">InterPhyr Network Connection</div>
+<div class="title-bar-controls">
+<button type="button" aria-label="Minimize"></button>
+<button type="button" aria-label="Close"></button>
+</div>
+</div>
+
+<div class="window-body">
+
+<div class="dialup-connection">
+
+<div class="dialup-icon-box">
+<img class="dialup-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/modem-4.png" alt="Modem">
+<span>Modem</span>
+</div>
+
+<div class="dialup-blocks" aria-hidden="true">
+<span></span><span></span><span></span><span></span>
+</div>
+
+<div class="dialup-icon-box">
+<img class="dialup-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-0.png" alt="Internet">
+<span>InterPhyr</span>
+</div>
+
+</div>
+
+<div id="dialup-status" class="dialup-status-text">
+<div id="dialup-line-1">Modem ready.</div>
+<div id="dialup-line-2" class="dialup-sub-status">Ready to connect to InterPhyr.net.</div>
+<div id="dialup-line-3" class="dialup-sub-status">Click Connect to begin.</div>
+</div>
+
+<div class="dialup-progress-frame">
+<div id="dialup-progress" class="dialup-progress">
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+<span></span><span></span><span></span><span></span><span></span>
+</div>
+</div>
+
+<div id="dialup-percent" class="dialup-percent">0%</div>
+
+<div class="dialup-button-row">
+<button id="dialup-connect" class="dialup-button" type="button">Connect</button>
+<button id="dialup-retry" class="dialup-button" type="button" style="display:none;">Retry</button>
+</div>
+
+</div>
+</div>
+</div>
+
+<div class="window browser-window">
+
+<div class="title-bar">
+<div class="title-bar-text">InterPhyr.net - Microsoft Internet Explorer</div>
+<div class="title-bar-controls">
+<button aria-label="Minimize"></button>
+<button aria-label="Maximize"></button>
+<button aria-label="Close"></button>
+</div>
+</div>
+
+<div class="ie-menu">
+<span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Favorites</span><span>Tools</span><span>Help</span>
+</div>
+
+<div class="ie-toolbar">
+<div class="ie-grip"></div>
+
+<button><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">⛒</span><span class="ie-toolbar-label">Stop</span></button>
+<button><span class="ie-toolbar-icon">↺</span><span class="ie-toolbar-label">Refresh</span></button>
+<button><span class="ie-toolbar-icon">⌂</span><span class="ie-toolbar-label">Home</span></button>
+
+<div class="ie-grip"></div>
+
+<button><span class="ie-toolbar-icon">⌕</span><span class="ie-toolbar-label">Search</span></button>
+<button><span class="ie-toolbar-icon">★</span><span class="ie-toolbar-label">Favorites</span></button>
+<button><span class="ie-toolbar-icon">◷</span><span class="ie-toolbar-label">History</span></button>
+<button><span class="ie-toolbar-icon">✉</span><span class="ie-toolbar-label">Mail</span><span class="ie-dropdown">▼</span></button>
+<button><span class="ie-toolbar-icon">▣</span><span class="ie-toolbar-label">Print</span></button>
+</div>
+
+<div class="ie-address-row">
+<span class="ie-address-label">Address</span>
+<img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
+<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/">
+<button id="ie-go" class="ie-go" type="button">Go</button>
+</div>
+
+<div class="ie-links">
+<div class="ie-grip"></div>
+<span class="ie-links-label">Links</span>
+<a href="#home">InterPhyr.net</a>
+<a href="#nations">Nations</a>
+<a href="#goals">Goals</a>
+<a href="#doctrines">Doctrines</a>
+<a href="#contact">Contact</a>
+</div>
+
+<div class="ie-main">
+
+<aside class="ie-explorer">
+
+<div class="explorer-header">InterPhyr</div>
+
+<div class="explorer-body">
+
+<ul class="tree-view explorer-tree">
+
+<li><a href="#home">Information</a></li>
+<li><a href="#goals">Goals</a></li>
+
+<li>Nations
+<ul>
+<li><a href="#astralyia">Astralyia Republic</a></li>
+<li><a href="#zpr">Zapadiya People's Republic</a></li>
+<li><a href="#rendale">Kingdom of Rendale</a></li>
+</ul>
+</li>
+
+<li><a href="#doctrines">Doctrines</a></li>
+
+</ul>
+
+<div class="explorer-box">
+<fieldset>
+<legend>Zapadiya People's Republic</legend>
+<img class="explorer-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="Zapadiya People's Republic">
+</fieldset>
+</div>
+
+<div class="explorer-box">
+<fieldset>
+<legend>Astralyia Republic</legend>
+<img class="explorer-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="Astralyia Republic">
+</fieldset>
+</div>
+
+<div class="explorer-box">
+<fieldset>
+<legend>Kingdom of Rendale</legend>
+<img class="explorer-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="Kingdom of Rendale">
+</fieldset>
+</div>
+
+</div>
+</aside>
+
+<main class="ie-page">
+
+<div class="webpage webpage-loading" id="home">
+
+<header class="site-header">
+<h1 class="site-title">
+<span class="letter">I</span><span class="letter">n</span><span class="letter">t</span><span class="letter">e</span><span class="letter">r</span><span class="letter">P</span><span class="letter">h</span><span class="letter">y</span><span class="letter">r</span><span class="letter">!</span>
+<span class="domain">.net</span>
+</h1>
+</header>
+
+<section class="page-intro">
+
+<p><b>Welcome to InterPhyr.net!</b></p>
+
+<p>This is the official website of the Phyrrian Astral Federation.</p>
+
+<p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
+
+<p class="small">Last updated: 199X</p>
+
+</section>
+
+<section class="content-section">
+
+<h2>Information</h2>
+
+<p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
+
+<p>This website provides information about the federation and its participating member nations.</p>
+
+<div class="notice">
+<b>NOTICE:</b>
+This website is currently under construction.
+</div>
+
+</section>
+
+<section id="goals" class="content-section">
+
+<h2>Goals</h2>
+
+<ul>
+<li>Encourage cooperation between member nations.</li>
+<li>Coordinate common projects.</li>
+<li>Maintain diplomatic relations.</li>
+<li>Promote mutual development.</li>
+</ul>
+
+</section>
+
+<section id="nations" class="content-section">
+
+<h2>Member Nations</h2>
+
+<table class="nations-table">
+
+<thead>
+<tr>
+<th>Nation</th>
+<th>Status</th>
+<th>Member Since</th>
+</tr>
+</thead>
+
+<tbody>
+
+<tr>
+<td><a href="#astralyia">Astralyia Republic</a></td>
+<td>Member of the Phyrrian Astral Federation.</td>
+<td>199X</td>
+</tr>
+
+<tr>
+<td><a href="#zpr">Zapadiya People's Republic</a></td>
+<td>Member of the Phyrrian Astral Federation.</td>
+<td>199X</td>
+</tr>
+
+<tr>
+<td><a href="#rendale">Kingdom of Rendale</a></td>
+<td>Member of the Phyrrian Astral Federation.</td>
+<td>199X</td>
+</tr>
+
+</tbody>
+</table>
+
+</section>
+
+<section id="astralyia" class="nation">
+
+<div class="nation-heading">
+<img class="nation-logo astralyia win98-16bit" src="https://myimgs.org/storage/images/47158/astra.png" alt="Astralyia Republic">
+<h2 class="nation-name">Astralyia Republic</h2>
+</div>
+
+<div class="nation-info">
+
+<p>Member of the Phyrrian Astral Federation.</p>
+
+<p><b>Political Ideology:</b> Democracy</p>
+<p><b>Economic Ideology:</b> Mixed-Market Economy</p>
+<p><b>Alignment:</b> Socialist Democracy</p>
+
+</div>
+</section>
+
+<section id="zpr" class="nation">
+
+<div class="nation-heading">
+<img class="nation-logo zpr win98-16bit" src="https://myimgs.org/storage/images/47080/ZPRimg.png" alt="Zapadiya People's Republic">
+<h2 class="nation-name">Zapadiya People's Republic</h2>
+</div>
+
+<div class="nation-info">
+
+<p>Member of the Phyrrian Astral Federation.</p>
+
+<p><b>Political Ideology:</b> Popular Socialism</p>
+<p><b>Economic Ideology:</b> Collectivism</p>
+
+</div>
+</section>
+
+<section id="rendale" class="nation">
+
+<div class="nation-heading">
+<img class="nation-logo rendale win98-16bit" src="https://myimgs.org/storage/images/47156/Rendale.png" alt="Kingdom of Rendale">
+<h2 class="nation-name">Kingdom of Rendale</h2>
+</div>
+
+<div class="nation-info">
+
+<p>Member of the Phyrrian Astral Federation.</p>
+
+<p><b>Political Ideology:</b> Council-Type Monarchy</p>
+<p><b>Economic Ideology:</b> Peaceful Democracy</p>
+
+</div>
+</section>
+
+<section id="doctrines" class="content-section">
+
+<h2>Political &amp; Economic Profiles</h2>
+
+<p>The following information provides a brief overview of the political and economic systems of Phyrrian Astral Federation member nations.</p>
+
+<ul>
+
+<li>
+<a href="#astralyia">Astralyia Republic</a>
+-
+Democratic political system with a mixed-market economy.
+</li>
+
+<li>
+<a href="#zpr">Zapadiya People's Republic</a>
+-
+Popular Socialist political system with a collectivist economy.
+</li>
+
+<li>
+<a href="#rendale">Kingdom of Rendale</a>
+-
+Council-Type Monarchy with a peaceful democratic economy.
+</li>
+
+</ul>
+</section>
+
+<section id="contact" class="content-section">
+
+<h2>Contact</h2>
+
+<p>For inquiries concerning InterPhyr, please contact the appropriate representative.</p>
+
+<p>
+<b>InterPhyr Information Service:</b>
+<a href="https://discord.gg/5362UGaDSM" target="_blank" rel="noopener">interphyr@zapadtelecom.net</a>
+</p>
+
+<p class="small">Electronic mail is available through the InterPhyr network.</p>
+
+</section>
+
+<hr>
+
+<p class="small">
+InterPhyr.net © 199X–199X
+&nbsp;|&nbsp;
+Hosted by ZapadTelecom©
+</p>
+
+</div>
+</main>
+</div>
+
+<div class="ie-status">
+
+<div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
+
+<div class="ie-status-field">
+<img class="ie-status-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-1.png" alt="">
+Internet
+</div>
+
+</div>
+</div>
+
+<<script>
+document.addEventListener("DOMContentLoaded",function(){
+
+
+/* =========================================================
+   NATION REGISTRATION
+   ========================================================= */
+
+const registrationScreen=document.getElementById("registration-screen");
+const registrationErrorScreen=document.getElementById("registration-error-screen");
+const nationInput=document.getElementById("nation-name");
+const nationRegister=document.getElementById("nation-register");
+const registrationClose=document.getElementById("registration-close");
+const registrationErrorClose=document.getElementById("registration-error-close");
+
+
+function normalizeNationName(name){
+
+return name
+.normalize("NFD")
+.replace(/[\u0300-\u036f]/g,"")
+.toLowerCase()
+.replace(/[^a-z0-9]/g,"");
+
+}
+
+
+function isBlockedNation(name){
+
+/*
+ * Catches:
+ *
+ * Swissland
+ * SWISSLAND
+ * Swiss Land
+ * Swiss-Land
+ * Swiss_Land
+ * S.W.I.S.S.L.A.N.D.
+ *
+ * while leaving other names alone.
+ */
+
+return normalizeNationName(name)==="swissland";
+
+}
+
+
+function getCookie(name){
+
+const cookies=document.cookie.split(";");
+
+for(let i=0;i<cookies.length;i++){
+
+const cookie=cookies[i].trim();
+
+if(cookie.indexOf(name+"=")===0){
+
+return decodeURIComponent(
+cookie.substring((name+"=").length)
+);
+
+}
+
+}
+
+return null;
+
+}
+
+
+function getRegisteredNation(){
+
+return getCookie("interphyr_registered_nation");
+
+}
+
+
+function isWebsiteBlocked(){
+
+return getCookie("interphyr_blocked")==="1";
+
+}
+
+
+function setBlockedCookie(){
+
+/*
+ * This is the ONLY cookie created
+ * when a blocked nation is detected.
+ */
+
+document.cookie=
+"interphyr_blocked=1; max-age=31536000; path=/";
+
+}
+
+
+function showRegistration(){
+
+registrationScreen.style.display="flex";
+registrationErrorScreen.style.display="none";
+
+nationInput.value="";
+
+setTimeout(function(){
+
+nationInput.focus();
+
+},50);
+
+}
+
+
+function showBlockedRegion(){
+
+registrationScreen.style.display="none";
+registrationErrorScreen.style.display="flex";
+screen.style.display="none";
+
+}
+
+
+function resetDialup(){
+
+stopConnectionTimer();
+stopAudioOnly();
+stopBlocks();
+
+busy=false;
+finished=false;
+started=false;
+
+connect.classList.remove("pressed");
+connect.disabled=false;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Modem ready.";
+line2.textContent="Ready to connect to InterPhyr.net.";
+line3.textContent="Click Connect to begin.";
+
+}
+
+
+function finishRegistration(nation){
+
+/*
+ * The registered nation is stored
+ * in its own cookie for one year.
+ */
+
+document.cookie=
+"interphyr_registered_nation="+
+encodeURIComponent(nation)+
+"; max-age=31536000; path=/";
+
+registrationScreen.style.display="none";
+registrationErrorScreen.style.display="none";
+
+screen.style.display="flex";
+
+resetDialup();
+
+}
+
+
+nationRegister.addEventListener("click",function(){
+
+const nation=nationInput.value.trim();
+
+if(!nation){
+
+nationInput.focus();
+return;
+
+}
+
+if(isBlockedNation(nation)){
+
+/*
+ * Swissland creates a separate
+ * blocking cookie.
+ */
+
+setBlockedCookie();
+
+showBlockedRegion();
+
+return;
+
+}
+
+finishRegistration(nation);
+
+});
+
+
+nationInput.addEventListener("keydown",function(event){
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+nationRegister.click();
+
+}
+
+});
+
+
+/*
+ * Registration cannot be bypassed
+ * by closing the window.
+ */
+
+registrationClose.addEventListener("click",function(){
+
+nationInput.focus();
+
+});
+
+
+/*
+ * The blocked screen cannot be
+ * bypassed by closing its window.
+ */
+
+registrationErrorClose.addEventListener("click",function(){
+
+showBlockedRegion();
+
+});
+
+
+const screen=document.getElementById("dialup-screen");
+const audio=document.getElementById("dialup-audio");
+const errorAudio=document.getElementById("dialup-error-audio");
+const welcomeAudio=document.getElementById("dialup-welcome-audio");
+
+const line1=document.getElementById("dialup-line-1");
+const line2=document.getElementById("dialup-line-2");
+const line3=document.getElementById("dialup-line-3");
+
+const progress=document.getElementById("dialup-progress");
+const percent=document.getElementById("dialup-percent");
+const blocksContainer=document.querySelector(".dialup-blocks");
+
+const connect=document.getElementById("dialup-connect");
+const retry=document.getElementById("dialup-retry");
+const webpage=document.querySelector(".webpage");
+const statusText=document.getElementById("ie-status-text");
+const goButton=document.getElementById("ie-go");
+
+let dialupNumber="";
+let assignedIP="";
+
+let busy=false;
+let finished=false;
+let started=false;
+
+let connectionTimer=null;
+let connectionStartedAt=0;
+let shouldFail=false;
+
+function generateConnectionDetails(){
+
+const serviceNumber=Math.floor(Math.random()*100)
+.toString()
+.padStart(2,"0");
+
+dialupNumber="3615 "+serviceNumber;
+
+assignedIP=
+"10."+
+Math.floor(Math.random()*256)+"."+
+Math.floor(Math.random()*256)+"."+
+(Math.floor(Math.random()*254)+1);
+
+}
+
+function setProgress(value){
+
+value=Math.max(0,Math.min(100,value));
+
+const segments=progress.querySelectorAll("span");
+const filledCount=Math.floor((value/100)*segments.length);
+
+segments.forEach(function(segment,index){
+segment.classList.toggle("filled",index<filledCount);
+});
+
+percent.textContent=Math.floor(value)+"%";
+
+}
+
+function startBlocks(){
+blocksContainer.classList.add("active");
+}
+
+function stopBlocks(){
+blocksContainer.classList.remove("active");
+}
+
+function stopConnectionTimer(){
+
+if(connectionTimer!==null){
+clearInterval(connectionTimer);
+connectionTimer=null;
+}
+
+}
+
+function stopAudioOnly(){
+
+try{
+audio.pause();
+audio.currentTime=0;
+}catch(e){}
+
+}
+
+function playErrorSound(){
+
+try{
+
+errorAudio.pause();
+errorAudio.currentTime=0;
+errorAudio.volume=1;
+
+const promise=errorAudio.play();
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function playWelcomeSound(){
+
+try{
+
+welcomeAudio.pause();
+welcomeAudio.currentTime=0;
+welcomeAudio.volume=1;
+
+const promise=welcomeAudio.play();
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function startPageLoading(){
+
+webpage.className="webpage webpage-loading";
+
+statusText.textContent="Opening http://www.interphyr.net/...";
+
+setTimeout(function(){
+webpage.classList.add("page-stage-1");
+statusText.textContent="Opening page...";
+},250);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-2");
+statusText.textContent="Receiving document...";
+},650);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-3");
+statusText.textContent="Receiving document...";
+},1000);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-4");
+statusText.textContent="Receiving table...";
+},1350);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-5");
+statusText.textContent="Downloading picture...";
+},1750);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-6");
+statusText.textContent="Downloading picture...";
+},2150);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-7");
+statusText.textContent="Downloading picture...";
+},2500);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-8");
+statusText.textContent="Receiving document...";
+},2850);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-9");
+statusText.textContent="Receiving document...";
+},3150);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-10");
+statusText.textContent="Done";
+},3450);
+
+setTimeout(function(){
+
+webpage.className="webpage";
+statusText.textContent="Done";
+
+playWelcomeSound();
+
+},3500);
+
+}
+
+function revealWebsite(){
+
+screen.style.display="none";
+
+document.body.classList.remove("dialup-loading");
+
+startPageLoading();
+
+}
+
+function finishConnection(){
+
+if(finished||busy)return;
+
+stopConnectionTimer();
+
+finished=true;
+started=false;
+
+stopAudioOnly();
+stopBlocks();
+
+setProgress(100);
+
+line1.textContent="Connected to InterPhyr.net";
+line2.textContent="Connection established.";
+line3.textContent="Welcome.";
+
+connect.style.display="inline-block";
+connect.classList.add("pressed");
+connect.disabled=true;
+connect.textContent="Connected";
+
+retry.style.display="none";
+
+setTimeout(function(){
+revealWebsite();
+},700);
+
+}
+
+function busyLine(){
+
+if(finished||busy)return;
+
+stopConnectionTimer();
+
+busy=true;
+started=false;
+
+stopAudioOnly();
+stopBlocks();
+
+playErrorSound();
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="NO CARRIER";
+
+line3.innerHTML=
+'<div class="dialup-error">'+
+'<b>ERROR 680:</b><br><br>'+
+'The telephone line is currently in use.<br>'+
+'InterPhyr.net could not establish a connection.'+
+'</div>';
+
+progress.classList.add("error");
+
+setProgress(100);
+
+percent.textContent="BUSY";
+
+connect.classList.remove("pressed");
+connect.disabled=true;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="inline-block";
+
+}
+
+function updateConnection(elapsed){
+
+if(!started||busy||finished)return;
+
+setProgress((elapsed/29)*100);
+
+if(elapsed<2){
+
+line1.textContent="Initializing modem...";
+line2.textContent="Modem ready.";
+line3.textContent="Dialing InterPhyr.net...";
+
+}else if(elapsed<5){
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="ATDT "+dialupNumber;
+line3.textContent="Waiting for carrier...";
+
+}else if(elapsed<8){
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="RING";
+line3.textContent="RING";
+
+}else if(elapsed<11){
+
+line1.textContent="CONNECT 56000";
+line2.textContent="Carrier detected.";
+line3.textContent="V.90 negotiation...";
+
+}else if(elapsed<14){
+
+line1.textContent="CONNECT 56000";
+line2.textContent="V.90";
+line3.textContent="Negotiating PPP...";
+
+}else if(elapsed<18){
+
+line1.textContent="PPP connection established.";
+line2.textContent="Authenticating user...";
+line3.textContent="Username: INTERPHYR";
+
+}else if(elapsed<21){
+
+line1.textContent="Authentication accepted.";
+line2.textContent="Verifying account...";
+line3.textContent="Access granted.";
+
+}else if(elapsed<24){
+
+line1.textContent="Assigning network address...";
+line2.textContent="IP address: "+assignedIP;
+line3.textContent="DNS server: ZapadTelecom";
+
+}else if(elapsed<27){
+
+line1.textContent="Resolving www.interphyr.net...";
+line2.textContent="DNS lookup successful.";
+line3.textContent="Connecting to web server...";
+
+}else{
+
+line1.textContent="HTTP/1.0 connection established.";
+line2.textContent="GET / HTTP/1.0";
+line3.textContent="Loading InterPhyr.net...";
+
+}
+
+}
+
+function connectionTick(){
+
+if(!started||busy||finished)return;
+
+const elapsed=(performance.now()-connectionStartedAt)/1000;
+
+if(shouldFail&&elapsed>=4.3){
+
+busyLine();
+return;
+
+}
+
+updateConnection(elapsed);
+
+if(elapsed>=29){
+finishConnection();
+}
+
+}
+
+function startAudio(){
+
+try{
+
+audio.currentTime=0;
+audio.volume=1;
+
+const promise=audio.play();
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function beginConnection(){
+
+stopConnectionTimer();
+stopAudioOnly();
+
+busy=false;
+finished=false;
+started=true;
+
+generateConnectionDetails();
+
+shouldFail=Math.floor(Math.random()*10)===0;
+
+audio.dataset.shouldFail=shouldFail?"1":"0";
+
+connect.style.display="inline-block";
+connect.classList.add("pressed");
+connect.disabled=true;
+connect.textContent="Connecting...";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Initializing modem...";
+line2.textContent="Modem ready.";
+line3.textContent="Dialing InterPhyr.net...";
+
+startBlocks();
+
+connectionStartedAt=performance.now();
+
+updateConnection(0);
+
+connectionTimer=setInterval(connectionTick,100);
+
+startAudio();
+
+}
+
+audio.addEventListener("error",function(){});
+
+connect.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+if(busy||finished||started)return;
+
+beginConnection();
+
+});
+
+retry.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+stopConnectionTimer();
+stopAudioOnly();
+
+busy=false;
+finished=false;
+started=false;
+
+connect.classList.remove("pressed");
+connect.disabled=false;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Modem ready.";
+line2.textContent="Ready to connect to InterPhyr.net.";
+line3.textContent="Click Connect to begin.";
+
+beginConnection();
+
+});
+
+goButton.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+});
+
+document.querySelectorAll("a").forEach(function(link){
+
+link.addEventListener("click",function(){
+this.classList.add("clicked");
+});
+
+});
+
+
+/* =========================================================
+   INITIAL STARTUP
+   ========================================================= */
+
+/*
+ * BLOCK COOKIE CHECK HAPPENS FIRST.
+ *
+ * If interphyr_blocked=1 exists,
+ * the registration and dial-up are skipped.
+ */
+
+if(isWebsiteBlocked()){
+
+showBlockedRegion();
+
+}else{
+
+const registeredNation=getRegisteredNation();
+
+if(registeredNation){
+
+if(isBlockedNation(registeredNation)){
+
+/*
+ * Safety check:
+ * if the nation cookie says Swissland,
+ * create the blocking cookie as well.
+ */
+
+setBlockedCookie();
+
+showBlockedRegion();
+
+}else{
+
+/*
+ * Existing valid registration:
+ * go directly to the ORIGINAL dial-up.
+ */
+
+screen.style.display="flex";
+
+resetDialup();
+
+}
+
+}else{
+
+/*
+ * First visit:
+ * registration is shown BEFORE dial-up.
+ */
+
+screen.style.display="none";
+
+showRegistration();
+
+}
+
+}
+
+});
+</script>
+
+function resetDialup(){
+
+stopConnectionTimer();
+stopAudioOnly();
+stopBlocks();
+
+busy=false;
+finished=false;
+started=false;
+
+connect.classList.remove("pressed");
+connect.disabled=false;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Modem ready.";
+line2.textContent="Ready to connect to InterPhyr.net.";
+line3.textContent="Click Connect to begin.";
+
+}
+
+
+function finishRegistration(nation){
+
+/*
+ * This is the ONLY thing stored between sessions.
+ *
+ * Cookie duration: 1 year.
+ */
+
+document.cookie=
+"interphyr_registered_nation="+
+encodeURIComponent(nation)+
+"; max-age=31536000; path=/";
+
+registrationScreen.style.display="none";
+registrationErrorScreen.style.display="none";
+
+/*
+ * Continue with the ORIGINAL dial-up.
+ */
+
+screen.style.display="flex";
+
+resetDialup();
+
+}
+
+
+nationRegister.addEventListener("click",function(){
+
+const nation=nationInput.value.trim();
+
+if(!nation){
+
+nationInput.focus();
+return;
+
+}
+
+if(isBlockedNation(nation)){
+
+showBlockedRegion();
+return;
+
+}
+
+finishRegistration(nation);
+
+});
+
+
+nationInput.addEventListener("keydown",function(event){
+
+if(event.key==="Enter"){
+
+event.preventDefault();
+nationRegister.click();
+
+}
+
+});
+
+
+/*
+ * Registration cannot be bypassed by closing
+ * the registration window.
+ */
+
+registrationClose.addEventListener("click",function(){
+
+nationInput.focus();
+
+});
+
+
+/*
+ * The blocked screen also cannot be bypassed
+ * by closing its window.
+ */
+
+registrationErrorClose.addEventListener("click",function(){
+
+showBlockedRegion();
+
+});
+
+
+const screen=document.getElementById("dialup-screen");
+const audio=document.getElementById("dialup-audio");
+const errorAudio=document.getElementById("dialup-error-audio");
+const welcomeAudio=document.getElementById("dialup-welcome-audio");
+
+const line1=document.getElementById("dialup-line-1");
+const line2=document.getElementById("dialup-line-2");
+const line3=document.getElementById("dialup-line-3");
+
+const progress=document.getElementById("dialup-progress");
+const percent=document.getElementById("dialup-percent");
+const blocksContainer=document.querySelector(".dialup-blocks");
+
+const connect=document.getElementById("dialup-connect");
+const retry=document.getElementById("dialup-retry");
+const webpage=document.querySelector(".webpage");
+const statusText=document.getElementById("ie-status-text");
+const goButton=document.getElementById("ie-go");
+
+let dialupNumber="";
+let assignedIP="";
+
+let busy=false;
+let finished=false;
+let started=false;
+
+let connectionTimer=null;
+let connectionStartedAt=0;
+let shouldFail=false;
+
+function generateConnectionDetails(){
+
+const serviceNumber=Math.floor(Math.random()*100)
+.toString()
+.padStart(2,"0");
+
+dialupNumber="3615 "+serviceNumber;
+
+assignedIP=
+"10."+
+Math.floor(Math.random()*256)+"."+
+Math.floor(Math.random()*256)+"."+
+(Math.floor(Math.random()*254)+1);
+
+}
+
+function setProgress(value){
+
+value=Math.max(0,Math.min(100,value));
+
+const segments=progress.querySelectorAll("span");
+const filledCount=Math.floor((value/100)*segments.length);
+
+segments.forEach(function(segment,index){
+segment.classList.toggle("filled",index<filledCount);
+});
+
+percent.textContent=Math.floor(value)+"%";
+
+}
+
+function startBlocks(){
+blocksContainer.classList.add("active");
+}
+
+function stopBlocks(){
+blocksContainer.classList.remove("active");
+}
+
+function stopConnectionTimer(){
+
+if(connectionTimer!==null){
+clearInterval(connectionTimer);
+connectionTimer=null;
+}
+
+}
+
+function stopAudioOnly(){
+
+try{
+audio.pause();
+audio.currentTime=0;
+}catch(e){}
+
+}
+
+function playErrorSound(){
+
+try{
+
+errorAudio.pause();
+errorAudio.currentTime=0;
+errorAudio.volume=1;
+
+const promise=errorAudio.play();
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function playWelcomeSound(){
+
+try{
+
+welcomeAudio.pause();
+welcomeAudio.currentTime=0;
+welcomeAudio.volume=1;
+
+const promise=welcomeAudio.play();
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function startPageLoading(){
+
+webpage.className="webpage webpage-loading";
+
+statusText.textContent="Opening http://www.interphyr.net/...";
+
+setTimeout(function(){
+webpage.classList.add("page-stage-1");
+statusText.textContent="Opening page...";
+},250);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-2");
+statusText.textContent="Receiving document...";
+},650);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-3");
+statusText.textContent="Receiving document...";
+},1000);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-4");
+statusText.textContent="Receiving table...";
+},1350);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-5");
+statusText.textContent="Downloading picture...";
+},1750);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-6");
+statusText.textContent="Downloading picture...";
+},2150);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-7");
+statusText.textContent="Downloading picture...";
+},2500);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-8");
+statusText.textContent="Receiving document...";
+},2850);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-9");
+statusText.textContent="Receiving document...";
+},3150);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-10");
+statusText.textContent="Done";
+},3450);
+
+setTimeout(function(){
+
+webpage.className="webpage";
+statusText.textContent="Done";
+
+/*
+ * Welcome sound plays only after the
+ * staged website loading has completed.
+ */
+
+playWelcomeSound();
+
+},3500);
+
+}
+
+function revealWebsite(){
+
+screen.style.display="none";
+
+document.body.classList.remove("dialup-loading");
+
+startPageLoading();
+
+}
+
+function finishConnection(){
+
+if(finished||busy)return;
+
+stopConnectionTimer();
+
+finished=true;
+started=false;
+
+stopAudioOnly();
+stopBlocks();
+
+setProgress(100);
+
+line1.textContent="Connected to InterPhyr.net";
+line2.textContent="Connection established.";
+line3.textContent="Welcome.";
+
+connect.style.display="inline-block";
+connect.classList.add("pressed");
+connect.disabled=true;
+connect.textContent="Connected";
+
+retry.style.display="none";
+
+setTimeout(function(){
+revealWebsite();
+},700);
+
+}
+
+function busyLine(){
+
+if(finished||busy)return;
+
+stopConnectionTimer();
+
+busy=true;
+started=false;
+
+stopAudioOnly();
+stopBlocks();
+
+playErrorSound();
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="NO CARRIER";
+
+line3.innerHTML=
+'<div class="dialup-error">'+
+'<b>ERROR 680:</b><br><br>'+
+'The telephone line is currently in use.<br>'+
+'InterPhyr.net could not establish a connection.'+
+'</div>';
+
+progress.classList.add("error");
+
+setProgress(100);
+
+percent.textContent="BUSY";
+
+connect.classList.remove("pressed");
+connect.disabled=true;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="inline-block";
+
+}
+
+function updateConnection(elapsed){
+
+if(!started||busy||finished)return;
+
+setProgress((elapsed/29)*100);
+
+if(elapsed<2){
+
+line1.textContent="Initializing modem...";
+line2.textContent="Modem ready.";
+line3.textContent="Dialing InterPhyr.net...";
+
+}else if(elapsed<5){
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="ATDT "+dialupNumber;
+line3.textContent="Waiting for carrier...";
+
+}else if(elapsed<8){
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="RING";
+line3.textContent="RING";
+
+}else if(elapsed<11){
+
+line1.textContent="CONNECT 56000";
+line2.textContent="Carrier detected.";
+line3.textContent="V.90 negotiation...";
+
+}else if(elapsed<14){
+
+line1.textContent="CONNECT 56000";
+line2.textContent="V.90";
+line3.textContent="Negotiating PPP...";
+
+}else if(elapsed<18){
+
+line1.textContent="PPP connection established.";
+line2.textContent="Authenticating user...";
+line3.textContent="Username: INTERPHYR";
+
+}else if(elapsed<21){
+
+line1.textContent="Authentication accepted.";
+line2.textContent="Verifying account...";
+line3.textContent="Access granted.";
+
+}else if(elapsed<24){
+
+line1.textContent="Assigning network address...";
+line2.textContent="IP address: "+assignedIP;
+line3.textContent="DNS server: ZapadTelecom";
+
+}else if(elapsed<27){
+
+line1.textContent="Resolving www.interphyr.net...";
+line2.textContent="DNS lookup successful.";
+line3.textContent="Connecting to web server...";
+
+}else{
+
+line1.textContent="HTTP/1.0 connection established.";
+line2.textContent="GET / HTTP/1.0";
+line3.textContent="Loading InterPhyr.net...";
+
+}
+
+}
+
+function connectionTick(){
+
+if(!started||busy||finished)return;
+
+const elapsed=(performance.now()-connectionStartedAt)/1000;
+
+/*
+ * One in ten connections fails at 4.3 seconds.
+ */
+
+if(shouldFail&&elapsed>=4.3){
+
+busyLine();
+return;
+
+}
+
+updateConnection(elapsed);
+
+if(elapsed>=29){
+finishConnection();
+}
+
+}
+
+function startAudio(){
+
+try{
+
+audio.currentTime=0;
+audio.volume=1;
+
+const promise=audio.play();
+
+/*
+ * IMPORTANT:
+ *
+ * The MP3 is completely optional.
+ * If it fails to load, the simulated
+ * connection continues normally.
+ */
+
+if(promise&&typeof promise.catch==="function"){
+promise.catch(function(){});
+}
+
+}catch(e){}
+
+}
+
+function beginConnection(){
+
+stopConnectionTimer();
+stopAudioOnly();
+
+busy=false;
+finished=false;
+started=true;
+
+generateConnectionDetails();
+
+/*
+ * One in ten attempts receives
+ * the simulated NO CARRIER error.
+ */
+
+shouldFail=Math.floor(Math.random()*10)===0;
+
+audio.dataset.shouldFail=shouldFail?"1":"0";
+
+connect.style.display="inline-block";
+connect.classList.add("pressed");
+connect.disabled=true;
+connect.textContent="Connecting...";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Initializing modem...";
+line2.textContent="Modem ready.";
+line3.textContent="Dialing InterPhyr.net...";
+
+startBlocks();
+
+/*
+ * Start the simulation immediately.
+ *
+ * It does NOT wait for the external
+ * dial-up MP3 to load or play.
+ */
+
+connectionStartedAt=performance.now();
+
+updateConnection(0);
+
+connectionTimer=setInterval(connectionTick,100);
+
+/*
+ * Audio is attempted separately.
+ */
+
+startAudio();
+
+}
+
+audio.addEventListener("error",function(){
+/*
+ * Intentionally empty.
+ *
+ * Audio failure must never stop
+ * the connection simulation.
+ */
+});
+
+/*
+ * The MP3 "ended" event is intentionally
+ * not used. The fake connection always
+ * lasts 29 seconds.
+ */
+
+connect.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+if(busy||finished||started)return;
+
+beginConnection();
+
+});
+
+retry.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+stopConnectionTimer();
+stopAudioOnly();
+
+busy=false;
+finished=false;
+started=false;
+
+connect.classList.remove("pressed");
+connect.disabled=false;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="none";
+
+progress.classList.remove("error");
+
+setProgress(0);
+
+line1.textContent="Modem ready.";
+line2.textContent="Ready to connect to InterPhyr.net.";
+line3.textContent="Click Connect to begin.";
+
+beginConnection();
+
+});
+
+goButton.addEventListener("click",function(event){
+
+event.preventDefault();
+event.stopPropagation();
+
+/*
+ * Intentionally does nothing.
+ */
+
+});
+
+document.querySelectorAll("a").forEach(function(link){
+
+link.addEventListener("click",function(){
+this.classList.add("clicked");
+});
+
+});
+
+
+/* =========================================================
+   INITIAL STARTUP
+   ========================================================= */
+
+/*
+ * The registration check happens BEFORE
+ * the dial-up is allowed to appear.
+ *
+ * Only the registered nation is persisted.
+ */
+
+const registeredNation=getRegisteredNation();
+
+screen.style.display="none";
+registrationErrorScreen.style.display="none";
+
+if(registeredNation){
+
+if(isBlockedNation(registeredNation)){
+
+showBlockedRegion();
+
+}else{
+
+/*
+ * Existing valid registration:
+ * go directly to the ORIGINAL dial-up.
+ */
+
+screen.style.display="flex";
+
+resetDialup();
+
+}
+
+}else{
+
+/*
+ * First visit:
+ * registration is shown BEFORE dial-up.
+ */
+
+screen.style.display="none";
+
+showRegistration();
+
+}
+
+});
+</script>
+
+</body>
+</html>

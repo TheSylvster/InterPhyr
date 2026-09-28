@@ -1644,6 +1644,18 @@ document.cookie="interphyr_admin_session=; max-age=0; path=/";
 }
 
 /*
+ * True when this load was reached by clicking a
+ * link from another page on this site (e.g. a
+ * nation sub-page's "Back to InterPhyr.net"),
+ * rather than a fresh visit, bookmark, or typed
+ * URL (which have no same-origin referrer). Used
+ * to skip replaying the dial-up screen for someone
+ * who was already logged in.
+ */
+
+const cameFromInterPhyr=document.referrer.indexOf(location.origin)===0;
+
+/*
  * NATION STATUS COOKIE CHECK HAPPENS FIRST.
  *
  * If interphyr_nation_status=invalid,
@@ -1674,17 +1686,32 @@ showBlockedRegion();
 
 }else{
 
-/*
- * Existing valid registration:
- * go directly to the ORIGINAL dial-up.
- */
-
 registrationScreen.style.display="none";
 registrationErrorScreen.style.display="none";
+
+if(cameFromInterPhyr){
+
+/*
+ * Came back from another InterPhyr page while
+ * already logged in - skip the dial-up replay
+ * and go straight to the loaded site.
+ */
+
+revealWebsite();
+
+}else{
+
+/*
+ * A genuine fresh visit (typed URL, bookmark,
+ * or refresh) with an existing registration:
+ * go through the ORIGINAL dial-up.
+ */
 
 screen.style.display="flex";
 
 resetDialup();
+
+}
 
 }
 

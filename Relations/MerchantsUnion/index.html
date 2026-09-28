@@ -64,7 +64,7 @@ document.cookie="interphyr_connected=; max-age=0; path=/";
 /*
  * Outside Relations and Projects are for citizens of
  * PAF member nations only. Anyone else (except the
- * admin session) sees an "Access Restricted" notice
+ * admin session) sees a "blocked in your region" notice
  * instead - see the restriction script in the body.
  * Swissland never gets this far: it is blocked from
  * the whole site on the home page.
@@ -428,7 +428,7 @@ Hosted by <a href="../../ZapadTelecom/">ZapadTelecom</a>&copy;
 /*
  * Restricted section: if the login gate decided this
  * visitor's nation isn't a PAF member, swap the page
- * content for an "Access Restricted" notice.
+ * content for a "blocked in your region" notice.
  */
 
 if(!window.interphyrRestricted)return;
@@ -444,27 +444,10 @@ Array.prototype.slice.call(document.querySelectorAll(".ie-explorer .explorer-box
 el.parentNode.removeChild(el);
 });
 
-var nation="";
-try{
-var m=document.cookie.match(/(?:^|;\s*)interphyr_registered_nation=([^;]*)/);
-if(m)nation=decodeURIComponent(m[1]);
-}catch(e){}
-
 var notice=document.createElement("section");
 notice.id="information";
 notice.className="content-section";
-notice.innerHTML='<h2>Access Restricted</h2><div class="notice"><b>ACCESS DENIED:</b> This section of InterPhyr.net is restricted to registered citizens of Phyrrian Astral Federation member nations.</div><p class="restricted-nation"></p><p><a href="../../">Return to InterPhyr.net</a></p>';
-
-var who=notice.querySelector(".restricted-nation");
-if(nation){
-who.appendChild(document.createTextNode("Your registered nation, "));
-var b=document.createElement("b");
-b.textContent=nation;
-who.appendChild(b);
-who.appendChild(document.createTextNode(", is not a member of the Federation."));
-}else{
-who.parentNode.removeChild(who);
-}
+notice.innerHTML='<h2>This page is blocked in your region</h2>';
 
 header.parentNode.insertBefore(notice,header.nextSibling);
 

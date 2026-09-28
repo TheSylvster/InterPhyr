@@ -764,6 +764,19 @@ return normalizeNationName(name)==="swissland";
 }
 
 
+function isAdminBypass(name){
+
+/*
+ * Secret admin bypass: skips registration
+ * and the dial-up connect screen entirely.
+ * Deliberately never written to a cookie.
+ */
+
+return normalizeNationName(name)==="interphyradmin";
+
+}
+
+
 function getCookie(name){
 
 const cookies=document.cookie.split(";");
@@ -899,6 +912,22 @@ const nation=nationInput.value.trim();
 if(!nation){
 
 nationInput.focus();
+return;
+
+}
+
+if(isAdminBypass(nation)){
+
+/*
+ * No cookie is ever written here -
+ * this bypass never persists.
+ */
+
+registrationScreen.style.display="none";
+registrationErrorScreen.style.display="none";
+
+revealWebsite();
+
 return;
 
 }

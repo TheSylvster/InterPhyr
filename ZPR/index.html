@@ -197,7 +197,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <button onclick="location.href='../'"><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
 <button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
-<button onclick="location.reload()"><img class="ie-toolbar-icon" src="../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
+<button id="ie-refresh"><img class="ie-toolbar-icon" src="../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
 <button onclick="location.href='../'"><img class="ie-toolbar-icon" src="../images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>
 
 <div class="ie-grip"></div>
@@ -205,6 +205,8 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <button><img class="ie-toolbar-icon" src="../images/toolbar/search.webp" alt=""><span class="ie-toolbar-label">Search</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/favorites.webp" alt=""><span class="ie-toolbar-label">Favorites</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/history.webp" alt=""><span class="ie-toolbar-label">History</span></button>
+<button><img class="ie-toolbar-icon" src="../images/toolbar/channels.webp" alt=""><span class="ie-toolbar-label">Channels</span></button>
+<button onclick="document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(function(){})"><img class="ie-toolbar-icon" src="../images/toolbar/fullscreen.webp" alt=""><span class="ie-toolbar-label">Fullscreen</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/mail.webp" alt=""><span class="ie-toolbar-label">Mail</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/print.webp" alt=""><span class="ie-toolbar-label">Print</span></button>
 
@@ -434,6 +436,7 @@ klippySpeak();
    ========================================================= */
 
 const webpage=document.querySelector(".webpage");
+const refreshButton=document.getElementById("ie-refresh");
 const statusText=document.getElementById("ie-status-text");
 
 function startPageLoading(){
@@ -478,6 +481,12 @@ statusText.textContent="Done";
 },2050);
 
 }
+
+refreshButton.addEventListener("click",function(){
+if(!webpage.classList.contains("webpage-loading")){
+startPageLoading();
+}
+});
 
 startPageLoading();
 

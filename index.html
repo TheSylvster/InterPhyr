@@ -515,7 +515,7 @@ InterPhyr.net cannot be accessed from the registered region.
 <button><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
 <button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
-<button><img class="ie-toolbar-icon" src="images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
+<button id="ie-refresh"><img class="ie-toolbar-icon" src="images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>
 
 <div class="ie-grip"></div>
@@ -523,6 +523,8 @@ InterPhyr.net cannot be accessed from the registered region.
 <button><img class="ie-toolbar-icon" src="images/toolbar/search.webp" alt=""><span class="ie-toolbar-label">Search</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/favorites.webp" alt=""><span class="ie-toolbar-label">Favorites</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/history.webp" alt=""><span class="ie-toolbar-label">History</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/channels.webp" alt=""><span class="ie-toolbar-label">Channels</span></button>
+<button onclick="document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(function(){})"><img class="ie-toolbar-icon" src="images/toolbar/fullscreen.webp" alt=""><span class="ie-toolbar-label">Fullscreen</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/mail.webp" alt=""><span class="ie-toolbar-label">Mail</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="images/toolbar/print.webp" alt=""><span class="ie-toolbar-label">Print</span></button>
 
@@ -1168,6 +1170,7 @@ const retry=document.getElementById("dialup-retry");
 const webpage=document.querySelector(".webpage");
 const statusText=document.getElementById("ie-status-text");
 const goButton=document.getElementById("ie-go");
+const refreshButton=document.getElementById("ie-refresh");
 
 let dialupNumber="";
 let assignedIP="";
@@ -1274,6 +1277,8 @@ promise.catch(function(){});
 }
 
 function startPageLoading(){
+
+if(webpage.classList.contains("webpage-loading"))return;
 
 webpage.className="webpage webpage-loading";
 
@@ -1629,6 +1634,10 @@ goButton.addEventListener("click",function(event){
 event.preventDefault();
 event.stopPropagation();
 
+});
+
+refreshButton.addEventListener("click",function(){
+startPageLoading();
 });
 
 document.querySelectorAll("a").forEach(function(link){

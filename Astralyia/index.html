@@ -17,16 +17,28 @@ return decodeURIComponent(c.substring((name+"=").length));
 return null;
 }
 
+var blocked=getCookie("interphyr_nation_status")==="invalid";
+var registered=getCookie("interphyr_registered_nation");
+var adminSession=getCookie("interphyr_admin_session")==="1";
+
+/*
+ * Reload detection is best-effort only - if it
+ * throws for any reason, the login check above
+ * must still run and still redirect. Never let
+ * this be the reason the gate fails open.
+ */
+
+try{
+
 var navEntries=performance.getEntriesByType("navigation");
 var navType=navEntries.length?navEntries[0].type:"navigate";
 
 if(navType==="reload"){
 document.cookie="interphyr_admin_session=; max-age=0; path=/";
+adminSession=false;
 }
 
-var blocked=getCookie("interphyr_nation_status")==="invalid";
-var registered=getCookie("interphyr_registered_nation");
-var adminSession=getCookie("interphyr_admin_session")==="1";
+}catch(e){}
 
 if(blocked||(!registered&&!adminSession)){
 location.replace("../");

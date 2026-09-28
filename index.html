@@ -437,10 +437,10 @@ InterPhyr.net cannot be accessed from the registered region.
 
 
 <div id="dialup-screen" class="dialup-screen">
-<div class="window dialup-window" role="dialog" aria-label="InterPhyr Network Connection">
+<div class="window dialup-window" role="dialog" aria-label="ZapadTelecom Network Connection">
 
 <div class="title-bar">
-<div class="title-bar-text">InterPhyr Network Connection</div>
+<div class="title-bar-text">ZapadTelecom Network Connection</div>
 <div class="title-bar-controls">
 <button type="button" aria-label="Minimize"></button>
 <button type="button" aria-label="Close"></button>
@@ -1637,8 +1637,14 @@ this.classList.add("clicked");
  * a refresh, so the session survives that.
  */
 
+let navType="navigate";
+
+try{
+
 const navEntries=performance.getEntriesByType("navigation");
-const navType=navEntries.length?navEntries[0].type:"navigate";
+navType=navEntries.length?navEntries[0].type:"navigate";
+
+}catch(e){}
 
 if(navType==="reload"){
 

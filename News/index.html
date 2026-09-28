@@ -141,7 +141,7 @@ img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
 .webpage-loading.page-stage-1 .site-header{visibility:visible}
 .webpage-loading.page-stage-2 #information{visibility:visible}
 .webpage-loading.page-stage-3 #masthead{visibility:visible}
-.webpage-loading.page-stage-4 #articles{visibility:visible}
+.webpage-loading.page-stage-4 #important,.webpage-loading.page-stage-4 #articles{visibility:visible}
 .webpage-loading.page-stage-5 #related{visibility:visible}
 .webpage-loading.page-stage-6 hr,.webpage-loading.page-stage-6 .small{visibility:visible}
 
@@ -172,6 +172,7 @@ a:active{color:#800080!important}
 .news-story:first-of-type{border-top:none}
 .news-headline{margin:0 0 3px;font-family:"Times New Roman",Times,serif;font-size:17px;color:#000}
 .news-byline{margin:0 0 6px;font-size:10px;color:#404040;font-style:italic}
+#important .news-story{margin-top:6px;padding:8px 10px;border:1px solid #808080;border-left:4px solid #c00000;background:#fffff0}
 .news-more{margin-top:4px}
 .news-more>summary{display:inline-block;list-style:none;cursor:pointer;user-select:none;padding:3px 10px;margin:2px 0 4px;font-size:10px;background:#c0c0c0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #fff,inset -2px -2px #808080,inset 2px 2px #dfdfdf}
 .news-more>summary::-webkit-details-marker{display:none}
@@ -342,7 +343,26 @@ This website is currently under construction.
 
 </section>
 
-<!-- To add a new story, copy one of the <article class="news-story"> blocks below. Put the first sentence in "news-lead" and the rest in paragraphs after the <summary>. Newest stories go first. -->
+<section id="important" class="content-section">
+
+<h2>Important News</h2>
+
+<article class="news-story">
+<h3 class="news-headline">First Secretary AldAz Secures the Frontier!</h3>
+<p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 26.09.1996</p>
+<p class="news-lead">Yesterday, the Central Committee announced the formal ratification of the historic pact between the Zapadiyan People's Republic and the Phyrrian Astral Federation (PAF).</p>
+<details class="news-more">
+<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
+<p>This monumental diplomatic achievement, secured through the unyielding resolve of First Secretary AldAz, Chairperson of the Central Committee, establishes the sovereign borders of the ZPR and marks a decisive victory for the working class over external imperialist pressure.</p>
+<p>The agreement was finalized following intense negotiations between First Secretary AldAz and President Zwariowany, the leader of the Astralyia Republic. For months, reactionary elements abroad predicted the containment of our young republic, yet the iron solidarity of the Zapadiyan proletariat has forced the PAF leadership to recognize the permanence of our socialist state.</p>
+<p>By decree of First Secretary AldAz, all heavy industry, transport networks, and private banking institutions are declared the property of the state. To restore economic life and combat the sabotage of class enemies, the Council of People's Commissars has initiated an immediate program of socialist construction. Labor detachments are already moving into the coal districts to restore production, while regional committees have begun the redistribution of confiscated estates to the landless peasantry.</p>
+<p>First Secretary AldAz emphasized that strict revolutionary discipline must be maintained in all sectors to ensure the supply of bread to the industrial centers and to frustrate the efforts of speculators and black-marketeers.</p>
+</details>
+</article>
+
+</section>
+
+<!-- To add a new story, copy one of the <article class="news-story"> blocks below. Put the first sentence in "news-lead" and the rest in paragraphs after the <summary>. Newest stories go first. Stories in "Important News" are pinned above "Latest Stories". -->
 
 <section id="articles" class="content-section">
 
@@ -381,19 +401,6 @@ This website is currently under construction.
 <p>The upgrade programme will replace a number of ageing telephone exchanges across the federation, some of which date back to a period the company refers to only as "before." Engineers will also install new modems at the central data centre, bringing the total number of modems at the central data centre to four.</p>
 <p>Subscribers are advised that the "line busy" error may appear more often while the work is carried out. ZapadTelecom&copy; reminds customers that this is normal, that the line is not in fact busy, and that the problem can usually be resolved by clicking Retry and thinking about something else.</p>
 <p>The company has also confirmed that the ZapadTelecom Interweb Surfer&copy; will be updated to a new version later this year, which it says will be identical to the current version in every respect except the version number.</p>
-</details>
-</article>
-
-<article class="news-story">
-<h3 class="news-headline">First Secretary AldAz Secures the Frontier!</h3>
-<p class="news-byline">People's Information Ministry &mdash; Edited &amp; Approved &mdash; 26.09.1996</p>
-<p class="news-lead">Yesterday, the Central Committee announced the formal ratification of the historic pact between the Zapadiyan People's Republic and the Phyrrian Astral Federation (PAF).</p>
-<details class="news-more">
-<summary><span class="news-more-closed">&#9660; Read more</span><span class="news-more-open">&#9650; Show less</span></summary>
-<p>This monumental diplomatic achievement, secured through the unyielding resolve of First Secretary AldAz, Chairperson of the Central Committee, establishes the sovereign borders of the ZPR and marks a decisive victory for the working class over external imperialist pressure.</p>
-<p>The agreement was finalized following intense negotiations between First Secretary AldAz and President Zwariowany, the leader of the Astralyia Republic. For months, reactionary elements abroad predicted the containment of our young republic, yet the iron solidarity of the Zapadiyan proletariat has forced the PAF leadership to recognize the permanence of our socialist state.</p>
-<p>By decree of First Secretary AldAz, all heavy industry, transport networks, and private banking institutions are declared the property of the state. To restore economic life and combat the sabotage of class enemies, the Council of People's Commissars has initiated an immediate program of socialist construction. Labor detachments are already moving into the coal districts to restore production, while regional committees have begun the redistribution of confiscated estates to the landless peasantry.</p>
-<p>First Secretary AldAz emphasized that strict revolutionary discipline must be maintained in all sectors to ensure the supply of bread to the industrial centers and to frustrate the efforts of speculators and black-marketeers.</p>
 </details>
 </article>
 

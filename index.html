@@ -825,7 +825,12 @@ const klippyLines=[
 "I see you're browsing InterPhyr.net. Need any tips? ...No? Okay.",
 "You clicked me. That's it. That's the whole feature.",
 "Still here. Still a paperclip.",
-"It looks like you're trying to connect to the internet. Bold of you."
+"It looks like you're trying to connect to the internet. Bold of you.",
+"It looks like you're reading the Goals section. Rule one: don't type 'Swissland'.",
+"Three member nations, one paperclip. Seems balanced.",
+"Careful with the Doctrines section - socialism and monarchy sharing a webpage.",
+"It looks like you're checking the Member Nations table. They're all very nice, mostly.",
+"This website is currently under construction. So am I, emotionally."
 ];
 
 let klippyLastLine=-1;
@@ -912,10 +917,12 @@ function isAdminBypass(name){
 /*
  * Secret admin bypass: skips registration
  * and the dial-up connect screen entirely.
- * Deliberately never written to a cookie.
+ * Only a session-only cookie is written (see
+ * interphyr_admin_session), never a real
+ * persistent registration.
  */
 
-return normalizeNationName(name)==="interphyradmin";
+return normalizeNationName(name)==="zaptelit";
 
 }
 

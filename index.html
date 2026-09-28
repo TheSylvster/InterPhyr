@@ -2510,12 +2510,23 @@ showRegistration();
 <script>
 (function(){
 /* Browsers only allow entering fullscreen from a user gesture,
-   so we request it on the very first click/keypress/touch. */
+   so we request it on the very first click/keypress/touch -
+   but only when the site is freshly opened (typed URL, bookmark,
+   refresh). Arriving via an in-site link or Back/Forward leaves
+   the user's fullscreen choice alone. */
+var navType="navigate";
+try{
+var navEntries=performance.getEntriesByType("navigation");
+if(navEntries.length)navType=navEntries[0].type;
+}catch(e){}
+var fromSite=navType==="back_forward"||(navType!=="reload"&&document.referrer.indexOf(new URL("./",location.href).href)===0);
+if(fromSite)return;
 function goFullscreen(){
 var el=document.documentElement;
 var request=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
 if(request&&!document.fullscreenElement){
-request.call(el).catch(function(){});
+var result=request.call(el);
+if(result&&result.catch)result.catch(function(){});
 }
 ["click","keydown","touchstart"].forEach(function(evt){
 document.removeEventListener(evt,goFullscreen);

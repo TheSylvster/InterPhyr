@@ -557,9 +557,9 @@ InterPhyr.net cannot be accessed from the registered region.
 
 <li>Nations
 <ul>
-<li><a href="#astralyia">Astralyia Republic</a></li>
-<li><a href="#zpr">Zapadiya People's Republic</a></li>
-<li><a href="#rendale">Kingdom of Rendale</a></li>
+<li><a href="Astralyia/">Astralyia Republic</a></li>
+<li><a href="ZPR/">Zapadiya People's Republic</a></li>
+<li><a href="Rendale/">Kingdom of Rendale</a></li>
 </ul>
 </li>
 
@@ -1062,9 +1062,14 @@ return;
 if(isAdminBypass(nation)){
 
 /*
- * No cookie is ever written here -
- * this bypass never persists.
+ * Session-only: keeps you logged in while
+ * navigating between InterPhyr pages, but is
+ * cleared the moment this page is refreshed
+ * (see the reload check in INITIAL STARTUP).
+ * Never becomes a persistent registration.
  */
+
+document.cookie="interphyr_admin_session=1; path=/";
 
 registrationScreen.style.display="none";
 registrationErrorScreen.style.display="none";
@@ -1611,6 +1616,23 @@ this.classList.add("clicked");
    ========================================================= */
 
 /*
+ * A hard refresh of THIS page clears the admin
+ * session cookie, so the bypass has to be typed
+ * again. Navigating here from another InterPhyr
+ * page (a normal link click) does not count as
+ * a refresh, so the session survives that.
+ */
+
+const navEntries=performance.getEntriesByType("navigation");
+const navType=navEntries.length?navEntries[0].type:"navigate";
+
+if(navType==="reload"){
+
+document.cookie="interphyr_admin_session=; max-age=0; path=/";
+
+}
+
+/*
  * NATION STATUS COOKIE CHECK HAPPENS FIRST.
  *
  * If interphyr_nation_status=invalid,
@@ -1654,6 +1676,19 @@ screen.style.display="flex";
 resetDialup();
 
 }
+
+}else if(getCookie("interphyr_admin_session")==="1"){
+
+/*
+ * Still within the same admin session
+ * (navigated here, didn't refresh) -
+ * go straight to the loaded site.
+ */
+
+registrationScreen.style.display="none";
+registrationErrorScreen.style.display="none";
+
+revealWebsite();
 
 }else{
 

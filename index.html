@@ -543,6 +543,7 @@ InterPhyr.net cannot be accessed from the registered region.
 <a href="#nations">Nations</a>
 <a href="#goals">Goals</a>
 <a href="#doctrines">Doctrines</a>
+<a href="News/">News</a>
 <a href="#contact">Contact</a>
 </div>
 
@@ -569,6 +570,7 @@ InterPhyr.net cannot be accessed from the registered region.
 
 <li><a href="#doctrines">Doctrines</a></li>
 <li><a href="ZapadTelecom/">ZapadTelecom</a></li>
+<li><a href="News/">The Zapadiyan Daily</a></li>
 
 </ul>
 
@@ -615,7 +617,7 @@ InterPhyr.net cannot be accessed from the registered region.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">Last updated: 199X</p>
+<p class="small">Last updated: 1998</p>
 
 </section>
 
@@ -626,6 +628,8 @@ InterPhyr.net cannot be accessed from the registered region.
 <p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
 
 <p>This website provides information about the federation and its participating member nations.</p>
+
+<p>Read the latest official communications in <a href="News/">The Zapadiyan Daily</a>.</p>
 
 <div class="notice">
 <b>NOTICE:</b>
@@ -1661,9 +1665,16 @@ document.cookie="interphyr_admin_session=; max-age=0; path=/";
  * URL (which have no same-origin referrer). Used
  * to skip replaying the dial-up screen for someone
  * who was already logged in.
+ *
+ * A reload keeps re-sending the ORIGINAL referrer
+ * (whatever page you first arrived from), so without
+ * the navType check here, hitting refresh right after
+ * following an in-site link would be mistaken for
+ * "came from another InterPhyr page" and skip the
+ * dial-up replay a genuine refresh is supposed to show.
  */
 
-const cameFromInterPhyr=document.referrer.indexOf(location.origin)===0;
+const cameFromInterPhyr=navType!=="reload"&&document.referrer.indexOf(location.origin)===0;
 
 /*
  * NATION STATUS COOKIE CHECK HAPPENS FIRST.

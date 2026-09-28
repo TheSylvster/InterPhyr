@@ -2195,5 +2195,25 @@ showRegistration();
 });
 </script>
 
+<script>
+(function(){
+/* Browsers only allow entering fullscreen from a user gesture,
+   so we request it on the very first click/keypress/touch. */
+function goFullscreen(){
+var el=document.documentElement;
+var request=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
+if(request&&!document.fullscreenElement){
+request.call(el).catch(function(){});
+}
+["click","keydown","touchstart"].forEach(function(evt){
+document.removeEventListener(evt,goFullscreen);
+});
+}
+["click","keydown","touchstart"].forEach(function(evt){
+document.addEventListener(evt,goFullscreen,{once:true});
+});
+})();
+</script>
+
 </body>
 </html>

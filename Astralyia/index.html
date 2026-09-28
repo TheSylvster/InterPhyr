@@ -87,9 +87,10 @@ body{overflow:hidden;background:#c0c0c0;font-family:Arial,Helvetica,sans-serif;f
 
 .webpage-loading>*{visibility:hidden}
 .webpage-loading.page-stage-1 .site-header{visibility:visible}
-.webpage-loading.page-stage-2 #nation-profile{visibility:visible}
-.webpage-loading.page-stage-3 #related{visibility:visible}
-.webpage-loading.page-stage-4 hr,.webpage-loading.page-stage-4 .small{visibility:visible}
+.webpage-loading.page-stage-2 #information{visibility:visible}
+.webpage-loading.page-stage-3 #nation-profile{visibility:visible}
+.webpage-loading.page-stage-4 #related{visibility:visible}
+.webpage-loading.page-stage-5 hr,.webpage-loading.page-stage-5 .small{visibility:visible}
 
 .site-header{padding-bottom:5px;margin-bottom:10px;border-bottom:1px solid #808080}
 .site-title{margin:0;display:inline-block;font-family:Georgia,"Times New Roman",Times,serif;font-size:40px;font-weight:900;letter-spacing:-2.5px;color:#e00000;text-shadow:2px 2px 0 #800000;line-height:42px}
@@ -102,6 +103,8 @@ body{overflow:hidden;background:#c0c0c0;font-family:Arial,Helvetica,sans-serif;f
 .content-section h2{margin:0 0 5px;padding-bottom:2px;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080;border-bottom:1px solid #808080}
 .content-section p{margin:5px 0;line-height:1.35}
 .content-section ul{margin-top:5px;padding-left:25px}
+
+.notice{margin:10px 0;padding:5px 7px;background:#ffffcc;border:1px solid #808080;font-size:10px}
 
 a{color:#0000ff!important}
 a:visited{color:#0000ff!important}
@@ -245,6 +248,21 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 </h1>
 </header>
 
+<section id="information" class="content-section">
+
+<h2>Information</h2>
+
+<p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
+
+<p>This website provides information about the federation and its participating member nations.</p>
+
+<div class="notice">
+<b>NOTICE:</b>
+This website is currently under construction.
+</div>
+
+</section>
+
 <section id="nation-profile" class="content-section nation">
 
 <div class="nation-heading">
@@ -382,23 +400,28 @@ statusText.textContent="Receiving document...";
 
 setTimeout(function(){
 webpage.classList.add("page-stage-2");
-statusText.textContent="Receiving picture...";
-},650);
+statusText.textContent="Receiving document...";
+},600);
 
 setTimeout(function(){
 webpage.classList.add("page-stage-3");
-statusText.textContent="Receiving document...";
-},1050);
+statusText.textContent="Receiving picture...";
+},950);
 
 setTimeout(function(){
 webpage.classList.add("page-stage-4");
+statusText.textContent="Receiving document...";
+},1300);
+
+setTimeout(function(){
+webpage.classList.add("page-stage-5");
 statusText.textContent="Done";
-},1450);
+},1650);
 
 setTimeout(function(){
 webpage.className="webpage";
 statusText.textContent="Done";
-},1500);
+},1700);
 
 }
 

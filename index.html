@@ -254,8 +254,7 @@ position:fixed;
 right:18px;
 bottom:18px;
 z-index:99999;
-width:64px;
-height:64px;
+width:70px;
 cursor:pointer;
 user-select:none;
 -webkit-user-select:none;
@@ -268,48 +267,16 @@ outline-offset:3px;
 }
 
 .klippy-face{
-font-size:52px;
-line-height:1;
-text-align:center;
-transform:scaleX(-1);
-filter:drop-shadow(1px 2px 1px rgba(0,0,0,.35));
-}
-
-.klippy-eyes{
-position:absolute;
-top:14px;
-left:0;
+display:block;
 width:100%;
-display:flex;
-justify-content:center;
-gap:10px;
-pointer-events:none;
-}
-
-.klippy-eye{
-width:9px;
-height:9px;
-background:#fff;
-border:1px solid #000;
-border-radius:50%;
-display:flex;
-align-items:center;
-justify-content:center;
-animation:klippy-blink 4.2s infinite;
-}
-
-.klippy-eye::after{
-content:"";
-width:4px;
-height:4px;
-background:#000;
-border-radius:50%;
+height:auto;
+filter:drop-shadow(1px 2px 1px rgba(0,0,0,.35));
 }
 
 .klippy-bubble{
 position:absolute;
 right:0;
-bottom:76px;
+bottom:58px;
 min-width:150px;
 max-width:210px;
 background:#ffffe1;
@@ -360,11 +327,6 @@ pointer-events:auto;
 @keyframes klippy-bob{
 0%,100%{transform:translateY(0)}
 50%{transform:translateY(-5px)}
-}
-
-@keyframes klippy-blink{
-0%,92%,100%{transform:scaleY(1)}
-96%{transform:scaleY(.15)}
 }
 
 </style>
@@ -841,11 +803,7 @@ Internet
 
 <div id="klippy" role="button" tabindex="0" aria-label="Klippy the assistant">
 <div id="klippy-bubble" class="klippy-bubble" role="status" aria-live="polite"></div>
-<div class="klippy-face">📎</div>
-<div class="klippy-eyes">
-<div class="klippy-eye"></div>
-<div class="klippy-eye"></div>
-</div>
+<img class="klippy-face" src="images/klippy.png" alt="Klippy" draggable="false">
 </div>
 
 <<script>

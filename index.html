@@ -646,7 +646,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">InterPhyr Version: V0.87</p>
+<p class="small">InterPhyr Version: V0.88</p>
 
 </section>
 
@@ -1070,9 +1070,21 @@ return getCookie("interphyr_registered_nation");
 }
 
 
+function isLockedOut(){
+
+/*
+ * Set by the Government Access page after
+ * three failed logon attempts.
+ */
+
+return getCookie("interphyr_lockout")==="1";
+
+}
+
+
 function isWebsiteBlocked(){
 
-return getCookie("interphyr_nation_status")==="invalid";
+return getCookie("interphyr_nation_status")==="invalid"||isLockedOut();
 
 }
 
@@ -1110,6 +1122,11 @@ nationInput.focus();
 
 
 function showBlockedRegion(){
+
+if(isLockedOut()){
+registrationErrorScreen.querySelector(".registration-error-text").textContent="Access to the ZapadTelecom© network has been revoked";
+registrationErrorScreen.querySelector(".registration-error-subtext").textContent="Repeated failed logon attempts to a restricted government system were recorded from this terminal. The incident has been reported to the Zapadiyan People's Information Ministry.";
+}
 
 registrationScreen.style.display="none";
 registrationErrorScreen.style.display="flex";

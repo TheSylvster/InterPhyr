@@ -31,6 +31,7 @@ return null;
 function isLoggedIn(){
 try{
 if(getCookie("interphyr_nation_status")==="invalid")return false;
+if(getCookie("interphyr_lockout")==="1")return false;
 if(getCookie("interphyr_admin_session")==="1")return true;
 return !!getCookie("interphyr_registered_nation")&&getCookie("interphyr_connected")==="1";
 }catch(e){

@@ -31,6 +31,7 @@ return null;
 function isLoggedIn(){
 try{
 if(getCookie("interphyr_nation_status")==="invalid")return false;
+if(getCookie("interphyr_lockout")==="1")return false;
 if(getCookie("interphyr_admin_session")==="1")return true;
 return !!getCookie("interphyr_registered_nation")&&getCookie("interphyr_connected")==="1";
 }catch(e){
@@ -632,22 +633,59 @@ const html=await crypto.subtle.decrypt({name:"AES-GCM",iv:fromB64(vault.content.
 return new TextDecoder().decode(html);
 }
 
+/*
+ * Three failed logons lock this browser out of the whole site
+ * (see isLockedOut on the home page). The count survives reloads.
+ */
+
+const MAX_FAILED_LOGONS=3;
+
+function failedLogons(){
+const m=document.cookie.match(/(?:^|;\s*)interphyr_gov_fails=(\d+)/);
+return m?parseInt(m[1],10):0;
+}
+
+function setFailedLogons(n){
+document.cookie="interphyr_gov_fails="+n+"; max-age=31536000; path=/";
+}
+
+function lockOut(){
+document.cookie="interphyr_lockout=1; max-age=31536000; path=/";
+document.cookie="interphyr_admin_session=; max-age=0; path=/";
+document.cookie="interphyr_connected=; max-age=0; path=/";
+location.replace("../");
+}
+
 form.addEventListener("submit",function(event){
 
 event.preventDefault();
 
 const username=userInput.value;
 errorText.textContent="";
+
+if(!username.trim()||!passInput.value){
+errorText.textContent="Please enter a username and password.";
+return;
+}
+
 submit.disabled=true;
 submit.textContent="Verifying...";
 
 unlock(username,passInput.value).then(function(html){
+setFailedLogons(0);
 contentBody.innerHTML=html;
 who.textContent=username.trim();
 login.hidden=true;
 content.hidden=false;
 }).catch(function(){
-errorText.textContent="Logon failed. The username or password is incorrect.";
+const fails=failedLogons()+1;
+setFailedLogons(fails);
+if(fails>=MAX_FAILED_LOGONS){
+lockOut();
+return;
+}
+const left=MAX_FAILED_LOGONS-fails;
+errorText.textContent="Logon failed. The username or password is incorrect. "+left+(left===1?" attempt":" attempts")+" remaining before this terminal is locked out.";
 passInput.focus();
 }).finally(function(){
 passInput.value="";

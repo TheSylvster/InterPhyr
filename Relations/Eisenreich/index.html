@@ -239,7 +239,32 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .klippy-bubble.klippy-visible{opacity:1;transform:translateY(0);pointer-events:auto}
 
 @keyframes klippy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-</style>
+
+/* =========================================================
+   MOBILE LAYOUT (phones; desktop is unaffected)
+   ========================================================= */
+
+.ie-menu-toggle{display:none}
+
+@media (max-width:760px){
+.browser-window{min-width:0;min-height:0}
+.browser-window>.title-bar .title-bar-text{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ie-menu{gap:10px;overflow:hidden}
+.ie-toolbar-label,.ie-toolbar .ie-dropdown{display:none}
+.ie-toolbar button{min-width:30px;padding:1px 4px}
+.ie-toolbar button:nth-of-type(6),.ie-toolbar button:nth-of-type(7),.ie-toolbar button:nth-of-type(8),.ie-toolbar button:nth-of-type(9),.ie-toolbar button:nth-of-type(11),.ie-toolbar button:nth-of-type(12){display:none}
+.ie-address-label{display:none}
+.ie-menu-toggle{display:inline-block;height:21px!important;min-width:0!important;padding:1px 8px!important;font-size:10px!important;flex-shrink:0}
+.ie-links{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.ie-links::-webkit-scrollbar{display:none}
+.ie-main{position:relative}
+.ie-explorer{position:absolute;left:0;top:0;bottom:0;z-index:50;height:auto;box-shadow:3px 0 8px rgba(0,0,0,.4);transform:translateX(-105%);transition:transform .15s ease-out}
+.ie-main.explorer-open .ie-explorer{transform:none}
+.webpage{padding:10px 10px 24px}
+.site-title{font-size:30px;line-height:34px;letter-spacing:-2px}
+.nation-info{margin-left:0}
+#klippy{display:none!important}
+}</style>
 </head>
 
 <body>
@@ -292,6 +317,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 </div>
 
 <div class="ie-address-row">
+<button type="button" class="ie-menu-toggle" aria-label="Show or hide the InterPhyr menu">Menu</button>
 <span class="ie-address-label">Address</span>
 <img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
 <input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/relations/eisenreich">
@@ -796,6 +822,32 @@ backdrop.querySelector('[aria-label="Close"]').focus();
 
 document.addEventListener("keydown",function(event){
 if(event.key==="Escape")closeViewer();
+});
+
+})();
+</script>
+<script>
+(function(){
+
+/*
+ * Mobile: the side panel slides out from the left when
+ * the Menu button (next to the address bar) is pressed.
+ * Tapping a link, or anywhere outside the panel, closes it.
+ */
+
+var main=document.querySelector(".ie-main");
+var toggle=document.querySelector(".ie-menu-toggle");
+if(!main||!toggle)return;
+
+toggle.addEventListener("click",function(event){
+event.stopPropagation();
+main.classList.toggle("explorer-open");
+});
+
+main.addEventListener("click",function(event){
+if(!main.classList.contains("explorer-open"))return;
+var inPanel=event.target.closest(".ie-explorer");
+if(!inPanel||event.target.closest("a"))main.classList.remove("explorer-open");
 });
 
 })();

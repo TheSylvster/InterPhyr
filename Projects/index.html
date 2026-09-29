@@ -62,21 +62,14 @@ document.cookie="interphyr_connected=; max-age=0; path=/";
 }
 
 /*
- * Outside Relations and Projects are for citizens of
- * PAF member nations only. Anyone else (except the
- * admin session) sees a "blocked in your region" notice
- * instead - see the restriction script in the body.
- * Swissland never gets this far: it is blocked from
- * the whole site on the home page.
+ * Projects is open to every registered nation now that
+ * classified work lives in Government Access. A Swissland
+ * registration (status "invalid") stays blocked - it is
+ * normally stopped on the home page before reaching here.
  */
 
-function isPafMember(name){
-var s=name.normalize("NFD").toLowerCase().replace(/[^a-z0-9]/g,"").replace(/^the/,"");
-return s==="zpr"||/^(astralyia|zapadiya|zapadyia|rendale|kingdomofrendale)/.test(s);
-}
-
 try{
-window.interphyrRestricted=getCookie("interphyr_admin_session")!=="1"&&!isPafMember(getCookie("interphyr_registered_nation")||"");
+window.interphyrRestricted=getCookie("interphyr_nation_status")==="invalid";
 }catch(e){
 window.interphyrRestricted=true;
 }

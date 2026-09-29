@@ -240,6 +240,9 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
    ========================================================= */
 
 .ie-menu-toggle{display:none}
+svg.ie-toolbar-icon{height:17px;fill:#000}
+.explorer-tree summary{list-style:none}
+.explorer-tree summary::-webkit-details-marker{display:none}
 
 @media (max-width:760px){
 .browser-window{min-width:0;min-height:0}
@@ -259,6 +262,8 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .site-title{font-size:30px;line-height:34px;letter-spacing:-2px}
 .nation-info{margin-left:0}
 #klippy{display:none!important}
+.ie-page{overflow-x:hidden}
+.nations-table th,.nations-table td,.relations-table th,.relations-table td{white-space:normal}
 }</style>
 </head>
 
@@ -292,8 +297,8 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="ie-toolbar">
 <div class="ie-grip"></div>
 
-<button onclick="interphyrGo('../')"><span class="ie-toolbar-icon">🢀</span><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
-<button><span class="ie-toolbar-icon">🢂</span><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
+<button onclick="interphyrGo('../')"><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M16 8.5 9 2v4H1v5h8v4z"/></svg><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
 <button id="ie-refresh"><img class="ie-toolbar-icon" src="../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
 <button onclick="interphyrGo('../')"><img class="ie-toolbar-icon" src="../images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>

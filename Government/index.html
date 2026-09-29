@@ -390,14 +390,14 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 <div class="title-bar-text">ZapadTelecom&copy; Secure Logon</div>
 </div>
 <div class="window-body">
-<form id="gov-form" autocomplete="off">
+<form id="gov-form">
 <div class="gov-field">
 <label for="gov-user">Username:</label>
-<input id="gov-user" class="gov-masked" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other">
+<input id="gov-user" class="gov-masked" type="text" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false">
 </div>
 <div class="gov-field">
 <label for="gov-pass">Password:</label>
-<input id="gov-pass" class="gov-masked" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore data-form-type="other">
+<input id="gov-pass" type="password" autocomplete="current-password">
 </div>
 <p id="gov-error" class="gov-error" role="alert"></p>
 <div class="gov-buttons"><button id="gov-submit" type="submit">Log On</button></div>
@@ -602,17 +602,14 @@ const logoff=document.getElementById("gov-logoff");
 const enc=new TextEncoder();
 
 /*
- * Both fields are plain text boxes drawn as dots, so the browser's
- * password manager never recognises a login form and won't offer to
- * save or autofill it. Where dot-masking isn't supported, fall back to
- * password boxes that are told not to autofill.
+ * The username box is drawn as dots so it stays private on a shared
+ * screen, while remaining a normal username field so the browser can
+ * still save and autofill the login. Where dot-masking isn't
+ * supported, make it a password box instead.
  */
 
 if(!(window.CSS&&CSS.supports&&CSS.supports("-webkit-text-security","disc"))){
-[userInput,passInput].forEach(function(input){
-input.type="password";
-input.autocomplete="new-password";
-});
+userInput.type="password";
 }
 
 function fromB64(s){

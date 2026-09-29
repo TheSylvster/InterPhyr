@@ -643,7 +643,7 @@ InterPhyr.net cannot be accessed from the registered region.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">InterPhyr Version: V0.73</p>
+<p class="small">InterPhyr Version: V0.74</p>
 
 </section>
 
@@ -933,22 +933,89 @@ return name
 }
 
 
+function editDistance(a,b){
+
+let prev=[];
+for(let j=0;j<=b.length;j++)prev[j]=j;
+
+for(let i=1;i<=a.length;i++){
+const cur=[i];
+for(let j=1;j<=b.length;j++){
+cur[j]=Math.min(
+prev[j]+1,
+cur[j-1]+1,
+prev[j-1]+(a[i-1]===b[j-1]?0:1)
+);
+}
+prev=cur;
+}
+
+return prev[b.length];
+
+}
+
+
+function looseLetters(text){
+
+/*
+ * Lowercase letters only, with accents removed,
+ * common number/symbol stand-ins read as letters,
+ * and doubled letters collapsed ("ss" -> "s").
+ */
+
+const leet={"0":"o","1":"l","3":"e","4":"a","5":"s","7":"t","$":"s","@":"a","|":"l","!":"i"};
+
+return text
+.normalize("NFKD")
+.replace(/[̀-ͯ]/g,"")
+.toLowerCase()
+.replace(/[013457$@|!]/g,function(c){return leet[c];})
+.replace(/[^a-z]/g,"")
+.replace(/(.)\1+/g,"$1");
+
+}
+
+
 function isBlockedNation(name){
 
 /*
- * Catches:
+ * Catches Swissland in any case, spacing,
+ * punctuation or spelling close enough to it:
+ * SWISSLAND, Swiss Land, S.W.I.S.S.L.A.N.D.,
+ * Swisland, Swizzland, Sw1ssl4nd, Swissalnd,
+ * "Republic of Swissland", ...
  *
- * Swissland
- * SWISSLAND
- * Swiss Land
- * Swiss-Land
- * Swiss_Land
- * S.W.I.S.S.L.A.N.D.
- *
- * while leaving other names alone.
+ * Every run of consecutive words is compared to
+ * "swisland" (the collapsed spelling). One typo is
+ * always enough; two only if the chunk starts with
+ * "s", so real names like Switzerland, Swaziland,
+ * Scotland, Sealand or "New Island" stay allowed.
  */
 
-return normalizeNationName(name)==="swissland";
+const target="swisland";
+const words=name.split(/[\s\-_.,;:'"\/\\()]+/).filter(Boolean);
+
+for(let i=0;i<words.length;i++){
+
+let chunk="";
+
+for(let j=i;j<words.length;j++){
+
+chunk+=words[j];
+
+const loose=looseLetters(chunk);
+if(loose.length<5)continue;
+if(loose.length>target.length+3)break;
+
+const d=editDistance(loose,target);
+
+if(d<=1||(d<=2&&loose[0]==="s"))return true;
+
+}
+
+}
+
+return false;
 
 }
 

@@ -117,6 +117,18 @@ style.textContent=
 ".ipx-menu{position:fixed;z-index:3000;min-width:190px;max-width:calc(100vw - 8px);padding:2px;background:#c0c0c0;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px #808080,inset 2px 2px #fff;font-size:11px}"+
 ".ipx-menu-item{display:flex;align-items:center;gap:6px;width:100%;min-width:0;min-height:0;padding:3px 16px 3px 4px;border:0;background:none;box-shadow:none!important;color:#000;text-align:left;text-decoration:none;white-space:nowrap;cursor:default}"+
 ".ipx-menu-item:hover,.ipx-menu-item:focus{background:#000080;color:#fff;outline:none}"+
+".ie-menu span{cursor:default}"+
+".ie-menu span:hover{box-shadow:inset -1px -1px #808080,inset 1px 1px #fff}"+
+".ie-toolbar button:disabled img,.ie-toolbar button:disabled svg{opacity:.4}"+
+".ie-toolbar button:disabled{cursor:default}"+
+".ipx-props{border-collapse:collapse;margin:8px 0 0}"+
+".ipx-props td{padding:2px 12px 2px 0;vertical-align:top}"+
+".ipx-props td:first-child{white-space:nowrap}"+
+".ipx-fieldset{margin:0 0 8px;padding:6px 10px}"+
+".ipx-fieldset p{margin:0 0 6px}"+
+".ipx-about{text-align:center}"+
+".ipx-about img{height:56px;width:auto;margin:6px auto 10px;display:block}"+
+".ipx-about p{margin:0 0 8px;line-height:1.4}"+
 ".ipx-menu-item img{width:16px;height:16px;flex-shrink:0}"+
 ".ipx-menu-label{padding:3px 6px;color:#808080}"+
 ".ipx-menu hr{margin:3px 1px;border:0;border-top:1px solid #808080;border-bottom:1px solid #fff}"+
@@ -280,8 +292,9 @@ document.addEventListener("DOMContentLoaded",revealAdminLinks);
 var lastPath=location.pathname;
 new MutationObserver(function(){
 revealAdminLinks();
+updateNavButtons();
 if(location.pathname!==lastPath){lastPath=location.pathname;recordVisit();}
-}).observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+}).observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["class"]});
 
 
 /* =========================================================
@@ -470,6 +483,14 @@ var MAIL=[
 ]}
 ];
 
+/* ZapadTelecom addresses lead to the InterPhyr Discord, like the Contact section. */
+var DISCORD="https://discord.gg/5362UGaDSM";
+
+function mailAddress(address){
+if(/@zapadtelecom\.net$/.test(address))return '<a href="'+DISCORD+'" target="_blank" rel="noopener">'+escapeHtml(address)+"</a>";
+return escapeHtml(address);
+}
+
 function readMail(){
 try{return JSON.parse(localStorage.getItem("interphyr_mail_read"))||{};}catch(e){return {};}
 }
@@ -496,7 +517,7 @@ tr.classList.toggle("selected",tr.getAttribute("data-ipx-mail")===String(i));
 var row=body.querySelector('tr[data-ipx-mail="'+i+'"]');
 if(row)row.classList.remove("unread");
 markRead(i);
-view.innerHTML='<div class="ipx-mail-head"><div><b>From:</b> '+escapeHtml(m.from)+" &lt;"+escapeHtml(m.address)+"&gt;</div><div><b>Date:</b> "+m.date+"</div><div><b>Subject:</b> "+escapeHtml(m.subject)+"</div></div>"+
+view.innerHTML='<div class="ipx-mail-head"><div><b>From:</b> '+escapeHtml(m.from)+" &lt;"+mailAddress(m.address)+"&gt;</div><div><b>Date:</b> "+m.date+"</div><div><b>Subject:</b> "+escapeHtml(m.subject)+"</div></div>"+
 (m.withheld?'<div class="ipx-withheld">MESSAGE WITHHELD BY ORDER OF THE PEOPLE\'S INFORMATION MINISTRY</div>':m.body.map(function(p){return "<p>"+escapeHtml(p)+"</p>";}).join(""));
 view.scrollTop=0;
 }
@@ -551,6 +572,194 @@ go("");
 }
 }
 
+function canGoForward(){
+if(window.navigation&&typeof window.navigation.canGoForward==="boolean")return window.navigation.canGoForward;
+return true;
+}
+
+function isLoading(){
+var page=document.querySelector(".webpage");
+return !!page&&page.classList.contains("webpage-loading")&&toolbarReady();
+}
+
+function toolbarButton(label){
+var buttons=document.querySelectorAll(".ie-toolbar button");
+for(var i=0;i<buttons.length;i++){
+var l=buttons[i].querySelector(".ie-toolbar-label");
+if(l&&l.textContent.trim()===label)return buttons[i];
+}
+return null;
+}
+
+/*
+ * Like Internet Explorer, Back, Forward and Stop are greyed out
+ * when there is nothing for them to do.
+ */
+function updateNavButtons(){
+var states={
+Back:canGoBack()||location.href.split("#")[0]!==root,
+Forward:canGoForward(),
+Stop:isLoading()
+};
+Object.keys(states).forEach(function(label){
+var button=toolbarButton(label);
+if(!button||button.hasAttribute("onclick"))return;
+if(button.disabled!==!states[label])button.disabled=!states[label];
+});
+}
+
+window.addEventListener("popstate",function(){setTimeout(updateNavButtons,0);});
+window.addEventListener("pageshow",updateNavButtons);
+document.addEventListener("DOMContentLoaded",updateNavButtons);
+
+function toggleFullscreen(){
+var el=document.documentElement;
+if(document.fullscreenElement){
+document.exitFullscreen().catch(function(){});
+}else if(el.requestFullscreen){
+el.requestFullscreen().catch(function(){});
+}
+}
+
+
+/* =========================================================
+   PROPERTIES / INTERNET OPTIONS / ABOUT
+   ========================================================= */
+
+function nationName(){
+if(getCookie("interphyr_admin_session")==="1")return "ZapadTelecom© IT";
+return getCookie("interphyr_registered_nation")||"Unregistered";
+}
+
+function openProperties(){
+var address=document.getElementById("ie-address-input");
+var size=document.documentElement.outerHTML.length;
+showWindow("Properties","html-1.png",
+'<div class="ipx-message"><img src="'+iconUrl("html-1.png")+'" alt=""><div><p><b>'+escapeHtml(pageTitle(document.title))+'</b></p></div></div>'+
+'<table class="ipx-props">'+
+'<tr><td>Protocol:</td><td>HyperText Transfer Protocol</td></tr>'+
+'<tr><td>Type:</td><td>HTML Document</td></tr>'+
+'<tr><td>Address:</td><td>'+escapeHtml(address?address.value:"http://www.interphyr.net/")+'</td></tr>'+
+'<tr><td>Size:</td><td>'+size.toLocaleString("en-US")+' bytes</td></tr>'+
+'<tr><td>Connection:</td><td>ZapadTelecom&copy; Dial-Up Networking (56k)</td></tr>'+
+'<tr><td>Hosted by:</td><td>ZapadTelecom&copy;</td></tr>'+
+'</table><div class="ipx-buttons"><button type="button" data-ipx-close>OK</button></div>');
+}
+
+function openOptions(){
+showWindow("Internet Options","world-0.png",
+'<fieldset class="ipx-fieldset"><legend>Home page</legend>'+
+'<p>You can change which page to use for your home page.</p>'+
+'<div class="ipx-search-row"><label>Address:</label><input type="text" value="http://www.interphyr.net/" readonly></div>'+
+'<p class="small">The home page is set by the People\'s Information Ministry and cannot be changed.</p></fieldset>'+
+'<fieldset class="ipx-fieldset"><legend>Connection</legend>'+
+'<p>ZapadTelecom&copy; Dial-Up Networking (56k)<br>Registered nation: '+escapeHtml(nationName())+'</p></fieldset>'+
+'<fieldset class="ipx-fieldset"><legend>Security</legend>'+
+'<p>Security level: <b>Ministry Approved (Highest)</b></p></fieldset>'+
+'<div class="ipx-buttons"><button type="button" data-ipx-close>OK</button><button type="button" data-ipx-close>Cancel</button></div>');
+}
+
+function openAboutBrowser(){
+showWindow("About ZapadTelecom© Interweb Surfer©",null,
+'<div class="ipx-about"><img src="'+new URL("images/zapadtelecom-logo.png",root).href+'" alt="ZapadTelecom©">'+
+'<p><b>ZapadTelecom&copy; Interweb Surfer&copy;</b><br>Version 5.0, InterPhyr Edition</p>'+
+'<p>Copyright &copy; 1996&ndash;1998 ZapadTelecom&copy;.<br>Owned and operated by the Zapadiyan People\'s Information Ministry.</p>'+
+'<p>This product is licensed to:<br><b>'+escapeHtml(nationName())+'</b></p></div>'+
+'<div class="ipx-buttons"><button type="button" data-ipx-close>OK</button></div>');
+}
+
+
+/* =========================================================
+   MENU BAR (File, Edit, View, Go, Favorites, Tools, Help)
+   ========================================================= */
+
+function selectPage(){
+var page=document.querySelector(".webpage");
+if(!page)return;
+var range=document.createRange();
+range.selectNodeContents(page);
+var sel=window.getSelection();
+sel.removeAllRanges();
+sel.addRange(range);
+}
+
+function copySelection(){
+var text=String(window.getSelection()||"");
+if(!text){status("Nothing to copy.");return;}
+if(navigator.clipboard&&navigator.clipboard.writeText){
+navigator.clipboard.writeText(text).then(function(){status("Copied to the clipboard.");},function(){status("Copy failed.");});
+}else{
+try{document.execCommand("copy");status("Copied to the clipboard.");}catch(e){status("Copy failed.");}
+}
+}
+
+function clickRefresh(){
+var r=document.getElementById("ie-refresh");
+if(r)r.click();
+}
+
+function menuItems(name,anchor){
+switch(name){
+case "File":return [
+{label:"Save As...",action:function(){showMessage("Save As","msg_warning-0.png",["Saving pages is not permitted.","All content on InterPhyr.net remains the property of the People's Information Ministry."]);}},
+{label:"Print...",action:openPrint},
+"-",
+{label:"Work Offline",action:function(){showMessage("Work Offline","msg_information-0.png",["Working offline is not available.","Your ZapadTelecom© connection must remain active at all times."]);}},
+{label:"Properties",action:openProperties},
+"-",
+{label:"Close",action:function(){showMessage("ZapadTelecom© Interweb Surfer©","msg_warning-0.png",["The Interweb Surfer cannot be closed while you are connected to the ZapadTelecom© network."]);}}
+];
+case "Edit":return [
+{label:"Select All",action:selectPage},
+{label:"Copy",action:copySelection},
+"-",
+{label:"Find on InterPhyr.net...",icon:"search_file-0.png",action:openSearch}
+];
+case "View":return [
+{label:"Stop",action:stopLoading},
+{label:"Refresh",action:clickRefresh},
+"-",
+{label:"Full Screen",action:toggleFullscreen},
+{label:"Source",action:function(){showMessage("Source","msg_warning-0.png",["Viewing the source of this page is restricted by the People's Information Ministry."]);}}
+];
+case "Go":return [
+{label:"Back",action:goBack},
+{label:"Forward",action:function(){history.forward();}},
+{label:"Home Page",icon:"html-1.png",action:goHome},
+"-",
+{label:"Search the Network",icon:"search_file-0.png",action:openSearch},
+{label:"Mail",icon:"envelope_closed-0.png",action:openMail},
+{label:"The Zapadiyan Daily",icon:"html-1.png",action:function(){go("News/");}},
+{label:"World Map",icon:"html-1.png",action:function(){go("Map/");}}
+];
+case "Favorites":return null;
+case "Tools":return [
+{label:"Mail and News",icon:"envelope_closed-0.png",action:openMail},
+{label:"ZapadTelecom© Update",action:function(){showMessage("ZapadTelecom© Update","msg_information-0.png",["Your ZapadTelecom© Interweb Surfer© is up to date.","Updates are installed automatically by the People's Information Ministry."]);}},
+"-",
+{label:"Internet Options...",icon:"world-0.png",action:openOptions}
+];
+case "Help":return [
+{label:"Contents and Index",icon:"html-1.png",action:function(){go("About/");}},
+{label:"Online Support",icon:"html-1.png",action:function(){go("#contact");}},
+{label:"Ask Klipi",action:function(){var k=document.getElementById("klippy");if(k&&k.offsetParent)k.click();else showMessage("Klipi","msg_information-0.png",["Klipi is not available on this screen."]);}},
+"-",
+{label:"About ZapadTelecom© Interweb Surfer©",action:openAboutBrowser}
+];
+}
+return [];
+}
+
+document.addEventListener("click",function(event){
+var item=event.target.closest?event.target.closest(".ie-menu span"):null;
+if(!item)return;
+if(!toolbarReady())return;
+var name=item.textContent.trim();
+if(name==="Favorites"){openFavorites(item);return;}
+var items=menuItems(name,item);
+if(items&&items.length)showMenu(item,items);
+});
+
 
 /* =========================================================
    CLICK HANDLING
@@ -576,6 +785,7 @@ case "Channels":openChannels();break;
 case "Mail":openMail();break;
 case "Print":openPrint();break;
 }
+setTimeout(updateNavButtons,0);
 });
 
 })();

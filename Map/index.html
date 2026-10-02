@@ -209,16 +209,14 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .map-window>.window-body{margin:3px;padding:3px}
 .map-frame{position:relative;line-height:0;border:2px inset #808080;background:#1f3f7f}
 .map-image{display:block;width:100%;height:auto}
-.map-pin{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;background:var(--pin);border:2px solid #fff;outline:1px solid #000;transform:rotate(45deg);animation:map-pulse 1.4s steps(1) infinite}
-.map-pin:hover,.map-pin:focus{width:16px;height:16px;margin:-8px 0 0 -8px;animation:none;outline:2px solid #000;z-index:2}
+.map-pin{position:absolute;width:12px;height:12px;margin:-6px 0 0 -6px;background:var(--pin);border:2px solid #fff;outline:1px solid #000;transform:rotate(45deg)}
+.map-pin:hover,.map-pin:focus{width:16px;height:16px;margin:-8px 0 0 -8px;outline:2px solid #000;z-index:2}
 .map-tip{position:absolute;z-index:3;padding:2px 5px;background:#ffffe1;border:1px solid #000;color:#000;font-size:11px;line-height:14px;white-space:nowrap;pointer-events:none}
 .map-window .status-bar-field{margin:0;font-size:11px}
 .map-key{display:inline-block;width:11px;height:11px;margin:0 4px;background:var(--pin);border:2px solid #fff;outline:1px solid #000;transform:rotate(45deg)}
 .relations-table{width:100%;max-width:720px;border-collapse:collapse;margin-top:6px}
 .relations-table th,.relations-table td{border:1px solid #808080;padding:4px 6px;text-align:left;vertical-align:middle;font-size:11px}
 .relations-table th{background:#c0c0c0}
-@keyframes map-pulse{50%{opacity:.55}}
-@media (prefers-reduced-motion:reduce){.map-pin{animation:none}}
 
 /* =========================================================
    KLIPPY
@@ -426,8 +424,8 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <a class="map-pin" style="left:37.9%;top:82.3%;--pin:#0000a8" href="../Rendale/" data-name="The Kingdom of Rendale" data-status="Member nation"></a>
 <a class="map-pin" style="left:73%;top:22.8%;--pin:#00a000" href="../Relations/Eisenreich/" data-name="The Eisenreich" data-status="Good"></a>
 <a class="map-pin" style="left:60.3%;top:42.9%;--pin:#d4a000" href="../Relations/Luminara/" data-name="Luminara" data-status="Neutral"></a>
-<a class="map-pin" style="left:53.3%;top:49.6%;--pin:#006400" href="../Relations/MerchantsUnion/" data-name="Merchants' Union" data-status="Excellent"></a>
-<a class="map-pin" style="left:59.7%;top:66%;--pin:#00a000" href="../Relations/Pancake/" data-name="The Royal Kingdom of Pancake" data-status="Good"></a>
+<a class="map-pin" style="left:53.3%;top:48.4%;--pin:#006400" href="../Relations/MerchantsUnion/" data-name="Merchants' Union" data-status="Excellent"></a>
+<a class="map-pin" style="left:59.7%;top:64.8%;--pin:#00a000" href="../Relations/Pancake/" data-name="The Royal Kingdom of Pancake" data-status="Good"></a>
 <a class="map-pin" style="left:87.7%;top:75.6%;--pin:#e00000" href="../Relations/Swissland/" data-name="Swissland" data-status="Hostile"></a>
 <a class="map-pin" style="left:7.9%;top:9.4%;--pin:#8cb400" href="../Relations/Frostborn/" data-name="The Frostborn" data-status="Neutral&ndash;Positive"></a>
 <div class="map-tip" role="tooltip" hidden></div>

@@ -204,6 +204,7 @@ lines.map(function(l){return "<p>"+l+"</p>";}).join("")+
 
 /* Also used by pages (e.g. the Swissland report form). */
 window.interphyrMessage=showMessage;
+window.interphyrWindow=showWindow;
 
 /* A dropdown menu under a toolbar button. items: {label,icon,action} or "-" or {header}. */
 function showMenu(button,items){

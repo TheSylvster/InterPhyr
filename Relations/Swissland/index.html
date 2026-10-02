@@ -248,6 +248,14 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 fieldset.report-field .field-row{margin:3px 0}
 .report-error{color:#c00000;min-height:14px;margin:4px 0!important;font-size:10px}
 .report-buttons{text-align:right}
+.report-received{text-align:center;padding:4px 6px 0}
+.report-received img{display:block;height:84px;width:auto;margin:2px auto 8px}
+.report-received-title{margin:0 0 8px;padding:4px;background:#000080;color:#fff;font-weight:bold;letter-spacing:4px}
+.report-received p{margin:0 0 8px;line-height:1.4}
+.report-received-meta{margin:0 auto 8px;border-collapse:collapse;text-align:left;background:transparent}
+.report-received-meta td{padding:2px 8px 2px 0;vertical-align:top}
+.report-received-meta td:first-child{font-weight:bold;white-space:nowrap}
+.report-received-thanks{font-style:italic}
 
 /* =========================================================
    KLIPPY
@@ -772,16 +780,26 @@ submit.textContent="Sending...";
 
 setTimeout(function(){
 var number="ZPR/PIM/RL/98-"+String(Math.floor(10000+Math.random()*90000));
+var source=document.getElementById("report-source").value;
+var checked=form.querySelector('input[name="report-certainty"]:checked');
+var certainty=checked?checked.value:"Certain";
 form.reset();
 submit.disabled=false;
 submit.textContent="Send Report";
-var lines=[
-"<b>Thank you, citizen.</b>",
-"Your report has been received by the People's Information Ministry.",
-"Report number: <b>"+number+"</b>",
-"The truth thanks you for your vigilance."
-];
-if(window.interphyrMessage)window.interphyrMessage("Report Received","msg_information-0.png",lines);
+function esc(t){var d=document.createElement("div");d.textContent=t;return d.innerHTML;}
+var html='<div class="report-received">'+
+'<img src="../../images/zaptel-ministry-logo.webp" alt="People\x27s Information Ministry">'+
+'<div class="report-received-title">REPORT RECEIVED</div>'+
+'<p>Thank you, citizen. Your report has been received by the People\x27s Information Ministry.</p>'+
+'<table class="report-received-meta">'+
+'<tr><td>Report No.:</td><td><b>'+number+'</b></td></tr>'+
+'<tr><td>Source:</td><td>'+esc(source)+'</td></tr>'+
+'<tr><td>Certainty:</td><td>'+esc(certainty)+'</td></tr>'+
+'<tr><td>Status:</td><td>Forwarded to the People\x27s Information Ministry</td></tr>'+
+'</table>'+
+'<p class="report-received-thanks">The truth thanks you for your vigilance.</p>'+
+'</div><div class="ipx-buttons"><button type="button" data-ipx-close>OK</button></div>';
+if(window.interphyrWindow)window.interphyrWindow("Report Received - People\x27s Information Ministry","msg_information-0.png",html);
 else alert("Thank you, citizen. Your report "+number+" has been received.");
 },900);
 

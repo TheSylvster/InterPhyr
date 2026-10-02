@@ -677,9 +677,9 @@ userInput.type="password";
 }
 
 /*
- * FEDCON - Federation Defence Condition, shown as a popup on logon
- * and as a bar above the documents. The level itself is kept inside
- * the encrypted Level 1 content, as
+ * FEDCON - Federation Defence Condition, shown as a bar above the
+ * documents; its Details... button opens the full alert popup. The
+ * level itself is kept inside the encrypted Level 1 content, as
  *   <div class="fedcon-data" data-level="1-5" data-date="dd.mm.yyyy">reason</div>
  * so it is only known to people who can log on.
  */
@@ -767,7 +767,6 @@ bar.style.color=info.t;
 bar.innerHTML='<span class="fedcon-lamp"></span><span>FEDCON '+fedcon.level+' &mdash; '+info.name+'</span><span class="fedcon-more">Details...</span>';
 bar.addEventListener("click",function(){showFedconPopup(fedcon);});
 fedconBar.appendChild(bar);
-showFedconPopup(fedcon);
 }
 
 function fromB64(s){

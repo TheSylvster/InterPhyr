@@ -533,7 +533,17 @@ show(0);
    PRINT
    ========================================================= */
 
+/* The same Windows 98 error sound as the dial-up error. */
+function playErrorSound(){
+try{
+var sound=new Audio(new URL("sounds/windows-98-error.mp3",root).href);
+var played=sound.play();
+if(played&&played.catch)played.catch(function(){});
+}catch(e){}
+}
+
 function openPrint(){
+playErrorSound();
 showMessage("ZapadTelecom© Interweb Surfer","msg_error-0.png",[
 "<b>There was an error printing to LPT1:.</b>",
 "The printer is not responding. It may have been reallocated to the printing of official bulletins.",

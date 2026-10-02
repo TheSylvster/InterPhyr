@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 
 <script src="../../maintenance.js"></script>
+<script src="../../toolbar.js"></script>
 <script>
 (function(){
 
@@ -115,7 +116,7 @@ location.replace("../../");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="../../images/roundels/interphyr.png">
 <title>Swissland - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
-<link rel="stylesheet" href="https://unpkg.com/98.css">
+<link rel="stylesheet" href="../../css/98.css">
 
 <style>
 *{box-sizing:border-box}
@@ -199,7 +200,7 @@ img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{curs
 .webpage-loading.page-stage-1 .site-header{visibility:visible}
 .webpage-loading.page-stage-2 #information{visibility:visible}
 .webpage-loading.page-stage-3 #nation-profile,.webpage-loading.page-stage-3 #members{visibility:visible}
-.webpage-loading.page-stage-4 #explainer{visibility:visible}
+.webpage-loading.page-stage-4 #explainer,.webpage-loading.page-stage-4 #report-lie{visibility:visible}
 .webpage-loading.page-stage-5 #related{visibility:visible}
 .webpage-loading.page-stage-6 hr,.webpage-loading.page-stage-6 .small{visibility:visible}
 
@@ -236,6 +237,19 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .ie-status-icon{width:16px;height:16px;object-fit:contain;margin-right:3px}
 
 /* =========================================================
+   REPORT A SWISSLANDIAN LIE
+   ========================================================= */
+
+.report-window{max-width:460px;margin:10px 0}
+.report-window .window-body{padding:8px 10px}
+.report-field{margin:0 0 8px}
+.report-field>label{display:block;margin-bottom:3px}
+.report-field input[type=text],.report-field select,.report-field textarea{width:100%;box-sizing:border-box}
+fieldset.report-field .field-row{margin:3px 0}
+.report-error{color:#c00000;min-height:14px;margin:4px 0!important;font-size:10px}
+.report-buttons{text-align:right}
+
+/* =========================================================
    KLIPPY
    ========================================================= */
 
@@ -265,7 +279,9 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 .ie-menu{gap:10px;overflow:hidden}
 .ie-toolbar-label,.ie-toolbar .ie-dropdown{display:none}
 .ie-toolbar button{min-width:30px;padding:1px 4px}
-.ie-toolbar button:nth-of-type(6),.ie-toolbar button:nth-of-type(7),.ie-toolbar button:nth-of-type(8),.ie-toolbar button:nth-of-type(9),.ie-toolbar button:nth-of-type(11),.ie-toolbar button:nth-of-type(12){display:none}
+.ie-toolbar{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.ie-toolbar::-webkit-scrollbar{display:none}
+.ie-toolbar button,.ie-toolbar .ie-grip{flex-shrink:0}
 .ie-address-label{display:none}
 .ie-menu-toggle{display:inline-block;height:21px!important;min-width:0!important;padding:1px 8px!important;font-size:10px!important;flex-shrink:0}
 .ie-links{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
@@ -312,7 +328,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <div class="ie-toolbar">
 <div class="ie-grip"></div>
 
-<button onclick="interphyrGo('../../')"><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
 <button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M16 8.5 9 2v4H1v5h8v4z"/></svg><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../../images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
 <button id="ie-refresh"><img class="ie-toolbar-icon" src="../../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
@@ -334,7 +350,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <div class="ie-address-row">
 <button type="button" class="ie-menu-toggle" aria-label="Show or hide the InterPhyr menu">Menu</button>
 <span class="ie-address-label">Address</span>
-<img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
+<img class="ie-address-icon win98-16bit" src="../../images/icons/win98/html-1.png" alt="">
 <input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/relations/swissland">
 <button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
 </div>
@@ -344,6 +360,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <span class="ie-links-label">Links</span>
 <a href="../../">InterPhyr.net</a>
 <a href="../../#nations">Nations</a>
+<a href="../../Map/">World Map</a>
 <a href="../../#goals">Goals</a>
 <a href="../../Doctrines/">Doctrines</a>
 <a href="../../Relations/">Outside Relations</a>
@@ -372,6 +389,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <li><a href="../../Rendale/">The Kingdom of Rendale</a></li>
 </ul>
 </details></li>
+<li><a href="../../Map/">World Map</a></li>
 
 <li><a href="../../Doctrines/">Doctrines</a></li>
 <li><details open><summary><a href="../../Relations/">Outside Relations</a></summary>
@@ -388,6 +406,8 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <li><a href="../../Projects/">Projects</a></li>
 <li><a href="../../ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="../../News/">The Zapadiyan Daily</a></li>
+<li><a href="../../About/">About InterPhyr.net</a></li>
+<li class="admin-only" hidden><a href="../../UpdateLogs/">Update Logs</a></li>
 
 </ul>
 <div class="explorer-box">
@@ -444,7 +464,56 @@ The Ministry of Outside Relations assesses relations with Swissland as hostile. 
 
 </section>
 
+<section id="report-lie" class="content-section">
 
+<h2>Report a Swisslandian Lie</h2>
+
+<p>Have you seen or heard a falsehood spread by the Swisslandian regime? Report it to the People's Information Ministry. Every report helps protect the truth.</p>
+
+<div class="window report-window">
+<div class="title-bar">
+<div class="title-bar-text">Report a Swisslandian Lie - People's Information Ministry</div>
+</div>
+<div class="window-body">
+<form id="report-form" novalidate>
+<div class="report-field">
+<label for="report-nation">Your nation:</label>
+<input id="report-nation" type="text" readonly>
+</div>
+<div class="report-field">
+<label for="report-source">Where did you see or hear it?</label>
+<select id="report-source">
+<option>Swisslandian State TV</option>
+<option>Swisslandian radio</option>
+<option>A newspaper or leaflet</option>
+<option>The internet</option>
+<option>Word of mouth</option>
+<option>Other</option>
+</select>
+</div>
+<div class="report-field">
+<label for="report-text">What was the lie?</label>
+<textarea id="report-text" rows="4" required placeholder="Describe what the regime claimed."></textarea>
+</div>
+<fieldset class="report-field">
+<legend>How certain are you that it is a lie?</legend>
+<div class="field-row"><input id="report-c1" type="radio" name="report-certainty" value="Certain" checked><label for="report-c1">Certain</label></div>
+<div class="field-row"><input id="report-c2" type="radio" name="report-certainty" value="Very certain"><label for="report-c2">Very certain</label></div>
+<div class="field-row"><input id="report-c3" type="radio" name="report-certainty" value="Absolutely certain"><label for="report-c3">Absolutely certain</label></div>
+</fieldset>
+<div class="field-row report-field">
+<input id="report-confirm" type="checkbox" required>
+<label for="report-confirm">I confirm that this report is truthful, unlike Swisslandian statements.</label>
+</div>
+<p id="report-error" class="report-error" role="alert"></p>
+<div class="report-buttons"><button type="reset">Clear</button> <button id="report-submit" type="submit">Send Report</button></div>
+</form>
+</div>
+</div>
+
+<p class="small">Reports are processed by the People's Information Ministry. False reports about false reports will themselves be reported.</p>
+
+</section>
 <section id="related" class="content-section">
 
 <h2>Related</h2>
@@ -510,7 +579,7 @@ header.parentNode.insertBefore(notice,header.nextSibling);
 <div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
 
 <div class="ie-status-field">
-<img class="ie-status-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-1.png" alt="">
+<img class="ie-status-icon win98-16bit" src="../../images/icons/win98/world-1.png" alt="">
 Internet
 </div>
 
@@ -641,6 +710,81 @@ startPageLoading();
 })();
 </script>
 
+<script>
+(function(){
+
+/*
+ * "Report a Swisslandian Lie" form. Purely for show: the
+ * report is not sent or stored anywhere. Sending it shows
+ * a confirmation window with a made-up report number.
+ */
+
+var form=document.getElementById("report-form");
+if(!form)return;
+
+var nation=document.getElementById("report-nation");
+var lie=document.getElementById("report-text");
+var confirmBox=document.getElementById("report-confirm");
+var error=document.getElementById("report-error");
+var submit=document.getElementById("report-submit");
+
+function getCookie(name){
+var cookies=document.cookie.split(";");
+for(var i=0;i<cookies.length;i++){
+var c=cookies[i].trim();
+if(c.indexOf(name+"=")===0)return decodeURIComponent(c.substring(name.length+1));
+}
+return null;
+}
+
+function fillNation(){
+nation.value=getCookie("interphyr_admin_session")==="1"?"ZapadTelecom© IT":(getCookie("interphyr_registered_nation")||"Unknown");
+}
+
+fillNation();
+form.addEventListener("reset",function(){
+error.textContent="";
+setTimeout(fillNation,0);
+});
+
+form.addEventListener("submit",function(event){
+
+event.preventDefault();
+error.textContent="";
+
+if(lie.value.trim().length<10){
+error.textContent="Please describe the lie in a little more detail.";
+lie.focus();
+return;
+}
+if(!confirmBox.checked){
+error.textContent="Please confirm that your report is truthful.";
+confirmBox.focus();
+return;
+}
+
+submit.disabled=true;
+submit.textContent="Sending...";
+
+setTimeout(function(){
+var number="ZPR/PIM/RL/98-"+String(Math.floor(10000+Math.random()*90000));
+form.reset();
+submit.disabled=false;
+submit.textContent="Send Report";
+var lines=[
+"<b>Thank you, citizen.</b>",
+"Your report has been received by the People's Information Ministry.",
+"Report number: <b>"+number+"</b>",
+"The truth thanks you for your vigilance."
+];
+if(window.interphyrMessage)window.interphyrMessage("Report Received","msg_information-0.png",lines);
+else alert("Thank you, citizen. Your report "+number+" has been received.");
+},900);
+
+});
+
+})();
+</script>
 <script>
 (function(){
 

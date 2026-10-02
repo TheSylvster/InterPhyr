@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<base href="/InterPhyr/">
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="images/roundels/interphyr.png">
+<title>The page cannot be found - ZapadTelecom Interweb Surfer©</title>
+<link rel="stylesheet" href="css/98.css">
+
+<style>
+*{box-sizing:border-box}
+html,body{width:100%;height:100%;margin:0;padding:0}
+body{overflow:hidden;background:#c0c0c0;font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#000}
+.win98-16bit{filter:url(#rgb565)}
+
+.browser-window{position:fixed;left:0;top:0;width:100vw;height:100vh;min-width:760px;min-height:500px;margin:0;z-index:10}
+.browser-window>.title-bar{height:22px;min-height:22px}
+.browser-window .title-bar-text{font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;text-decoration:underline}
+
+.ie-menu{height:21px;min-height:21px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:0 7px;gap:18px;font-family:Arial,Helvetica,sans-serif;font-size:11px;user-select:none}
+.ie-menu span{white-space:nowrap;font-weight:bold;text-decoration:underline}
+
+.ie-toolbar{height:34px;min-height:34px;background:#c0c0c0;border-top:1px solid #fff;border-bottom:1px solid #808080;display:flex;align-items:center;padding:2px 4px;gap:2px;overflow:hidden}
+.ie-logo-anim{margin-left:auto;height:30px;width:auto;object-fit:contain;flex-shrink:0}
+.ie-toolbar button{height:28px;min-width:54px;padding:1px 5px;display:flex;align-items:center;justify-content:center;gap:3px;font-family:Arial,Helvetica,sans-serif;font-size:10px;white-space:nowrap}
+.ie-toolbar-icon{width:17px;flex-shrink:0;font-family:"Arial Unicode MS",Arial,sans-serif;font-size:17px;line-height:17px;text-align:center}
+img.ie-toolbar-icon{height:17px;object-fit:contain;image-rendering:pixelated}
+.ie-toolbar-label{line-height:14px}
+.ie-dropdown{font-size:7px;margin-left:-1px}
+.ie-grip{width:6px;height:23px;flex-shrink:0;margin-right:2px;border-left:1px solid #808080;border-right:1px solid #fff;background:repeating-linear-gradient(to bottom,transparent 0,transparent 2px,#808080 2px,#808080 3px)}
+
+.ie-address-row{height:27px;min-height:27px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;gap:4px;padding:2px 5px}
+.ie-address-label{font-size:11px;margin-right:2px}
+.ie-address-icon{width:16px;height:16px;object-fit:contain;flex-shrink:0}
+.ie-address-input{height:20px!important;min-width:0;flex:1;padding:1px 4px;font-family:Arial,Helvetica,sans-serif;font-size:11px}
+.ie-go{height:21px!important;min-width:37px;padding:1px 7px!important;font-size:10px!important}
+
+.ie-links{height:23px;min-height:23px;background:#c0c0c0;border-bottom:1px solid #808080;display:flex;align-items:center;padding:1px 5px;gap:1px;overflow:hidden}
+.ie-links .ie-grip{height:17px}
+.ie-links-label{font-size:10px;margin:0 5px 0 2px}
+.ie-links a{display:inline-block;color:#000080;font-size:10px;text-decoration:underline;padding:2px 7px;white-space:nowrap}
+
+.ie-main{display:flex;height:calc(100% - 148px);min-height:0;background:#fff}
+
+.ie-explorer{width:205px;min-width:205px;height:100%;overflow-y:auto;overflow-x:hidden;background:#d4d0c8;border-right:2px solid #808080;padding:4px}
+.explorer-header{height:25px;padding:4px 6px;color:#fff;font-weight:bold;font-size:11px;background:linear-gradient(to right,#000080 0%,#000080 55%,#1084d7 100%);border:1px solid #000;user-select:none}
+.explorer-header-icon{height:15px;width:auto;vertical-align:top;margin-right:5px}
+.explorer-header-title{position:relative;top:-1px;font-family:Georgia,"Times New Roman",Times,serif;font-size:17px;font-weight:900;letter-spacing:-.9px;color:#e00000;text-shadow:1px 1px 0 #800000;line-height:15px}
+.explorer-header-title .letter{position:relative;display:inline-block}.explorer-header-title .letter:nth-child(1){top:1px}.explorer-header-title .letter:nth-child(2){top:1px}.explorer-header-title .letter:nth-child(3){top:.5px}.explorer-header-title .letter:nth-child(5){top:-.5px}.explorer-header-title .letter:nth-child(6){top:-.5px}.explorer-header-title .letter:nth-child(7){top:-1px}.explorer-header-title .letter:nth-child(8){top:-1px}.explorer-header-title .letter:nth-child(9){top:-1.5px}.explorer-header-title .letter:nth-child(10){top:-2px}
+.explorer-body{padding-top:5px}
+.explorer-tree{width:100%;margin:0;padding:5px;background:#fff;border:1px solid #808080}
+.explorer-tree li{font-size:11px;line-height:16px}
+.explorer-tree a{color:#000080;text-decoration:none}
+.explorer-tree a:hover{text-decoration:underline}
+
+.explorer-box{margin-top:6px}
+.explorer-box fieldset{margin:0;padding:5px;min-height:63px;background:#d4d0c8}
+.explorer-box legend{font-size:10px;padding:0 3px}
+
+.explorer-logo,.nation-logo{display:block;width:auto;height:auto;max-width:48px;max-height:48px;object-fit:contain;object-position:center;flex-shrink:0}
+.explorer-logo{margin:1px auto}
+.explorer-box .explorer-logo{width:auto;height:56px;max-width:none;max-height:none}
+img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{cursor:pointer}
+.flag-viewer-backdrop{position:fixed;left:0;top:0;right:0;bottom:0;z-index:100000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.25)}
+.flag-viewer{max-width:90vw}
+.flag-viewer .window-body{margin:8px;text-align:center}
+.flag-viewer-image{display:block;max-width:80vw;max-height:70vh;width:auto;height:auto;min-width:120px;margin:0 auto;border:1px solid #808080;background:#fff}
+.flag-viewer-caption{margin-top:6px;font-size:11px}
+
+.ie-page{flex:1;min-width:0;min-height:0;overflow:auto;background:#fff}
+.webpage{min-height:100%;padding:12px 18px 30px 18px}
+
+.webpage-loading>*{visibility:hidden}
+.webpage-loading.page-stage-1 .site-header{visibility:visible}
+.webpage-loading.page-stage-2 #information{visibility:visible}
+.webpage-loading.page-stage-3 #company-profile{visibility:visible}
+.webpage-loading.page-stage-4 #ownership{visibility:visible}
+.webpage-loading.page-stage-5 #related{visibility:visible}
+.webpage-loading.page-stage-6 hr,.webpage-loading.page-stage-6 .small{visibility:visible}
+
+.site-header{padding-bottom:5px;margin-bottom:10px;border-bottom:1px solid #808080}
+.site-title{margin:0;display:inline-block;font-family:Georgia,"Times New Roman",Times,serif;font-size:40px;font-weight:900;letter-spacing:-2.5px;color:#e00000;text-shadow:2px 2px 0 #800000;line-height:42px}
+.site-title .letter{position:relative;display:inline-block}
+.site-title .letter:nth-child(1){top:3px}.site-title .letter:nth-child(2){top:2px}.site-title .letter:nth-child(3){top:1px}.site-title .letter:nth-child(4){top:0}.site-title .letter:nth-child(5){top:-1px}.site-title .letter:nth-child(6){top:-2px}.site-title .letter:nth-child(7){top:-3px}.site-title .letter:nth-child(8){top:-4px}.site-title .letter:nth-child(9){top:-5px}.site-title .letter:nth-child(10){top:-7px}
+.site-title .domain{font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:normal;letter-spacing:0;color:#0000a0;text-shadow:none;margin-left:2px}
+
+.small{font-size:10px}
+.content-section{margin-top:15px}
+.content-section h2{margin:0 0 5px;padding-bottom:2px;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080;border-bottom:1px solid #808080}
+.content-section h3{margin:12px 0 4px;font-family:"Times New Roman",Times,serif;font-size:15px;color:#800000}
+.content-section p{margin:5px 0;line-height:1.35}
+.content-section ul{margin-top:5px;padding-left:25px}
+
+.notice{margin:10px 0;padding:5px 7px;background:#ffffcc;border:1px solid #808080;font-size:10px}
+
+a{color:#0000ff!important}
+a:visited{color:#0000ff!important}
+a:hover{color:#ff0000!important}
+a:active{color:#800080!important}
+
+.nation{margin-top:6px;padding-top:8px}
+.nation-heading{display:flex;align-items:center;gap:8px;min-height:48px;margin-bottom:5px}
+.nation-name{margin:0;font-family:"Times New Roman",Times,serif;font-size:17px;color:#000080}
+.nation-info{margin-left:56px}
+
+hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
+
+.ie-status{height:21px;min-height:21px;display:flex;background:#c0c0c0;border-top:1px solid #fff;padding:2px}
+.ie-status-field{height:17px;display:flex;align-items:center;padding:0 5px;background:#c0c0c0;border:1px solid #808080;border-right-color:#fff;border-bottom-color:#fff;font-size:10px}
+.ie-status-main{flex:1}
+.ie-status-icon{width:16px;height:16px;object-fit:contain;margin-right:3px}
+
+/* =========================================================
+   404 PAGE
+   ========================================================= */
+
+.admin-only[hidden]{display:none!important}
+.error-page{max-width:560px;padding:18px 22px 30px;font-size:11px;line-height:1.5}
+.error-head{display:flex;align-items:flex-start;gap:12px}
+.error-head img{width:32px;height:32px;flex-shrink:0}
+.error-head h2{margin:4px 0 0;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080}
+.error-page hr{border:0;border-top:1px solid #c0c0c0;margin:14px 0}
+.error-page ul{margin:6px 0;padding-left:22px}
+.error-page li{margin:4px 0}
+.error-foot{color:#606060;font-size:10px}
+
+/* =========================================================
+   KLIPPY
+   ========================================================= */
+
+#klippy{position:fixed;right:24px;bottom:24px;z-index:99999;width:140px;cursor:pointer;user-select:none;-webkit-user-select:none;animation:klippy-bob 2.6s ease-in-out infinite}
+#klippy:focus-visible{outline:2px dotted #000;outline-offset:3px}
+.klippy-face{display:block;width:100%;height:auto;filter:drop-shadow(1px 2px 1px rgba(0,0,0,.35))}
+
+.klippy-bubble{position:absolute;right:0;bottom:106px;min-width:150px;max-width:210px;background:#ffffe1;border:1px solid #000;box-shadow:2px 2px 0 rgba(0,0,0,.4);padding:7px 9px;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:14px;color:#000;opacity:0;transform:translateY(4px);pointer-events:none;transition:opacity .15s ease,transform .15s ease}
+.klippy-bubble::after{content:"";position:absolute;right:71px;bottom:-7px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:7px solid #000}
+.klippy-bubble::before{content:"";position:absolute;right:72px;bottom:-5.5px;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:6px solid #ffffe1;z-index:1}
+.klippy-bubble.klippy-visible{opacity:1;transform:translateY(0);pointer-events:auto}
+
+@keyframes klippy-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* =========================================================
+   MOBILE LAYOUT (phones; desktop is unaffected)
+   ========================================================= */
+
+.ie-menu-toggle{display:none}
+svg.ie-toolbar-icon{height:17px;fill:#000}
+.explorer-tree summary{list-style:none}
+.explorer-tree summary::-webkit-details-marker{display:none}
+
+@media (max-width:760px){
+.browser-window{min-width:0;min-height:0}
+.browser-window>.title-bar .title-bar-text{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ie-menu{gap:10px;overflow:hidden}
+.ie-toolbar-label,.ie-toolbar .ie-dropdown{display:none}
+.ie-toolbar button{min-width:30px;padding:1px 4px}
+.ie-toolbar button:nth-of-type(6),.ie-toolbar button:nth-of-type(7),.ie-toolbar button:nth-of-type(8),.ie-toolbar button:nth-of-type(9),.ie-toolbar button:nth-of-type(11),.ie-toolbar button:nth-of-type(12){display:none}
+.ie-address-label{display:none}
+.ie-menu-toggle{display:inline-block;height:21px!important;min-width:0!important;padding:1px 8px!important;font-size:10px!important;flex-shrink:0}
+.ie-links{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.ie-links::-webkit-scrollbar{display:none}
+.ie-main{position:relative}
+.ie-explorer{position:absolute;left:0;top:0;bottom:0;z-index:50;height:auto;box-shadow:3px 0 8px rgba(0,0,0,.4);transform:translateX(-105%);transition:transform .15s ease-out}
+.ie-main.explorer-open .ie-explorer{transform:none}
+.webpage{padding:10px 10px 24px}
+.site-title{font-size:30px;line-height:34px;letter-spacing:-2px}
+.nation-info{margin-left:0}
+#klippy{display:none!important}
+.ie-page{overflow-x:hidden}
+.nations-table th,.nations-table td,.relations-table th,.relations-table td{white-space:normal}
+}</style>
+</head>
+
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<filter id="rgb565" color-interpolation-filters="sRGB">
+<feComponentTransfer>
+<feFuncR type="discrete" tableValues="0 .032258 .064516 .096774 .129032 .161290 .193548 .225806 .258064 .290322 .322580 .354838 .387096 .419354 .451612 .483870 .516129 .548387 .580645 .612903 .645161 .677419 .709677 .741935 .774193 .806451 .838709 .870967 .903225 .935483 .967741 1"></feFuncR>
+<feFuncG type="discrete" tableValues="0 .015873 .031746 .047619 .063492 .079365 .095238 .111111 .126984 .142857 .158730 .174603 .190476 .206349 .222222 .238095 .253968 .269841 .285714 .301587 .317460 .333333 .349206 .365079 .380952 .396825 .412698 .428571 .444444 .460317 .476190 .492063 .507936 .523809 .539682 .555555 .571428 .587301 .603174 .619047 .634920 .650793 .666666 .682539 .698412 .714285 .730158 .746031 .761904 .777777 .793650 .809523 .825396 .841269 .857142 .873015 .888888 .904761 .920634 .936507 .952380 .968253 .984126 1"></feFuncG>
+<feFuncB type="discrete" tableValues="0 .032258 .064516 .096774 .129032 .161290 .193548 .225806 .258064 .290322 .322580 .354838 .387096 .419354 .451612 .483870 .516129 .548387 .580645 .612903 .645161 .677419 .709677 .741935 .774193 .806451 .838709 .870967 .903225 .935483 .967741 1"></feFuncB>
+</feComponentTransfer>
+</filter>
+</svg>
+
+<div class="window browser-window">
+
+<div class="title-bar">
+<div class="title-bar-text">The page cannot be found - ZapadTelecom Interweb Surfer©</div>
+<div class="title-bar-controls">
+<button aria-label="Minimize"></button>
+<button aria-label="Maximize"></button>
+<button aria-label="Close"></button>
+</div>
+</div>
+
+<div class="ie-menu">
+<span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Favorites</span><span>Tools</span><span>Help</span>
+</div>
+
+<div class="ie-toolbar">
+<div class="ie-grip"></div>
+
+<button onclick="history.back()"><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M16 8.5 9 2v4H1v5h8v4z"/></svg><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
+<button id="ie-refresh" onclick="location.reload()"><img class="ie-toolbar-icon" src="images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
+<button onclick="location.href='/InterPhyr/'"><img class="ie-toolbar-icon" src="images/toolbar/home.webp" alt=""><span class="ie-toolbar-label">Home</span></button>
+
+<div class="ie-grip"></div>
+
+<button><img class="ie-toolbar-icon" src="images/toolbar/search.webp" alt=""><span class="ie-toolbar-label">Search</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/favorites.webp" alt=""><span class="ie-toolbar-label">Favorites</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/history.webp" alt=""><span class="ie-toolbar-label">History</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/channels.webp" alt=""><span class="ie-toolbar-label">Channels</span></button>
+<button onclick="document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(function(){})"><img class="ie-toolbar-icon" src="images/toolbar/fullscreen.webp" alt=""><span class="ie-toolbar-label">Fullscreen</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/mail.webp" alt=""><span class="ie-toolbar-label">Mail</span><span class="ie-dropdown">▼</span></button>
+<button><img class="ie-toolbar-icon" src="images/toolbar/print.webp" alt=""><span class="ie-toolbar-label">Print</span></button>
+
+<img class="ie-logo-anim" src="images/zapadtelecom-logo.png" alt="ZapadTelecom Interweb Surfer">
+</div>
+
+<div class="ie-address-row">
+<button type="button" class="ie-menu-toggle" aria-label="Show or hide the InterPhyr menu">Menu</button>
+<span class="ie-address-label">Address</span>
+<img class="ie-address-icon win98-16bit" src="images/icons/win98/html-1.png" alt="">
+<input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/zapadtelecom">
+<button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
+</div>
+
+<div class="ie-links">
+<div class="ie-grip"></div>
+<span class="ie-links-label">Links</span>
+<a href="">InterPhyr.net</a>
+<a href="#nations">Nations</a>
+<a href="Map/">World Map</a>
+<a href="#goals">Goals</a>
+<a href="Doctrines/">Doctrines</a>
+<a href="Relations/">Outside Relations</a>
+<a href="Projects/">Projects</a>
+<a href="News/">News</a>
+<a href="#contact">Contact</a>
+</div>
+
+<div class="ie-main">
+
+<aside class="ie-explorer">
+
+<div class="explorer-header"><img class="explorer-header-icon" src="images/roundels/interphyr.png" alt=""><span class="explorer-header-title"><span class="letter">I</span><span class="letter">n</span><span class="letter">t</span><span class="letter">e</span><span class="letter">r</span><span class="letter">P</span><span class="letter">h</span><span class="letter">y</span><span class="letter">r</span><span class="letter">!</span></span></div>
+
+<div class="explorer-body">
+
+<ul class="tree-view explorer-tree">
+
+<li><a href="#home">Information</a></li>
+<li><a href="#goals">Goals</a></li>
+
+<li><details><summary>Nations</summary>
+<ul>
+<li><a href="Astralyia/">The Astralyian Republic</a></li>
+<li><a href="ZPR/">The Zapadiyan People's Republic</a></li>
+<li><a href="Rendale/">The Kingdom of Rendale</a></li>
+</ul>
+</details></li>
+<li><a href="Map/">World Map</a></li>
+
+<li><a href="Doctrines/">Doctrines</a></li>
+<li><details><summary><a href="Relations/">Outside Relations</a></summary>
+<ul>
+<li><a href="Relations/Eisenreich/">The Eisenreich</a></li>
+<li><a href="Relations/Pancake/">The Royal Kingdom of Pancake</a></li>
+<li><a href="Relations/Swissland/">Swissland</a></li>
+<li><a href="Relations/Luminara/">Luminara</a></li>
+<li><a href="Relations/MerchantsUnion/">Merchants' Union</a></li>
+<li><a href="Relations/Frostborn/">The Frostborn</a></li>
+</ul>
+</details></li>
+
+<li><a href="Projects/">Projects</a></li>
+<li><a href="ZapadTelecom/">ZapadTelecom&copy;</a></li>
+<li><a href="News/">The Zapadiyan Daily</a></li>
+<li><a href="About/">About InterPhyr.net</a></li>
+<li class="admin-only" hidden><a href="UpdateLogs/">Update Logs</a></li>
+
+</ul>
+<div class="explorer-box">
+<fieldset>
+<legend>ZapadTelecom©</legend>
+<img class="explorer-logo win98-16bit" src="images/zapadtelecom-logo.png" alt="ZapadTelecom©">
+</fieldset>
+</div>
+
+</div>
+</aside>
+
+<main class="ie-page">
+
+<div class="webpage error-page">
+
+<div class="error-head">
+<img class="win98-16bit" src="images/icons/win98/msg_warning-0.png" alt="">
+<h2>The page cannot be found</h2>
+</div>
+<hr>
+<p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
+<p>Please try the following:</p>
+<ul>
+<li>If you typed the page address in the Address bar, make sure that it is spelled correctly.</li>
+<li>Open the <a href="/InterPhyr/">InterPhyr.net</a> home page, and then look for links to the information you want.</li>
+<li>Click the <a href="javascript:history.back()">Back</a> button to try another link.</li>
+</ul>
+<hr>
+<p class="error-foot">HTTP 404 - File not found<br>ZapadTelecom&copy; Interweb Surfer</p>
+
+</div>
+
+</main>
+</div>
+
+<div class="ie-status">
+
+<div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
+
+<div class="ie-status-field">
+<img class="ie-status-icon win98-16bit" src="images/icons/win98/world-1.png" alt="">
+Internet
+</div>
+
+</div>
+</div>
+
+<script>
+(function(){
+/* Show the address that was typed, in the style of the other pages. */
+var path=location.pathname.replace(/^\/InterPhyr\/?/i,"").toLowerCase();
+document.getElementById("ie-address-input").value="http://www.interphyr.net/"+path;
+document.title="The page cannot be found - ZapadTelecom Interweb Surfer©";
+})();
+</script>
+<script>
+(function(){
+/* Mobile: the side panel slides out when Menu is pressed. */
+var main=document.querySelector(".ie-main");
+var toggle=document.querySelector(".ie-menu-toggle");
+if(!main||!toggle)return;
+toggle.addEventListener("click",function(event){
+event.stopPropagation();
+main.classList.toggle("explorer-open");
+});
+main.addEventListener("click",function(event){
+if(!main.classList.contains("explorer-open"))return;
+var inPanel=event.target.closest(".ie-explorer");
+if(!inPanel||event.target.closest("a"))main.classList.remove("explorer-open");
+});
+})();
+</script>
+</body>
+
+</html>

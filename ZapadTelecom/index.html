@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 
 <script src="../maintenance.js"></script>
+<script src="../toolbar.js"></script>
 <script>
 (function(){
 
@@ -95,7 +96,7 @@ location.replace("../");
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="../images/roundels/interphyr.png">
 <title>ZapadTelecom© - InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
-<link rel="stylesheet" href="https://unpkg.com/98.css">
+<link rel="stylesheet" href="../css/98.css">
 
 <style>
 *{box-sizing:border-box}
@@ -230,7 +231,9 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 .ie-menu{gap:10px;overflow:hidden}
 .ie-toolbar-label,.ie-toolbar .ie-dropdown{display:none}
 .ie-toolbar button{min-width:30px;padding:1px 4px}
-.ie-toolbar button:nth-of-type(6),.ie-toolbar button:nth-of-type(7),.ie-toolbar button:nth-of-type(8),.ie-toolbar button:nth-of-type(9),.ie-toolbar button:nth-of-type(11),.ie-toolbar button:nth-of-type(12){display:none}
+.ie-toolbar{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.ie-toolbar::-webkit-scrollbar{display:none}
+.ie-toolbar button,.ie-toolbar .ie-grip{flex-shrink:0}
 .ie-address-label{display:none}
 .ie-menu-toggle{display:inline-block;height:21px!important;min-width:0!important;padding:1px 8px!important;font-size:10px!important;flex-shrink:0}
 .ie-links{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
@@ -277,7 +280,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <div class="ie-toolbar">
 <div class="ie-grip"></div>
 
-<button onclick="interphyrGo('../')"><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
+<button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M1 8.5 8 2v4h8v5H8v4z"/></svg><span class="ie-toolbar-label">Back</span><span class="ie-dropdown">▼</span></button>
 <button><svg class="ie-toolbar-icon" viewBox="0 0 17 17" aria-hidden="true"><path d="M16 8.5 9 2v4H1v5h8v4z"/></svg><span class="ie-toolbar-label">Forward</span><span class="ie-dropdown">▼</span></button>
 <button><img class="ie-toolbar-icon" src="../images/toolbar/stop.webp" alt=""><span class="ie-toolbar-label">Stop</span></button>
 <button id="ie-refresh"><img class="ie-toolbar-icon" src="../images/toolbar/refresh.webp" alt=""><span class="ie-toolbar-label">Refresh</span></button>
@@ -299,7 +302,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <div class="ie-address-row">
 <button type="button" class="ie-menu-toggle" aria-label="Show or hide the InterPhyr menu">Menu</button>
 <span class="ie-address-label">Address</span>
-<img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
+<img class="ie-address-icon win98-16bit" src="../images/icons/win98/html-1.png" alt="">
 <input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/zapadtelecom">
 <button id="ie-go" class="ie-go" type="button" onclick="document.getElementById('ie-refresh').click()">Go</button>
 </div>
@@ -309,6 +312,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <span class="ie-links-label">Links</span>
 <a href="../">InterPhyr.net</a>
 <a href="../#nations">Nations</a>
+<a href="../Map/">World Map</a>
 <a href="../#goals">Goals</a>
 <a href="../Doctrines/">Doctrines</a>
 <a href="../Relations/">Outside Relations</a>
@@ -337,6 +341,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <li><a href="../Rendale/">The Kingdom of Rendale</a></li>
 </ul>
 </details></li>
+<li><a href="../Map/">World Map</a></li>
 
 <li><a href="../Doctrines/">Doctrines</a></li>
 <li><details><summary><a href="../Relations/">Outside Relations</a></summary>
@@ -353,6 +358,8 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <li><a href="../Projects/">Projects</a></li>
 <li><a href="../ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="../News/">The Zapadiyan Daily</a></li>
+<li><a href="../About/">About InterPhyr.net</a></li>
+<li class="admin-only" hidden><a href="../UpdateLogs/">Update Logs</a></li>
 
 </ul>
 <div class="explorer-box">
@@ -383,11 +390,6 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <p>InterPhyr is the official information service of the Phyrrian Astral Federation.</p>
 
 <p>This website provides information about the federation and its participating member nations.</p>
-
-<div class="notice">
-<b>NOTICE:</b>
-This website is currently under construction.
-</div>
 
 </section>
 
@@ -451,7 +453,7 @@ Hosted by ZapadTelecom&copy;
 <div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
 
 <div class="ie-status-field">
-<img class="ie-status-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-1.png" alt="">
+<img class="ie-status-icon win98-16bit" src="../images/icons/win98/world-1.png" alt="">
 Internet
 </div>
 

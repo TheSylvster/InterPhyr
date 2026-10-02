@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="images/roundels/interphyr.png">
 <title>InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
-<link rel="stylesheet" href="https://unpkg.com/98.css">
+<link rel="stylesheet" href="css/98.css">
 <script src="maintenance.js"></script>
+<script src="toolbar.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -98,6 +99,9 @@ img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{curs
 .content-section h2{margin:0 0 5px;padding-bottom:2px;font-family:"Times New Roman",Times,serif;font-size:19px;font-weight:bold;color:#000080;border-bottom:1px solid #808080}
 .content-section h3{margin:12px 0 4px;font-family:"Times New Roman",Times,serif;font-size:15px;color:#800000}
 .content-section p{margin:5px 0;line-height:1.35}
+.contact-table{width:100%;max-width:640px;border-collapse:collapse;margin:8px 0}
+.contact-table th,.contact-table td{border:1px solid #808080;padding:4px 6px;text-align:left;vertical-align:top;font-size:11px}
+.contact-table th{background:#c0c0c0}
 .content-section ul{margin-top:5px;padding-left:25px}
 
 a{color:#0000ff!important}
@@ -362,7 +366,9 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 .ie-menu{gap:10px;overflow:hidden}
 .ie-toolbar-label,.ie-toolbar .ie-dropdown{display:none}
 .ie-toolbar button{min-width:30px;padding:1px 4px}
-.ie-toolbar button:nth-of-type(6),.ie-toolbar button:nth-of-type(7),.ie-toolbar button:nth-of-type(8),.ie-toolbar button:nth-of-type(9),.ie-toolbar button:nth-of-type(11),.ie-toolbar button:nth-of-type(12){display:none}
+.ie-toolbar{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+.ie-toolbar::-webkit-scrollbar{display:none}
+.ie-toolbar button,.ie-toolbar .ie-grip{flex-shrink:0}
 .ie-address-label{display:none}
 .ie-menu-toggle{display:inline-block;height:21px!important;min-width:0!important;padding:1px 8px!important;font-size:10px!important;flex-shrink:0}
 .ie-links{overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
@@ -406,9 +412,9 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 </filter>
 </svg>
 
-<audio id="dialup-audio" preload="auto" src="https://archive.org/download/the-sound-of-dial-up-internet-62402/the-sound-of-dial-up-internet-6240%282%29.mp3"></audio>
-<audio id="dialup-error-audio" preload="auto" src="https://www.myinstants.com/media/sounds/windows-98-error.mp3"></audio>
-<audio id="dialup-welcome-audio" preload="auto" src="https://www.myinstants.com/media/sounds/welcome_aYqx3Y2.mp3"></audio>
+<audio id="dialup-audio" preload="auto" src="sounds/dialup.mp3"></audio>
+<audio id="dialup-error-audio" preload="auto" src="sounds/windows-98-error.mp3"></audio>
+<audio id="dialup-welcome-audio" preload="auto" src="sounds/welcome.mp3"></audio>
 
 
 <!-- =====================================================
@@ -480,7 +486,7 @@ Your registered nation is stored locally on this computer for future ZapadTeleco
 
 <img
 class="registration-error-icon win98-16bit"
-src="https://win98icons.alexmeub.com/icons/png/msg_error-0.png"
+src="images/icons/win98/msg_error-0.png"
 alt=""
 >
 
@@ -513,7 +519,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <div class="dialup-connection">
 
 <div class="dialup-icon-box">
-<img class="dialup-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/modem-4.png" alt="Modem">
+<img class="dialup-icon win98-16bit" src="images/icons/win98/modem-4.png" alt="Modem">
 <span>Modem</span>
 </div>
 
@@ -522,7 +528,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 </div>
 
 <div class="dialup-icon-box">
-<img class="dialup-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-0.png" alt="Internet">
+<img class="dialup-icon win98-16bit" src="images/icons/win98/world-0.png" alt="Internet">
 <span>InterPhyr</span>
 </div>
 
@@ -594,7 +600,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <div class="ie-address-row">
 <button type="button" class="ie-menu-toggle" aria-label="Show or hide the InterPhyr menu">Menu</button>
 <span class="ie-address-label">Address</span>
-<img class="ie-address-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/html-1.png" alt="">
+<img class="ie-address-icon win98-16bit" src="images/icons/win98/html-1.png" alt="">
 <input id="ie-address-input" class="ie-address-input" type="text" value="http://www.interphyr.net/">
 <button id="ie-go" class="ie-go" type="button">Go</button>
 </div>
@@ -604,6 +610,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <span class="ie-links-label">Links</span>
 <a href="#home">InterPhyr.net</a>
 <a href="#nations">Nations</a>
+<a href="Map/">World Map</a>
 <a href="#goals">Goals</a>
 <a href="Doctrines/">Doctrines</a>
 <a href="Relations/">Outside Relations</a>
@@ -632,6 +639,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <li><a href="Rendale/">The Kingdom of Rendale</a></li>
 </ul>
 </details></li>
+<li><a href="Map/">World Map</a></li>
 
 <li><a href="Doctrines/">Doctrines</a></li>
 <li><details><summary><a href="Relations/">Outside Relations</a></summary>
@@ -648,6 +656,8 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <li><a href="Projects/">Projects</a></li>
 <li><a href="ZapadTelecom/">ZapadTelecom&copy;</a></li>
 <li><a href="News/">The Zapadiyan Daily</a></li>
+<li><a href="About/">About InterPhyr.net</a></li>
+<li class="admin-only" hidden><a href="UpdateLogs/">Update Logs</a></li>
 
 </ul>
 <div class="explorer-box">
@@ -693,7 +703,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">InterPhyr Version: V0.99</p>
+<p class="small">InterPhyr Version: V1.0.0</p>
 
 </section>
 
@@ -706,11 +716,6 @@ Service to the registered nation has been suspended for geopolitical reasons.
 <p>This website provides information about the federation and its participating member nations.</p>
 
 <p>Read the latest official communications in <a href="News/">The Zapadiyan Daily</a>.</p>
-
-<div class="notice">
-<b>NOTICE:</b>
-This website is currently under construction.
-</div>
 
 <p class="gov-access-row"><a class="gov-access-button" href="Government/">Government Access</a> <span class="small">Restricted to PAF member governments.</span></p>
 
@@ -859,12 +864,17 @@ Council-Type Constitutional Monarchy with a peaceful democratic economy.
 
 <p>For inquiries concerning InterPhyr, please contact the appropriate representative.</p>
 
-<p>
-<b>InterPhyr Information Service:</b>
-<a href="https://discord.gg/5362UGaDSM" target="_blank" rel="noopener">interphyr@zapadtelecom.net</a>
-</p>
+<table class="contact-table">
+<tr><th>Office</th><th>For</th><th>Address</th></tr>
+<tr><td><b>InterPhyr Information Service</b></td><td>The website, general enquiries</td><td><a href="https://discord.gg/5362UGaDSM" target="_blank" rel="noopener">interphyr@zapadtelecom.net</a></td></tr>
+<tr><td><b>People's Information Ministry</b></td><td>Press, The Zapadiyan Daily, official statements</td><td>ministry@zapadtelecom.net</td></tr>
+<tr><td><b>Ministry of Outside Relations</b></td><td>Enquiries from nations outside the Federation</td><td>relations@zapadtelecom.net</td></tr>
+<tr><td><b>ZapadTelecom&copy; Customer Service</b></td><td>Connection problems, dial-up, billing</td><td>service@zapadtelecom.net</td></tr>
+</table>
 
-<p class="small">Electronic mail is available through the ZapadTelecom© network.</p>
+<p>Officials of member governments should use <a href="Government/">Government Access</a> or their official channels.</p>
+
+<p class="small">Electronic mail is available through the ZapadTelecom© network. Press <b>Mail</b> on the toolbar to open your ZapadMail© inbox. All correspondence may be read by the People's Information Ministry.</p>
 
 </section>
 
@@ -880,7 +890,7 @@ Hosted by <a href="ZapadTelecom/">ZapadTelecom</a>©
 
 <div class="maintenance-page" role="alert">
 <div class="maintenance-head">
-<img class="win98-16bit" src="https://win98icons.alexmeub.com/icons/png/msg_warning-0.png" alt="">
+<img class="win98-16bit" src="images/icons/win98/msg_warning-0.png" alt="">
 <h2>This website is under maintenance</h2>
 </div>
 <hr>
@@ -903,7 +913,7 @@ Hosted by <a href="ZapadTelecom/">ZapadTelecom</a>©
 <div id="ie-status-text" class="ie-status-field ie-status-main">Done</div>
 
 <div class="ie-status-field">
-<img class="ie-status-icon win98-16bit" src="https://win98icons.alexmeub.com/icons/png/world-1.png" alt="">
+<img class="ie-status-icon win98-16bit" src="images/icons/win98/world-1.png" alt="">
 Internet
 </div>
 
@@ -939,7 +949,7 @@ const klippyLines=[
 "Three member nations, one paperclip. Seems balanced.",
 "Careful with the Doctrines section - socialism and monarchy sharing a webpage.",
 "It looks like you're checking the Member Nations table. They're all very nice, mostly.",
-"This website is currently under construction. So am I, emotionally.",
+"The website is finally finished. I, however, am still under construction.",
 "Looking for the Contact section? I'm not authorized to give out my email.",
 "Ah, ZapadTelecom Interweb Surfer©. A choice."
 ];

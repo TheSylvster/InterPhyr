@@ -6,6 +6,7 @@
 <link rel="icon" type="image/png" href="images/roundels/interphyr.png">
 <title>InterPhyr.net - ZapadTelecom Interweb Surfer©</title>
 <link rel="stylesheet" href="https://unpkg.com/98.css">
+<script src="maintenance.js"></script>
 
 <style>
 *{box-sizing:border-box}
@@ -375,7 +376,22 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 #klippy{display:none!important}
 .ie-page{overflow-x:hidden}
 .nations-table th,.nations-table td,.relations-table th,.relations-table td{white-space:normal}
-}</style>
+}
+
+/* =========================================================
+   MAINTENANCE PAGE (see maintenance.js)
+   ========================================================= */
+
+.maintenance-page{display:none;max-width:560px;padding:18px 22px 30px;font-family:Tahoma,Verdana,Arial,sans-serif;font-size:11px;line-height:1.5}
+.site-maintenance .maintenance-page{display:block}
+.site-maintenance .webpage,.site-maintenance .ie-explorer,.site-maintenance .ie-menu-toggle,.site-maintenance #klippy{display:none!important}
+.maintenance-head{display:flex;align-items:flex-start;gap:12px}
+.maintenance-head img{width:32px;height:32px;flex-shrink:0}
+.maintenance-head h2{margin:4px 0 0;font-family:Verdana,Tahoma,Arial,sans-serif;font-size:17px;font-weight:bold}
+.maintenance-page hr{border:0;border-top:1px solid #c0c0c0;margin:14px 0}
+.maintenance-page ul{margin:6px 0;padding-left:22px}
+.maintenance-page li{margin:4px 0}
+.maintenance-foot{color:#606060;font-size:10px}</style>
 </head>
 
 <body class="dialup-loading">
@@ -677,7 +693,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">InterPhyr Version: V0.94</p>
+<p class="small">InterPhyr Version: V0.95</p>
 
 </section>
 
@@ -861,6 +877,24 @@ Hosted by <a href="ZapadTelecom/">ZapadTelecom</a>©
 </p>
 
 </div>
+
+<div class="maintenance-page" role="alert">
+<div class="maintenance-head">
+<img class="win98-16bit" src="https://win98icons.alexmeub.com/icons/png/msg_warning-0.png" alt="">
+<h2>This website is under maintenance</h2>
+</div>
+<hr>
+<p>InterPhyr.net is temporarily unavailable while ZapadTelecom© engineers carry out scheduled maintenance on the network.</p>
+<p>Please try the following:</p>
+<ul>
+<li>Try again later. Service will be restored as soon as the work is complete.</li>
+<li>Do not disconnect your modem. Your ZapadTelecom© connection remains active.</li>
+<li>For urgent matters, contact the People's Information Ministry through official channels.</li>
+</ul>
+<p>We apologise for any inconvenience.</p>
+<hr>
+<p class="maintenance-foot">HTTP 503 - Service unavailable<br>ZapadTelecom© Interweb Surfer</p>
+</div>
 </main>
 </div>
 
@@ -881,7 +915,7 @@ Internet
 <img class="klippy-face" src="images/klippy.png" alt="Klipi" draggable="false">
 </div>
 
-<<script>
+<script>
 (function(){
 
 
@@ -1506,8 +1540,23 @@ screen.style.display="none";
 
 document.body.classList.remove("dialup-loading");
 
+if(isUnderMaintenance()){
+document.body.classList.add("site-maintenance");
+statusText.textContent="Done";
+return;
+}
+
 startPageLoading();
 
+}
+
+/*
+ * Maintenance switch: see maintenance.js.
+ * The admin bypass still gets through.
+ */
+
+function isUnderMaintenance(){
+return String(window.INTERPHYR_MAINTENANCE)==="1"&&getCookie("interphyr_admin_session")!=="1";
 }
 
 function finishConnection(){
@@ -1957,701 +2006,6 @@ showRegistration();
 }
 
 })();
-</script>
-
-function resetDialup(){
-
-stopConnectionTimer();
-stopAudioOnly();
-stopBlocks();
-
-busy=false;
-finished=false;
-started=false;
-
-connect.classList.remove("pressed");
-connect.disabled=false;
-connect.textContent="Connect";
-connect.style.display="inline-block";
-
-retry.style.display="none";
-
-progress.classList.remove("error");
-
-setProgress(0);
-
-line1.textContent="Modem ready.";
-line2.textContent="Ready to connect to InterPhyr.net.";
-line3.textContent="Click Connect to begin.";
-
-}
-
-
-function finishRegistration(nation){
-
-/*
- * This is the ONLY thing stored between sessions.
- *
- * Cookie duration: 1 year.
- */
-
-document.cookie=
-"interphyr_registered_nation="+
-encodeURIComponent(nation)+
-"; max-age=31536000; path=/";
-
-registrationScreen.style.display="none";
-registrationErrorScreen.style.display="none";
-
-/*
- * Continue with the ORIGINAL dial-up.
- */
-
-screen.style.display="flex";
-
-resetDialup();
-
-}
-
-
-nationRegister.addEventListener("click",function(){
-
-const nation=nationInput.value.trim();
-
-if(!nation){
-
-nationInput.focus();
-return;
-
-}
-
-if(isBlockedNation(nation)){
-
-showBlockedRegion();
-return;
-
-}
-
-finishRegistration(nation);
-
-});
-
-
-nationInput.addEventListener("keydown",function(event){
-
-if(event.key==="Enter"){
-
-event.preventDefault();
-nationRegister.click();
-
-}
-
-});
-
-
-/*
- * Registration cannot be bypassed by closing
- * the registration window.
- */
-
-registrationClose.addEventListener("click",function(){
-
-nationInput.focus();
-
-});
-
-
-/*
- * The blocked screen also cannot be bypassed
- * by closing its window.
- */
-
-registrationErrorClose.addEventListener("click",function(){
-
-showBlockedRegion();
-
-});
-
-
-const screen=document.getElementById("dialup-screen");
-const audio=document.getElementById("dialup-audio");
-const errorAudio=document.getElementById("dialup-error-audio");
-const welcomeAudio=document.getElementById("dialup-welcome-audio");
-
-const line1=document.getElementById("dialup-line-1");
-const line2=document.getElementById("dialup-line-2");
-const line3=document.getElementById("dialup-line-3");
-
-const progress=document.getElementById("dialup-progress");
-const percent=document.getElementById("dialup-percent");
-const blocksContainer=document.querySelector(".dialup-blocks");
-
-const connect=document.getElementById("dialup-connect");
-const retry=document.getElementById("dialup-retry");
-const webpage=document.querySelector(".webpage");
-const statusText=document.getElementById("ie-status-text");
-const goButton=document.getElementById("ie-go");
-
-let dialupNumber="";
-let assignedIP="";
-
-let busy=false;
-let finished=false;
-let started=false;
-
-let connectionTimer=null;
-let connectionStartedAt=0;
-let shouldFail=false;
-
-function generateConnectionDetails(){
-
-const serviceNumber=Math.floor(Math.random()*100)
-.toString()
-.padStart(2,"0");
-
-dialupNumber="3615 "+serviceNumber;
-
-assignedIP=
-"10."+
-Math.floor(Math.random()*256)+"."+
-Math.floor(Math.random()*256)+"."+
-(Math.floor(Math.random()*254)+1);
-
-}
-
-function setProgress(value){
-
-value=Math.max(0,Math.min(100,value));
-
-const segments=progress.querySelectorAll("span");
-const filledCount=Math.floor((value/100)*segments.length);
-
-segments.forEach(function(segment,index){
-segment.classList.toggle("filled",index<filledCount);
-});
-
-percent.textContent=Math.floor(value)+"%";
-
-}
-
-function startBlocks(){
-blocksContainer.classList.add("active");
-}
-
-function stopBlocks(){
-blocksContainer.classList.remove("active");
-}
-
-function stopConnectionTimer(){
-
-if(connectionTimer!==null){
-clearInterval(connectionTimer);
-connectionTimer=null;
-}
-
-}
-
-function stopAudioOnly(){
-
-try{
-audio.pause();
-audio.currentTime=0;
-}catch(e){}
-
-}
-
-function playErrorSound(){
-
-try{
-
-errorAudio.pause();
-errorAudio.currentTime=0;
-errorAudio.volume=1;
-
-const promise=errorAudio.play();
-
-if(promise&&typeof promise.catch==="function"){
-promise.catch(function(){});
-}
-
-}catch(e){}
-
-}
-
-function playWelcomeSound(){
-
-try{
-
-welcomeAudio.pause();
-welcomeAudio.currentTime=0;
-welcomeAudio.volume=1;
-
-const promise=welcomeAudio.play();
-
-if(promise&&typeof promise.catch==="function"){
-promise.catch(function(){});
-}
-
-}catch(e){}
-
-}
-
-function startPageLoading(){
-
-webpage.className="webpage webpage-loading";
-
-statusText.textContent="Opening http://www.interphyr.net/...";
-
-setTimeout(function(){
-webpage.classList.add("page-stage-1");
-statusText.textContent="Opening page...";
-},250);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-2");
-statusText.textContent="Receiving document...";
-},650);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-3");
-statusText.textContent="Receiving document...";
-},1000);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-4");
-statusText.textContent="Receiving table...";
-},1350);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-5");
-statusText.textContent="Downloading picture...";
-},1750);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-6");
-statusText.textContent="Downloading picture...";
-},2150);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-7");
-statusText.textContent="Downloading picture...";
-},2500);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-8");
-statusText.textContent="Receiving document...";
-},2850);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-9");
-statusText.textContent="Receiving document...";
-},3150);
-
-setTimeout(function(){
-webpage.classList.add("page-stage-10");
-statusText.textContent="Done";
-},3450);
-
-setTimeout(function(){
-
-webpage.className="webpage";
-statusText.textContent="Done";
-
-/*
- * Welcome sound plays only after the
- * staged website loading has completed.
- */
-
-playWelcomeSound();
-
-},3500);
-
-}
-
-function revealWebsite(){
-
-screen.style.display="none";
-
-document.body.classList.remove("dialup-loading");
-
-startPageLoading();
-
-}
-
-function finishConnection(){
-
-if(finished||busy)return;
-
-stopConnectionTimer();
-
-finished=true;
-started=false;
-
-stopAudioOnly();
-stopBlocks();
-
-setProgress(100);
-
-line1.textContent="Connected to InterPhyr.net";
-line2.textContent="Connection established.";
-line3.textContent="Welcome.";
-
-connect.style.display="inline-block";
-connect.classList.add("pressed");
-connect.disabled=true;
-connect.textContent="Connected";
-
-retry.style.display="none";
-
-setTimeout(function(){
-revealWebsite();
-},700);
-
-}
-
-function busyLine(){
-
-if(finished||busy)return;
-
-stopConnectionTimer();
-
-busy=true;
-started=false;
-
-stopAudioOnly();
-stopBlocks();
-
-playErrorSound();
-
-line1.textContent="Dialing InterPhyr.net...";
-line2.textContent="NO CARRIER";
-
-line3.innerHTML=
-'<div class="dialup-error">'+
-'<b>ERROR 680:</b><br><br>'+
-'The telephone line is currently in use.<br>'+
-'InterPhyr.net could not establish a connection.'+
-'</div>';
-
-progress.classList.add("error");
-
-setProgress(100);
-
-percent.textContent="BUSY";
-
-connect.classList.remove("pressed");
-connect.disabled=true;
-connect.textContent="Connect";
-connect.style.display="inline-block";
-
-retry.style.display="inline-block";
-
-}
-
-function updateConnection(elapsed){
-
-if(!started||busy||finished)return;
-
-setProgress((elapsed/29)*100);
-
-if(elapsed<2){
-
-line1.textContent="Initializing modem...";
-line2.textContent="Modem ready.";
-line3.textContent="Dialing InterPhyr.net...";
-
-}else if(elapsed<5){
-
-line1.textContent="Dialing InterPhyr.net...";
-line2.textContent="ATDT "+dialupNumber;
-line3.textContent="Waiting for carrier...";
-
-}else if(elapsed<8){
-
-line1.textContent="Dialing InterPhyr.net...";
-line2.textContent="RING";
-line3.textContent="RING";
-
-}else if(elapsed<11){
-
-line1.textContent="CONNECT 56000";
-line2.textContent="Carrier detected.";
-line3.textContent="V.90 negotiation...";
-
-}else if(elapsed<14){
-
-line1.textContent="CONNECT 56000";
-line2.textContent="V.90";
-line3.textContent="Negotiating PPP...";
-
-}else if(elapsed<18){
-
-line1.textContent="PPP connection established.";
-line2.textContent="Authenticating user...";
-line3.textContent="Username: INTERPHYR";
-
-}else if(elapsed<21){
-
-line1.textContent="Authentication accepted.";
-line2.textContent="Verifying account...";
-line3.textContent="Access granted.";
-
-}else if(elapsed<24){
-
-line1.textContent="Assigning network address...";
-line2.textContent="IP address: "+assignedIP;
-line3.textContent="DNS server: ZapadTelecom";
-
-}else if(elapsed<27){
-
-line1.textContent="Resolving www.interphyr.net...";
-line2.textContent="DNS lookup successful.";
-line3.textContent="Connecting to web server...";
-
-}else{
-
-line1.textContent="HTTP/1.0 connection established.";
-line2.textContent="GET / HTTP/1.0";
-line3.textContent="Loading InterPhyr.net...";
-
-}
-
-}
-
-function connectionTick(){
-
-if(!started||busy||finished)return;
-
-const elapsed=(performance.now()-connectionStartedAt)/1000;
-
-/*
- * One in ten connections fails at 4.3 seconds.
- */
-
-if(shouldFail&&elapsed>=4.3){
-
-busyLine();
-return;
-
-}
-
-updateConnection(elapsed);
-
-if(elapsed>=29){
-finishConnection();
-}
-
-}
-
-function startAudio(){
-
-try{
-
-audio.currentTime=0;
-audio.volume=1;
-
-const promise=audio.play();
-
-/*
- * IMPORTANT:
- *
- * The MP3 is completely optional.
- * If it fails to load, the simulated
- * connection continues normally.
- */
-
-if(promise&&typeof promise.catch==="function"){
-promise.catch(function(){});
-}
-
-}catch(e){}
-
-}
-
-function beginConnection(){
-
-stopConnectionTimer();
-stopAudioOnly();
-
-busy=false;
-finished=false;
-started=true;
-
-generateConnectionDetails();
-
-/*
- * One in ten attempts receives
- * the simulated NO CARRIER error.
- */
-
-shouldFail=Math.floor(Math.random()*10)===0;
-
-audio.dataset.shouldFail=shouldFail?"1":"0";
-
-connect.style.display="inline-block";
-connect.classList.add("pressed");
-connect.disabled=true;
-connect.textContent="Connecting...";
-
-retry.style.display="none";
-
-progress.classList.remove("error");
-
-setProgress(0);
-
-line1.textContent="Initializing modem...";
-line2.textContent="Modem ready.";
-line3.textContent="Dialing InterPhyr.net...";
-
-startBlocks();
-
-/*
- * Start the simulation immediately.
- *
- * It does NOT wait for the external
- * dial-up MP3 to load or play.
- */
-
-connectionStartedAt=performance.now();
-
-updateConnection(0);
-
-connectionTimer=setInterval(connectionTick,100);
-
-/*
- * Audio is attempted separately.
- */
-
-startAudio();
-
-}
-
-audio.addEventListener("error",function(){
-/*
- * Intentionally empty.
- *
- * Audio failure must never stop
- * the connection simulation.
- */
-});
-
-/*
- * The MP3 "ended" event is intentionally
- * not used. The fake connection always
- * lasts 29 seconds.
- */
-
-connect.addEventListener("click",function(event){
-
-event.preventDefault();
-event.stopPropagation();
-
-if(busy||finished||started)return;
-
-beginConnection();
-
-});
-
-retry.addEventListener("click",function(event){
-
-event.preventDefault();
-event.stopPropagation();
-
-stopConnectionTimer();
-stopAudioOnly();
-
-busy=false;
-finished=false;
-started=false;
-
-connect.classList.remove("pressed");
-connect.disabled=false;
-connect.textContent="Connect";
-connect.style.display="inline-block";
-
-retry.style.display="none";
-
-progress.classList.remove("error");
-
-setProgress(0);
-
-line1.textContent="Modem ready.";
-line2.textContent="Ready to connect to InterPhyr.net.";
-line3.textContent="Click Connect to begin.";
-
-beginConnection();
-
-});
-
-goButton.addEventListener("click",function(event){
-
-event.preventDefault();
-event.stopPropagation();
-
-/*
- * Intentionally does nothing.
- */
-
-});
-
-document.querySelectorAll("a").forEach(function(link){
-
-link.addEventListener("click",function(){
-this.classList.add("clicked");
-});
-
-});
-
-
-/* =========================================================
-   INITIAL STARTUP
-   ========================================================= */
-
-/*
- * The registration check happens BEFORE
- * the dial-up is allowed to appear.
- *
- * Only the registered nation is persisted.
- */
-
-const registeredNation=getRegisteredNation();
-
-screen.style.display="none";
-registrationErrorScreen.style.display="none";
-
-if(registeredNation){
-
-if(isBlockedNation(registeredNation)){
-
-showBlockedRegion();
-
-}else{
-
-/*
- * Existing valid registration:
- * go directly to the ORIGINAL dial-up.
- */
-
-screen.style.display="flex";
-
-resetDialup();
-
-}
-
-}else{
-
-/*
- * First visit:
- * registration is shown BEFORE dial-up.
- */
-
-screen.style.display="none";
-
-showRegistration();
-
-}
-
-});
 </script>
 
 <script>

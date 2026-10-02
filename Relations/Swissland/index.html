@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 
+<script src="../../maintenance.js"></script>
 <script>
 (function(){
 
@@ -34,6 +35,15 @@ if(getCookie("interphyr_nation_status")==="invalid")return false;
 if(getCookie("interphyr_lockout")==="1")return false;
 if(getCookie("interphyr_admin_session")==="1")return true;
 return !!getCookie("interphyr_registered_nation")&&getCookie("interphyr_connected")==="1";
+}catch(e){
+return false;
+}
+}
+
+/* Maintenance switch: see maintenance.js. The admin bypass still gets through. */
+function isUnderMaintenance(){
+try{
+return String(window.INTERPHYR_MAINTENANCE)==="1"&&getCookie("interphyr_admin_session")!=="1";
 }catch(e){
 return false;
 }
@@ -82,7 +92,7 @@ window.interphyrRestricted=getCookie("interphyr_admin_session")!=="1"&&!isPafMem
 window.interphyrRestricted=true;
 }
 
-if(!isLoggedIn()){
+if(!isLoggedIn()||isUnderMaintenance()){
 if(window.interphyrSoftNav)window.interphyrSoftNav.redirecting=true;
 location.replace("../../");
 }
@@ -94,7 +104,7 @@ location.replace("../../");
  */
 
 window.addEventListener("pageshow",function(event){
-if(event.persisted&&!isLoggedIn()){
+if(event.persisted&&(!isLoggedIn()||isUnderMaintenance())){
 location.replace("../../");
 }
 });

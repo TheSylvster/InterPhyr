@@ -13,4 +13,4 @@
  * change can take that long to reach visitors.
  */
 
-window.INTERPHYR_MAINTENANCE = 1;
+window.INTERPHYR_MAINTENANCE = 0;

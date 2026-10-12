@@ -250,14 +250,22 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .fedcon-alert-window p{margin:0 0 7px}
 .fedcon-alert-flash{margin:0 0 10px;padding:8px;background:#e00000;color:#fff;border:2px solid #000;font-family:"Courier New",Courier,monospace;font-size:18px;font-weight:bold;letter-spacing:3px;text-align:center;animation:fedcon-blink .6s steps(1) infinite}
 .fedcon-alert .fedcon-buttons{gap:6px}
-.fedcon-alert-1{background:#000;color:#fff;font-family:"Courier New",Courier,monospace;text-align:center;animation:fedcon-red-border 1s steps(1) infinite}
-.fedcon-nuke{max-width:620px}
-.fedcon-nuke-symbol{font-size:110px;line-height:1;color:#ffd800;animation:fedcon-blink 1s steps(1) infinite}
-.fedcon-nuke-title{margin:6px 0;font-size:40px;font-weight:bold;letter-spacing:8px;color:#ff2020}
-.fedcon-nuke-level{margin-bottom:14px;font-size:14px;font-weight:bold;letter-spacing:3px}
-.fedcon-nuke p{margin:0 0 8px;font-size:13px;line-height:1.5}
-.fedcon-nuke-drill{color:#ffd800;font-size:16px!important;font-weight:bold;letter-spacing:4px}
-.fedcon-nuke-buttons{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.fedcon-alert-1{align-items:flex-start;overflow-y:auto;background:#000;color:#fff;font-family:"Pixelated MS Sans Serif",Arial,sans-serif;-webkit-font-smoothing:none;animation:fedcon-red-border 1s steps(1) infinite}
+.fedcon-nuke{width:620px;max-width:100%;margin:auto;padding:6px 4px 0}
+.fedcon-nuke-bar{margin-bottom:10px;padding:5px 10px;background:#c00000;color:#fff;font-size:11px;font-weight:bold;letter-spacing:2px;text-align:center}
+.fedcon-nuke-head{text-align:center}
+.fedcon-nuke-symbol{font-size:96px;line-height:1;color:#ffd800;animation:fedcon-blink 1s steps(1) infinite}
+.fedcon-nuke-title{margin:4px 0;font-size:36px;font-weight:bold;letter-spacing:8px;color:#ff2020}
+.fedcon-nuke-level{margin-bottom:10px;font-size:13px;font-weight:bold;letter-spacing:3px}
+.fedcon-nuke p,.fedcon-nuke li{margin:0 0 7px;font-size:11px;line-height:1.5}
+.fedcon-nuke .fedcon-nuke-drill{margin-bottom:12px;color:#ffd800;font-size:16px;font-weight:bold;letter-spacing:4px}
+.fedcon-nuke h3{margin:14px 0 6px;padding-bottom:2px;border-bottom:1px solid #808080;color:#ffd800;font-size:11px;letter-spacing:1px;text-transform:uppercase}
+.fedcon-nuke ol{margin:0;padding-left:22px}
+.fedcon-nuke-table{width:100%;border-collapse:collapse}
+.fedcon-nuke-table th,.fedcon-nuke-table td{padding:3px 6px;background:#000!important;color:#fff;border:1px solid #808080;font-size:11px;text-align:left;vertical-align:top;overflow-wrap:anywhere}
+.fedcon-nuke-table th{color:#ffd800}
+.fedcon-nuke-buttons{position:sticky;bottom:0;display:flex;justify-content:center;gap:8px;margin-top:14px;padding:10px 0 12px;background:#000}
+.fedcon-nuke-buttons button{color:#000}
 .fedcon-alert-0{background:#0000aa;color:#fff;cursor:default}
 .fedcon-bsod{max-width:640px;font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.45}
 .fedcon-bsod p{margin:0 0 16px}
@@ -266,7 +274,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .fedcon-bsod-continue{text-align:center}
 .fedcon-bsod-cursor{animation:fedcon-blink 1s steps(1) infinite}
 @keyframes fedcon-red-border{0%{box-shadow:inset 0 0 0 10px #e00000}50%{box-shadow:inset 0 0 0 10px #000}}
-@media (max-width:760px){.fedcon-nuke-symbol{font-size:72px}.fedcon-nuke-title{font-size:28px;letter-spacing:4px}.fedcon-bsod{font-size:12px}}
+@media (max-width:760px){.fedcon-nuke-symbol{font-size:64px}.fedcon-nuke-title{font-size:26px;letter-spacing:4px}.fedcon-nuke-bar{letter-spacing:1px}.fedcon-bsod{font-size:12px}}
 @media (prefers-reduced-motion:reduce){.fedcon-alert-flash,.fedcon-nuke-symbol,.fedcon-alert-1,.fedcon-bsod-cursor{animation:none}}
 @media (prefers-reduced-motion:reduce){.gov-fedcon .fedcon-lamp,.fedcon-cell.active{animation:none}}
 .gov-doc-window{margin:10px 0 18px;max-width:760px}
@@ -953,13 +961,31 @@ alert.innerHTML=
 }else if(level===1){
 alert.innerHTML=
 '<div class="fedcon-nuke">'+
+'<div class="fedcon-nuke-bar">ZAPADTELECOM&copy; EMERGENCY BROADCAST SYSTEM</div>'+
+'<div class="fedcon-nuke-head">'+
 '<div class="fedcon-nuke-symbol" aria-hidden="true">☢︎</div>'+
 '<div class="fedcon-nuke-title">NUCLEAR ALERT</div>'+
 '<div class="fedcon-nuke-level">FEDCON 1 &mdash; MAXIMUM READINESS</div>'+
 '<p class="fedcon-nuke-drill">THIS IS NOT A DRILL</p>'+
-'<p>All citizens must proceed immediately to the nearest fallout shelter.</p>'+
-'<p>Member governments are relocating to protected shelters. Federation strategic forces are ready for immediate use.</p>'+
-'<p>Remain tuned to ZapadTV&copy; for official instructions.</p>'+
+'</div>'+
+'<h3>What is happening</h3>'+
+'<p>The Phyrrian Astral Federation has been placed at FEDCON 1. A strategic attack on the Federation may be imminent. Member governments have relocated to protected shelters, and Federation strategic forces are ready for immediate use.</p>'+
+'<h3>What you must do now</h3>'+
+'<ol>'+
+'<li><b>Go to the nearest fallout shelter or basement immediately.</b></li>'+
+'<li>If you are caught outside, do not look at the flash. Lie face down and cover your head.</li>'+
+'<li>Stay away from windows.</li>'+
+'<li>Take drinking water, a battery radio and spare batteries.</li>'+
+'<li>Do not use telephone lines. Keep them free for the Government.</li>'+
+'<li>Stay in the shelter until the all-clear is broadcast.</li>'+
+'</ol>'+
+'<h3>Emergency broadcasts</h3>'+
+'<table class="fedcon-nuke-table">'+
+'<tr><th>Nation</th><th>Station</th><th>Frequency</th></tr>'+
+'<tr><td>The Astralyian Republic</td><td>Astralyian Emergency Radio</td><td>101.6 MHz</td></tr>'+
+'<tr><td>The Zapadiyan People\'s Republic</td><td>ZapadRadio&copy; Emergency Service</td><td>98.2 MHz</td></tr>'+
+'<tr><td>The Kingdom of Rendale</td><td>Royal Rendale Broadcasting</td><td>104.4 MHz</td></tr>'+
+'</table>'+
 '<div class="fedcon-nuke-buttons"><button type="button" data-fedcon-details>Details...</button><button type="button" data-fedcon-close>Acknowledge</button></div>'+
 '</div>';
 }else{

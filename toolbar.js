@@ -30,7 +30,7 @@ var PAGES=[
 {path:"Relations/",title:"Outside Relations",relations:true},
 {path:"Relations/Eisenreich/",title:"The Eisenreich",relations:true},
 {path:"Relations/Pancake/",title:"The Royal Kingdom of Pancake",relations:true},
-{path:"Relations/Swissland/",title:"Swissland",relations:true},
+{path:"Relations/Swissland/",title:"Swissland (Archived)",relations:true},
 {path:"Relations/Luminara/",title:"Luminara",relations:true},
 {path:"Relations/MerchantsUnion/",title:"Merchants' Union",relations:true},
 {path:"Relations/Frostborn/",title:"The Frostborn",relations:true},
@@ -798,5 +798,133 @@ case "Print":openPrint();break;
 }
 setTimeout(updateNavButtons,0);
 });
+
+/*
+ * ===================== SCREENSAVER =====================
+ *
+ * After 3 minutes without mouse, keyboard or touch input, the
+ * ZapadTelecom(c) screensaver (a Windows 98 style starfield with
+ * the ZapadTelecom(c) logo drifting across it) covers the page.
+ * Any input ends it. It does not start while a video or sound is
+ * playing, during an emergency alert, or when the visitor prefers
+ * reduced motion. window.interphyrScreensaver.start() shows it now.
+ */
+
+var SAVER_DELAY=3*60*1000;
+var saverTimer=null;
+var saver=null;
+var swallowUntil=0;
+
+function saverBlocked(){
+if(document.hidden)return true;
+if(document.querySelector(".fedcon-alert,.ipx-nuke-alert"))return true;
+if(document.body&&document.body.classList.contains("ipx-emergency"))return true;
+var media=document.querySelectorAll("audio,video");
+for(var i=0;i<media.length;i++){
+if(!media[i].paused&&!media[i].ended)return true;
+}
+return !!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+function armSaver(){
+clearTimeout(saverTimer);
+saverTimer=setTimeout(function(){
+if(saverBlocked())armSaver();
+else startSaver();
+},SAVER_DELAY);
+}
+
+function startSaver(){
+if(saver)return;
+var canvas=document.createElement("canvas");
+canvas.className="ipx-saver";
+canvas.setAttribute("aria-hidden","true");
+canvas.style.cssText="position:fixed;inset:0;z-index:100003;width:100%;height:100%;background:#000;cursor:none";
+document.documentElement.appendChild(canvas);
+var ctx=canvas.getContext("2d");
+var logo=new Image();
+logo.src=new URL("images/zapadtelecom-logo.png",root).href;
+var stars=[];
+for(var i=0;i<220;i++)stars.push({x:Math.random()*2-1,y:Math.random()*2-1,z:Math.random()});
+var logoX=48,logoY=48,dx=1.2,dy=0.9;
+var state={canvas:canvas,frame:0,startX:null,startY:null};
+function resize(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+resize();
+window.addEventListener("resize",resize);
+state.resize=resize;
+function draw(){
+var w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;
+ctx.fillStyle="#000";
+ctx.fillRect(0,0,w,h);
+/* Stars fly towards the viewer and are reborn far away. */
+for(var i=0;i<stars.length;i++){
+var s=stars[i];
+s.z-=0.006;
+if(s.z<=0.02){s.x=Math.random()*2-1;s.y=Math.random()*2-1;s.z=1;}
+var px=cx+(s.x/s.z)*cx,py=cy+(s.y/s.z)*cy;
+if(px<0||px>w||py<0||py>h){s.z=0;continue;}
+var size=Math.max(1,Math.round((1-s.z)*3));
+var shade=Math.round(255*(1-s.z));
+ctx.fillStyle="rgb("+shade+","+shade+","+shade+")";
+ctx.fillRect(px,py,size,size);
+}
+/* The logo drifts and bounces off the edges. */
+if(logo.complete&&logo.naturalWidth){
+var lw=Math.min(220,w*0.45),lh=lw*logo.naturalHeight/logo.naturalWidth;
+logoX+=dx;logoY+=dy;
+if(logoX<=8||logoX+lw+8>=w){dx=-dx;logoX=Math.max(8,Math.min(logoX,w-lw-8));}
+if(logoY<=8||logoY+lh+8>=h){dy=-dy;logoY=Math.max(8,Math.min(logoY,h-lh-8));}
+/* On a light plate, as the logo is dark blue. */
+ctx.fillStyle="#c0c0c0";
+ctx.fillRect(logoX-8,logoY-8,lw+16,lh+16);
+ctx.fillStyle="#fff";
+ctx.fillRect(logoX-6,logoY-6,lw+12,lh+12);
+ctx.drawImage(logo,logoX,logoY,lw,lh);
+}
+state.frame=requestAnimationFrame(draw);
+}
+draw();
+saver=state;
+}
+
+function stopSaver(){
+if(!saver)return false;
+cancelAnimationFrame(saver.frame);
+window.removeEventListener("resize",saver.resize);
+saver.canvas.remove();
+saver=null;
+return true;
+}
+
+/* Any input resets the timer; input while the screensaver shows only ends it. */
+function saverActivity(event){
+if(saver){
+if(event.type==="mousemove"){
+/* Ignore the tiny moves a mouse reports on its own. */
+if(saver.startX===null){saver.startX=event.clientX;saver.startY=event.clientY;return;}
+if(Math.abs(event.clientX-saver.startX)+Math.abs(event.clientY-saver.startY)<8)return;
+}
+stopSaver();
+if(event.type!=="mousemove"&&event.type!=="wheel"){
+swallowUntil=Date.now()+500;
+event.preventDefault();
+event.stopPropagation();
+}
+}
+armSaver();
+}
+
+["mousemove","keydown","pointerdown","wheel","touchstart"].forEach(function(type){
+document.addEventListener(type,saverActivity,{capture:true,passive:type==="mousemove"||type==="wheel"});
+});
+document.addEventListener("click",function(event){
+if(Date.now()<swallowUntil){event.preventDefault();event.stopPropagation();}
+},true);
+armSaver();
+
+window.interphyrScreensaver={start:startSaver,stop:stopSaver};
 
 })();

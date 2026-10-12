@@ -45,6 +45,7 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Fullscreen is requested only when the site is freshly opened, and is kept across pages through the soft-navigation page swaps.
 - Every sub-page has a fail-closed login gate. Typed addresses, bookmarks and refreshes must go back through registration and dial-up.
 - Keep the Windows 98 look: use 98.css components and the pixel font, and match the existing pages' fonts and styles.
+- The ZapadTelecom© screensaver (in `toolbar.js`) starts after 3 minutes without input; `window.interphyrScreensaver.start()` shows it straight away.
 - Do not publish accusations against real people (the leaders and members on the site are real players).
 
 ## Government Access (encrypted)
@@ -56,6 +57,7 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - To change a document or login, edit the private source and rebuild the vault with the private builder. Let browsers save the government login if the user wants that.
 - Three failed logons lock that browser out of the site.
 - **FEDCON** (the alert level) is stored in the encrypted content. After logging on, `window.FEDCON` drives the bar, the alert window and the emergency popups (FEDCON 2, 1 and 0 each have their own). To preview a level, type `SETFEDCON0` to `SETFEDCON5` (or `FEDCON = 1`) in the browser console, or type the code anywhere on the Government page. `SETFEDCONREAL` (or `FEDCON = null`) goes back. This works after a Government logon, and for the ZapTel_IT admin even without one (then only the popups show). A preview only changes what that browser shows.
+- **FEDCON history** is also in the encrypted content: `fedcon-past` lines (level, date, reason) under the `fedcon-data` line, newest first, shown under History... in the FEDCON window. When the level changes, the old current level moves down into the history.
 
 ## Testing
 

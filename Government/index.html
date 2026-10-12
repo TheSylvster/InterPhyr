@@ -844,6 +844,63 @@ if(played&&played.catch)played.catch(function(){});
 }catch(e){}
 }
 
+/*
+ * FEDCON 1: a classic Emergency Alert System sound, made in the
+ * browser (no recording): three data bursts, then the two-tone
+ * 853 + 960 Hz attention signal. It stops when the alert is closed.
+ */
+
+let easStop=null;
+
+function stopEasSound(){
+if(easStop){easStop();easStop=null;}
+}
+
+function playEasSound(){
+stopEasSound();
+const Ctx=window.AudioContext||window.webkitAudioContext;
+if(!Ctx)return;
+let ctx;
+try{ctx=new Ctx();}catch(e){return;}
+if(ctx.state==="suspended"&&ctx.resume)ctx.resume().catch(function(){});
+const out=ctx.createGain();
+out.gain.value=0.12;
+out.connect(ctx.destination);
+const start=ctx.currentTime+0.1;
+const BIT=1/520.83;
+/* Three data bursts (FSK: 2083.3 Hz and 1562.5 Hz) with a pause between each. */
+for(let burst=0;burst<3;burst++){
+const t0=start+burst*1.9;
+const osc=ctx.createOscillator();
+osc.type="square";
+const g=ctx.createGain();
+g.gain.value=0.5;
+osc.connect(g).connect(out);
+for(let i=0;i<450;i++){
+osc.frequency.setValueAtTime(Math.random()<0.5?2083.3:1562.5,t0+i*BIT);
+}
+osc.start(t0);
+osc.stop(t0+450*BIT);
+}
+/* The attention signal: 853 Hz and 960 Hz together for eight seconds. */
+const toneStart=start+3*1.9+0.6;
+[853,960].forEach(function(f){
+const osc=ctx.createOscillator();
+osc.type="sine";
+osc.frequency.value=f;
+const g=ctx.createGain();
+g.gain.value=0.5;
+osc.connect(g).connect(out);
+osc.start(toneStart);
+osc.stop(toneStart+8);
+});
+const timer=setTimeout(function(){stopEasSound();},(toneStart-ctx.currentTime+8.5)*1000);
+easStop=function(){
+clearTimeout(timer);
+try{ctx.close();}catch(e){}
+};
+}
+
 /* After the FEDCON 0 blue screen, the whole site becomes the Emergency Notice (see emergency.js). */
 function continueFromCollapse(){
 closeFedconAlert();
@@ -855,6 +912,7 @@ return !!(window.matchMedia&&window.matchMedia("(pointer: coarse)").matches);
 }
 
 function closeFedconAlert(){
+stopEasSound();
 const open=document.querySelector(".fedcon-alert");
 if(open)open.remove();
 document.removeEventListener("keydown",fedconAlertKeydown);
@@ -926,7 +984,8 @@ document.body.appendChild(alert);
 document.addEventListener("keydown",fedconAlertKeydown);
 const focus=alert.querySelector("[data-fedcon-close]:not([aria-label])");
 if(focus)focus.focus();
-playFedconSound();
+if(level===1)playEasSound();
+else playFedconSound();
 }
 
 /*

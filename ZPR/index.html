@@ -168,7 +168,7 @@ img.nation-logo,img.explorer-logo,img.nation-flag,img[src*="images/flags/"]{curs
 .webpage-loading.page-stage-1 .site-header{visibility:visible}
 .webpage-loading.page-stage-2 #information{visibility:visible}
 .webpage-loading.page-stage-3 #nation-profile,.webpage-loading.page-stage-3 #members{visibility:visible}
-.webpage-loading.page-stage-4 #explainer{visibility:visible}
+.webpage-loading.page-stage-4 #explainer,.webpage-loading.page-stage-4 #anthem{visibility:visible}
 .webpage-loading.page-stage-5 #related{visibility:visible}
 .webpage-loading.page-stage-6 hr,.webpage-loading.page-stage-6 .small{visibility:visible}
 
@@ -203,6 +203,14 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .ie-status-field{height:17px;display:flex;align-items:center;padding:0 5px;background:#c0c0c0;border:1px solid #808080;border-right-color:#fff;border-bottom-color:#fff;font-size:10px}
 .ie-status-main{flex:1}
 .ie-status-icon{width:16px;height:16px;object-fit:contain;margin-right:3px}
+
+/* =========================================================
+   NATIONAL ANTHEM
+   ========================================================= */
+
+.anthem-window{max-width:500px;margin:8px 0}
+.anthem-window .window-body{margin:3px;padding:3px}
+.anthem-video{display:block;width:100%;height:auto;background:#000}
 
 /* =========================================================
    KLIPPY
@@ -454,6 +462,22 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 
 </section>
 
+<section id="anthem" class="content-section">
+
+<h2>National Anthem</h2>
+
+<p>The national anthem of the Zapadiyan People's Republic is <b>The Internationale</b> (<i>La Internacional</i>).</p>
+
+<div class="window anthem-window">
+<div class="title-bar">
+<div class="title-bar-text">ZapadTV&copy; - National Anthem</div>
+</div>
+<div class="window-body">
+<video class="anthem-video" src="../videos/zpr-anthem.mp4" controls playsinline preload="metadata"></video>
+</div>
+</div>
+
+</section>
 <section id="related" class="content-section">
 
 <h2>Related</h2>

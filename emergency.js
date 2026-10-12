@@ -51,6 +51,11 @@ var PAGE=
 '<h1>Federation Emergency Notice</h1>'+
 '<p><b>The Phyrrian Astral Federation has ceased to function. InterPhyr.net is unavailable.</b></p>'+
 '<p>This page was stored on your computer by ZapadTelecom&copy; for use in a national emergency. It will be replaced when normal service is restored.</p>'+
+'<div class="ipx-em-tv">'+
+'<div class="ipx-em-tv-head">ZAPADTV&copy; EMERGENCY BROADCAST &mdash; NATIONAL ANTHEM</div>'+
+'<video class="ipx-em-video" src="'+root+'videos/zpr-anthem.mp4" playsinline loop controls></video>'+
+'<button type="button" class="ipx-em-sound" hidden>Click for sound</button>'+
+'</div>'+
 '<hr>'+
 '<h2>What has happened</h2>'+
 '<p>FEDCON 0, Federation Collapse, has been declared. Contact between the member governments of the Federation has been lost, and Federation government can no longer function. Emergency continuity-of-government plans are in force, and each member nation is now acting alone.</p>'+
@@ -90,6 +95,11 @@ var STYLE=
 "body.ipx-emergency .ipx-em-table th,body.ipx-emergency .ipx-em-table td{border:1px solid #000;padding:4px 6px;text-align:left;vertical-align:top;white-space:normal!important;overflow-wrap:anywhere;font-family:'Pixelated MS Sans Serif',Arial,sans-serif!important;font-size:11px;-webkit-font-smoothing:none}"+
 "body.ipx-emergency button{font-family:'Pixelated MS Sans Serif',Arial,sans-serif;font-size:11px;padding:4px 12px}"+
 "@media (max-width:480px){body.ipx-emergency .ipx-em-table th,body.ipx-emergency .ipx-em-table td{font-size:11px;padding:3px 4px}}"+
+"body.ipx-emergency .ipx-em-tv{margin:14px 0;border:2px solid #000;background:#000;text-align:center}"+
+"body.ipx-emergency .ipx-em-tv-head{padding:3px 6px;background:#000;color:#ffd800;font-weight:bold;letter-spacing:2px;text-align:left}"+
+"body.ipx-emergency .ipx-em-video{display:block;width:100%;height:auto;background:#000}"+
+"body.ipx-emergency .ipx-em-sound{margin:6px auto;display:inline-block}"+
+"body.ipx-emergency .ipx-em-sound[hidden]{display:none}"+
 "body.ipx-emergency .ipx-em-small{font-size:11px;color:#404040}";
 
 function addStyle(){
@@ -100,14 +110,42 @@ style.textContent=STYLE;
 (document.head||document.documentElement).appendChild(style);
 }
 
+/*
+ * The anthem plays with sound when the visitor has just pressed a key
+ * or clicked (e.g. Enter on the FEDCON 0 blue screen). Otherwise the
+ * browser only allows it muted, with a "Click for sound" button.
+ */
+function playAnthem(){
+var video=document.querySelector(".ipx-em-video");
+var sound=document.querySelector(".ipx-em-sound");
+if(!video)return;
+function muted(){
+video.muted=true;
+var p=video.play();
+if(p&&p.catch)p.catch(function(){});
+sound.hidden=false;
+}
+try{
+var p=video.play();
+if(p&&p.catch)p.catch(muted);
+}catch(e){muted();}
+sound.addEventListener("click",function(){
+video.muted=false;
+var p=video.play();
+if(p&&p.catch)p.catch(function(){});
+sound.hidden=true;
+});
+}
+
 function render(){
 addStyle();
 document.title="Emergency Notice - ZapadTelecom Emergency Broadcast System";
+document.querySelectorAll("audio,video").forEach(function(m){try{m.pause();}catch(e){}});
 document.body.className="ipx-emergency";
 document.body.removeAttribute("style");
 document.body.innerHTML=PAGE;
 document.documentElement.classList.remove("ipx-em-pending");
-document.querySelectorAll("audio,video").forEach(function(m){try{m.pause();}catch(e){}});
+playAnthem();
 if(canReturn()){
 var row=document.querySelector(".ipx-em-return");
 row.hidden=false;

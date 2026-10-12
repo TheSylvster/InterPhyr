@@ -22,6 +22,11 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Switching it on or off is not an update, so the version doesn't change.
 - GitHub Pages caches files for about 10 minutes.
 
+## Emergency switch (FEDCON 0)
+
+- `emergency.js` holds `window.INTERPHYR_FEDCON0 = 0;`. Set it to 1 to make every page show the ZapadTelecom Emergency Notice (Federation collapse) instead of the site, for everyone. The ZapTel_IT admin gets a "Return to full site" button.
+- A FEDCON 0 preview on the Government page (`SETFEDCON0`, then Enter on the blue screen) shows the Emergency Notice in that browser only, until "Return to full site" is pressed.
+
 ## Content and style rules
 
 - Put **©** after every mention of ZapadTelecom and its products (ZapadTelecom©, Interweb Surfer©, ZapadMail©, ZapadTV©).

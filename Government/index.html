@@ -5,6 +5,7 @@
 
 <script src="../maintenance.js"></script>
 <script src="../toolbar.js"></script>
+<script src="../emergency.js"></script>
 <script>
 (function(){
 
@@ -843,6 +844,12 @@ if(played&&played.catch)played.catch(function(){});
 }catch(e){}
 }
 
+/* After the FEDCON 0 blue screen, the whole site becomes the Emergency Notice (see emergency.js). */
+function continueFromCollapse(){
+closeFedconAlert();
+if(window.interphyrEmergency)window.interphyrEmergency.show();
+}
+
 function fedconTouch(){
 return !!(window.matchMedia&&window.matchMedia("(pointer: coarse)").matches);
 }
@@ -859,6 +866,7 @@ if(!open)return;
 /* FEDCON 0 only continues on Enter; the others also close on Escape. */
 if(open.classList.contains("fedcon-alert-0")?event.key==="Enter":event.key==="Escape"){
 event.preventDefault();
+if(open.classList.contains("fedcon-alert-0")){continueFromCollapse();return;}
 closeFedconAlert();
 }
 }
@@ -908,7 +916,7 @@ alert.innerHTML=
 '<p class="fedcon-bsod-continue">'+(fedconTouch()?"Tap the screen to continue":"Press ENTER to continue")+' <span class="fedcon-bsod-cursor">_</span></p>'+
 '</div>';
 /* On phones and tablets a tap is enough. */
-alert.addEventListener("pointerup",function(event){if(event.pointerType==="touch"||event.pointerType==="pen")closeFedconAlert();});
+alert.addEventListener("pointerup",function(event){if(event.pointerType==="touch"||event.pointerType==="pen")continueFromCollapse();});
 }
 alert.querySelectorAll("[data-fedcon-close]").forEach(function(b){b.addEventListener("click",closeFedconAlert);});
 alert.querySelectorAll("[data-fedcon-details]").forEach(function(b){
@@ -1014,6 +1022,7 @@ fedconNeedsLogon();
 
 function runFedconCode(code){
 if(!realFedcon&&!isItAdmin()){fedconNeedsLogon();return "Log on to Government Access first.";}
+if(code!=="0"&&window.interphyrEmergency)window.interphyrEmergency.clear();
 if(code==="REAL"){
 window.FEDCON=null;
 return realFedcon?"FEDCON back to the real level: FEDCON "+realFedcon.level+".":"FEDCON preview closed.";

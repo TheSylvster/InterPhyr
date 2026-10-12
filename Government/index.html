@@ -257,7 +257,7 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .fedcon-nuke p{margin:0 0 8px;font-size:13px;line-height:1.5}
 .fedcon-nuke-drill{color:#ffd800;font-size:16px!important;font-weight:bold;letter-spacing:4px}
 .fedcon-nuke-buttons{display:flex;justify-content:center;gap:8px;margin-top:16px}
-.fedcon-alert-0{background:#0000aa;color:#fff;cursor:pointer}
+.fedcon-alert-0{background:#0000aa;color:#fff;cursor:default}
 .fedcon-bsod{max-width:640px;font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.45}
 .fedcon-bsod p{margin:0 0 16px}
 .fedcon-bsod-head{margin-bottom:18px;text-align:center}
@@ -843,6 +843,10 @@ if(played&&played.catch)played.catch(function(){});
 }catch(e){}
 }
 
+function fedconTouch(){
+return !!(window.matchMedia&&window.matchMedia("(pointer: coarse)").matches);
+}
+
 function closeFedconAlert(){
 const open=document.querySelector(".fedcon-alert");
 if(open)open.remove();
@@ -852,7 +856,8 @@ document.removeEventListener("keydown",fedconAlertKeydown);
 function fedconAlertKeydown(event){
 const open=document.querySelector(".fedcon-alert");
 if(!open)return;
-if(open.classList.contains("fedcon-alert-0")||event.key==="Escape"){
+/* FEDCON 0 only continues on Enter; the others also close on Escape. */
+if(open.classList.contains("fedcon-alert-0")?event.key==="Enter":event.key==="Escape"){
 event.preventDefault();
 closeFedconAlert();
 }
@@ -900,9 +905,10 @@ alert.innerHTML=
 '*&nbsp; Continuity-of-government protocol is now in effect.<br>'+
 '*&nbsp; Each member nation must now act alone to survive.</p>'+
 '<p>FEDCON 0 &mdash; '+info.name+'</p>'+
-'<p class="fedcon-bsod-continue">Press any key to continue <span class="fedcon-bsod-cursor">_</span></p>'+
+'<p class="fedcon-bsod-continue">'+(fedconTouch()?"Tap the screen to continue":"Press ENTER to continue")+' <span class="fedcon-bsod-cursor">_</span></p>'+
 '</div>';
-alert.addEventListener("click",closeFedconAlert);
+/* On phones and tablets a tap is enough. */
+alert.addEventListener("pointerup",function(event){if(event.pointerType==="touch"||event.pointerType==="pen")closeFedconAlert();});
 }
 alert.querySelectorAll("[data-fedcon-close]").forEach(function(b){b.addEventListener("click",closeFedconAlert);});
 alert.querySelectorAll("[data-fedcon-details]").forEach(function(b){

@@ -226,6 +226,11 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .fedcon-scale{display:flex;gap:4px;margin-bottom:10px}
 .fedcon-cell{flex:1;padding:6px 0 4px;border:2px solid var(--c);color:var(--c);opacity:.35;font-size:20px;font-weight:bold;line-height:1}
 .fedcon-cell.active{opacity:1;background:var(--c);color:var(--t);animation:fedcon-blink 1s steps(1) infinite}
+.fedcon-cell{cursor:pointer}
+.fedcon-cell:hover{opacity:.7}
+.fedcon-cell.active:hover{opacity:1}
+.fedcon-cell.selected{outline:2px dotted #fff;outline-offset:2px}
+.fedcon-hint{margin-top:6px;font-size:10px;color:#808080;letter-spacing:1px}
 .fedcon-current{font-size:26px;font-weight:bold;letter-spacing:4px;line-height:1.1}
 .fedcon-current small{display:block;margin-top:3px;font-size:11px;letter-spacing:2px}
 .fedcon-info{margin:10px 2px 4px;font-size:11px;line-height:1.45}
@@ -701,11 +706,11 @@ userInput.type="password";
 const fedconBar=document.getElementById("gov-fedcon");
 
 const FEDCON_LEVELS={
-5:{name:"NORMAL READINESS",c:"#3c78ff",t:"#fff",desc:"Lowest state of readiness. Peacetime conditions throughout the Federation."},
-4:{name:"INCREASED INTELLIGENCE WATCH",c:"#00c000",t:"#000",desc:"Intelligence gathering is increased and security measures are strengthened."},
-3:{name:"INCREASED FORCE READINESS",c:"#ffd800",t:"#000",desc:"Federation forces are on heightened alert. Air forces are ready to mobilise within fifteen minutes."},
-2:{name:"FURTHER INCREASE IN FORCE READINESS",c:"#ff2020",t:"#fff",desc:"Federation forces are ready to deploy and engage within six hours."},
-1:{name:"MAXIMUM READINESS",c:"#ffffff",t:"#000",desc:"War is imminent or under way. All Federation forces are ready for immediate action."}
+5:{name:"NORMAL READINESS",c:"#3c78ff",t:"#fff",desc:"Lowest state of readiness. Peacetime conditions throughout the Federation.",when:"Used in peacetime, when there is no threat to the Federation or its member nations and no conflict near its borders."},
+4:{name:"INCREASED INTELLIGENCE WATCH",c:"#00c000",t:"#000",desc:"Intelligence gathering is increased and security measures are strengthened.",when:"Used when unrest or conflict near the Federation's borders needs close watching, but there is no direct threat to the Federation, such as after a war between neighbouring nations."},
+3:{name:"INCREASED FORCE READINESS",c:"#ffd800",t:"#000",desc:"Federation forces are on heightened alert. Air forces are ready to mobilise within fifteen minutes.",when:"Used when armed conflict breaks out on or near the Federation's borders, or when a hostile nation openly threatens or accuses a member nation."},
+2:{name:"FURTHER INCREASE IN FORCE READINESS",c:"#ff2020",t:"#fff",desc:"Federation forces are ready to deploy and engage within six hours.",when:"Used when an attack on the Federation or a member nation is expected, or when Federation forces may soon be drawn into a conflict."},
+1:{name:"MAXIMUM READINESS",c:"#ffffff",t:"#000",desc:"War is imminent or under way. All Federation forces are ready for immediate action.",when:"Used when the Federation or a member nation is under attack, or war is about to begin."}
 };
 
 function escapeHtml(text){
@@ -739,8 +744,12 @@ const info=FEDCON_LEVELS[fedcon.level];
 let cells="";
 for(let n=5;n>=1;n--){
 const l=FEDCON_LEVELS[n];
-cells+='<div class="fedcon-cell'+(n===fedcon.level?" active":"")+'" style="--c:'+l.c+';--t:'+l.t+'">'+n+'</div>';
+cells+='<div class="fedcon-cell'+(n===fedcon.level?" active selected":"")+'" data-level="'+n+'" role="button" tabindex="0" aria-label="FEDCON '+n+': '+l.name+'" style="--c:'+l.c+';--t:'+l.t+'">'+n+'</div>';
 }
+const currentInfo=
+'<p>'+info.desc+'</p>'+
+(fedcon.reason?'<p><b>Reason:</b> '+escapeHtml(fedcon.reason)+'</p>':'')+
+'<p class="fedcon-issued">Issued'+(fedcon.date?" "+escapeHtml(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>';
 const backdrop=document.createElement("div");
 backdrop.className="fedcon-backdrop";
 backdrop.innerHTML=
@@ -752,16 +761,37 @@ backdrop.innerHTML=
 '<div class="fedcon-head">PHYRRIAN ASTRAL FEDERATION<br>DEFENCE CONDITION</div>'+
 '<div class="fedcon-scale">'+cells+'</div>'+
 '<div class="fedcon-current" style="color:'+info.c+'">FEDCON '+fedcon.level+'<small>'+info.name+'</small></div>'+
+'<div class="fedcon-hint">Click a level to see when it is used.</div>'+
 '</div>'+
-'<div class="fedcon-info">'+
-'<p>'+info.desc+'</p>'+
-(fedcon.reason?'<p><b>Reason:</b> '+escapeHtml(fedcon.reason)+'</p>':'')+
-'<p class="fedcon-issued">Issued'+(fedcon.date?" "+escapeHtml(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>'+
-'</div>'+
+'<div class="fedcon-info">'+currentInfo+'</div>'+
 '<div class="fedcon-buttons"><button type="button">Acknowledge</button></div>'+
 '</div></div>';
 backdrop.querySelectorAll("button").forEach(function(button){
 button.addEventListener("click",closeFedconPopup);
+});
+/* Clicking another level shows when that level is used; clicking the current one goes back. */
+const infoBox=backdrop.querySelector(".fedcon-info");
+function selectLevel(n){
+backdrop.querySelectorAll(".fedcon-cell").forEach(function(cell){
+cell.classList.toggle("selected",Number(cell.getAttribute("data-level"))===n);
+});
+if(n===fedcon.level){
+infoBox.innerHTML=currentInfo;
+return;
+}
+const l=FEDCON_LEVELS[n];
+infoBox.innerHTML=
+'<p><b>FEDCON '+n+' &mdash; '+l.name+'</b></p>'+
+'<p>'+l.desc+'</p>'+
+'<p><b>When it is used:</b> '+l.when+'</p>'+
+'<p class="fedcon-issued">The current level is FEDCON '+fedcon.level+'. Click it to see the current reason.</p>';
+}
+backdrop.querySelectorAll(".fedcon-cell").forEach(function(cell){
+const n=Number(cell.getAttribute("data-level"));
+cell.addEventListener("click",function(){selectLevel(n);});
+cell.addEventListener("keydown",function(event){
+if(event.key==="Enter"||event.key===" "){event.preventDefault();selectLevel(n);}
+});
 });
 document.body.appendChild(backdrop);
 document.addEventListener("keydown",fedconKeydown);

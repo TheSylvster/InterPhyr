@@ -22,9 +22,15 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Switching it on or off is not an update, so the version doesn't change.
 - GitHub Pages caches files for about 10 minutes.
 
-## Emergency switch (FEDCON 0)
+## Emergency switch (public FEDCON)
 
-- `emergency.js` holds `window.INTERPHYR_FEDCON0 = 0;`. Set it to 1 to make every page show the ZapadTelecom Emergency Notice (Federation collapse) instead of the site, for everyone. The ZapTel_IT admin gets a "Return to full site" button.
+- `emergency.js` holds `window.INTERPHYR_FEDCON = 5;`, the public FEDCON level for everyone on every page.
+  - **0:** every page shows the ZapadTelecom Emergency Notice (Federation collapse) instead of the site. The ZapTel_IT admin gets a "Return to full site" button.
+  - **1:** every visitor gets the full-screen Nuclear Alert with the EAS sound. After Acknowledge it stays away until the browser is closed (session cookie `interphyr_fedcon1_ack`).
+  - **2 to 5:** normal.
+- The public level is separate from the Government page's FEDCON, which lives in the encrypted documents. When the level changes, set both.
+- For quick switching, prebuilt vaults for every level are kept privately next to the private builder, with a `use-fedcon.pl <level>` script that sets both the vault and the public switch. Rebuild them all when the documents or logins change.
+- The Nuclear Alert's markup, styles and EAS sound live in `emergency.js` (`window.interphyrEmergency.nuclear()`), and the Government page uses the same alert.
 - A FEDCON 0 preview on the Government page (`SETFEDCON0`, then Enter on the blue screen) shows the Emergency Notice in that browser only, until "Return to full site" is pressed.
 
 ## Content and style rules
@@ -54,4 +60,5 @@ This file holds the owner's standing instructions. Follow them on every change. 
 ## Testing
 
 - Test changes in a real browser (headless Chrome against a local server works) before pushing.
+- **Government logon tests:** the owner permits Claude to use **only the IT login** (the "IT" entry of the private credentials file) for automated Government logons, and only against a local test server, to check a rebuilt vault. Never use any other login. Never print, log, save or commit the IT login; feed it straight from the private file into the test, and delete the test file afterwards.
 - Check for script errors, broken images and links, and both the desktop and phone layouts.

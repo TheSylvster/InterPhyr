@@ -1,11 +1,18 @@
 /*
- * ================= EMERGENCY SWITCH (FEDCON 0) =================
+ * ==================== EMERGENCY SWITCH ====================
  *
- *   1 = FEDCON 0, Federation Collapse: every page of the site shows
- *       the ZapadTelecom Emergency Notice instead of InterPhyr.net,
- *       for everyone. The ZapTel_IT admin can still return to the
- *       full site.
- *   0 = normal.
+ * The public FEDCON level, for everyone on every page:
+ *
+ *   0 = FEDCON 0, Federation Collapse: every page of the site shows
+ *       the ZapadTelecom Emergency Notice instead of InterPhyr.net.
+ *       The ZapTel_IT admin can still return to the full site.
+ *   1 = FEDCON 1, Nuclear Alert: every visitor gets the full-screen
+ *       Nuclear Alert with the EAS sound. Once they press Acknowledge
+ *       it stays away until they close the browser.
+ *   5 = normal (2, 3 and 4 are also normal on the public site).
+ *
+ * This is separate from the Government page's FEDCON, which comes
+ * from the encrypted documents. Set both when the level changes.
  *
  * A FEDCON 0 preview on the Government page (SETFEDCON0, then press
  * Enter on the blue screen) shows the Emergency Notice in your own
@@ -14,7 +21,7 @@
  * GitHub Pages caches this file for up to 10 minutes.
  */
 
-window.INTERPHYR_FEDCON0 = 0;
+window.INTERPHYR_FEDCON = 1;
 
 (function(){
 
@@ -32,7 +39,11 @@ return null;
 }
 
 function globalOn(){
-return String(window.INTERPHYR_FEDCON0)==="1";
+return String(window.INTERPHYR_FEDCON)==="0";
+}
+
+function nuclearOn(){
+return String(window.INTERPHYR_FEDCON)==="1";
 }
 
 function isActive(){
@@ -157,6 +168,199 @@ location.href=root;
 }
 }
 
+/*
+ * FEDCON 1: the full-screen Nuclear Alert. Shown on every page when
+ * INTERPHYR_FEDCON is 1, and by the Government page for FEDCON 1.
+ */
+
+var NUKE_PAGE=
+'<div class="ipx-nuke">'+
+'<div class="ipx-nuke-bar">ZAPADTELECOM&copy; EMERGENCY BROADCAST SYSTEM</div>'+
+'<div class="ipx-nuke-head">'+
+'<div class="ipx-nuke-symbol" aria-hidden="true">☢︎</div>'+
+'<div class="ipx-nuke-title">NUCLEAR ALERT</div>'+
+'<div class="ipx-nuke-level">FEDCON 1 &mdash; MAXIMUM READINESS</div>'+
+'<p class="ipx-nuke-drill">THIS IS NOT A DRILL</p>'+
+'</div>'+
+'<h3>What is happening</h3>'+
+'<p>The Phyrrian Astral Federation has been placed at FEDCON 1. A strategic attack on the Federation may be imminent. Member governments have relocated to protected shelters, and Federation strategic forces are ready for immediate use.</p>'+
+'<h3>What you must do now</h3>'+
+'<ol>'+
+'<li><b>Go to the nearest fallout shelter or basement immediately.</b></li>'+
+'<li>If you are caught outside, do not look at the flash. Lie face down and cover your head.</li>'+
+'<li>Stay away from windows.</li>'+
+'<li>Take drinking water, a battery radio and spare batteries.</li>'+
+'<li>Do not use telephone lines. Keep them free for the Government.</li>'+
+'<li>Stay in the shelter until the all-clear is broadcast.</li>'+
+'</ol>'+
+'<h3>Emergency broadcasts</h3>'+
+'<table class="ipx-nuke-table">'+
+'<tr><th>Nation</th><th>Station</th><th>Frequency</th></tr>'+
+'<tr><td>The Astralyian Republic</td><td>Astralyian Emergency Radio</td><td>101.6 MHz</td></tr>'+
+'<tr><td>The Zapadiyan People\'s Republic</td><td>ZapadRadio&copy; Emergency Service</td><td>98.2 MHz</td></tr>'+
+'<tr><td>The Kingdom of Rendale</td><td>Royal Rendale Broadcasting</td><td>104.4 MHz</td></tr>'+
+'</table>'+
+'<div class="ipx-nuke-buttons"><button type="button" class="ipx-nuke-details" hidden>Details...</button><button type="button" class="ipx-nuke-close">Acknowledge</button></div>'+
+'</div>';
+
+var NUKE_STYLE=
+".ipx-nuke-alert{position:fixed;inset:0;z-index:100002;display:flex;align-items:flex-start;justify-content:center;padding:12px;overflow-y:auto;background:#000;color:#fff;font-family:'Pixelated MS Sans Serif',Arial,sans-serif;font-size:11px;text-align:left;-webkit-font-smoothing:none;animation:ipx-nuke-border 1s steps(1) infinite}"+
+".ipx-nuke{width:620px;max-width:100%;margin:auto;padding:6px 4px 0}"+
+".ipx-nuke-bar{margin-bottom:10px;padding:5px 10px;background:#c00000;color:#fff;font-size:11px;font-weight:bold;letter-spacing:2px;text-align:center}"+
+".ipx-nuke-head{text-align:center}"+
+".ipx-nuke-symbol{font-size:96px;line-height:1;color:#ffd800;animation:ipx-nuke-blink 1s steps(1) infinite}"+
+".ipx-nuke-title{margin:4px 0;font-size:36px;font-weight:bold;letter-spacing:8px;color:#ff2020}"+
+".ipx-nuke-level{margin-bottom:10px;font-size:13px;font-weight:bold;letter-spacing:3px}"+
+".ipx-nuke p,.ipx-nuke li{margin:0 0 7px;font-size:11px;line-height:1.5;color:#fff}"+
+".ipx-nuke .ipx-nuke-drill{margin-bottom:12px;color:#ffd800;font-size:16px;font-weight:bold;letter-spacing:4px}"+
+".ipx-nuke h3{margin:14px 0 6px;padding:0 0 2px;border:0;border-bottom:1px solid #808080;background:none;color:#ffd800;font-family:inherit;font-size:11px;font-weight:bold;letter-spacing:1px;text-transform:uppercase}"+
+".ipx-nuke ol{margin:0;padding-left:22px}"+
+".ipx-nuke-table{width:100%;border-collapse:collapse}"+
+".ipx-nuke-table th,.ipx-nuke-table td{padding:3px 6px;border:1px solid #808080;background:#000!important;color:#fff;font-family:inherit;font-size:11px;text-align:left;vertical-align:top;white-space:normal;overflow-wrap:anywhere}"+
+".ipx-nuke-table th{color:#ffd800}"+
+".ipx-nuke-buttons{position:sticky;bottom:0;display:flex;justify-content:center;gap:8px;margin-top:14px;padding:10px 0 12px;background:#000}"+
+".ipx-nuke-buttons button{color:#000;font-family:inherit;font-size:11px}"+
+".ipx-nuke-buttons button[hidden]{display:none}"+
+"@keyframes ipx-nuke-blink{50%{opacity:.45}}"+
+"@keyframes ipx-nuke-border{0%{box-shadow:inset 0 0 0 10px #e00000}50%{box-shadow:inset 0 0 0 10px #000}}"+
+"@media (max-width:760px){.ipx-nuke-symbol{font-size:64px}.ipx-nuke-title{font-size:26px;letter-spacing:4px}.ipx-nuke-bar{letter-spacing:1px}}"+
+"@media (prefers-reduced-motion:reduce){.ipx-nuke-alert,.ipx-nuke-symbol{animation:none}}";
+
+function addNukeStyle(){
+if(document.getElementById("ipx-nuke-style"))return;
+var style=document.createElement("style");
+style.id="ipx-nuke-style";
+style.textContent=NUKE_STYLE;
+(document.head||document.documentElement).appendChild(style);
+}
+
+/*
+ * A classic Emergency Alert System sound, made in the browser (no
+ * recording): three data bursts, then the two-tone 853 + 960 Hz
+ * attention signal. Browsers only allow sound after a click or key
+ * press, so on a freshly opened page it starts on the first one.
+ */
+
+var sirenStop=null;
+
+function stopSiren(){
+if(sirenStop){sirenStop();sirenStop=null;}
+}
+
+function playSiren(){
+stopSiren();
+var Ctx=window.AudioContext||window.webkitAudioContext;
+if(!Ctx)return;
+var ctx;
+try{ctx=new Ctx();}catch(e){return;}
+var out=ctx.createGain();
+out.gain.value=0.12;
+out.connect(ctx.destination);
+var start=ctx.currentTime+0.1;
+var BIT=1/520.83;
+/* Three data bursts (FSK: 2083.3 Hz and 1562.5 Hz) with a pause between each. */
+for(var burst=0;burst<3;burst++){
+var t0=start+burst*1.9;
+var osc=ctx.createOscillator();
+osc.type="square";
+var g=ctx.createGain();
+g.gain.value=0.5;
+osc.connect(g).connect(out);
+for(var i=0;i<450;i++){
+osc.frequency.setValueAtTime(Math.random()<0.5?2083.3:1562.5,t0+i*BIT);
+}
+osc.start(t0);
+osc.stop(t0+450*BIT);
+}
+/* The attention signal: 853 Hz and 960 Hz together for eight seconds. */
+var toneStart=start+3*1.9+0.6;
+[853,960].forEach(function(f){
+var tone=ctx.createOscillator();
+tone.type="sine";
+tone.frequency.value=f;
+var tg=ctx.createGain();
+tg.gain.value=0.5;
+tone.connect(tg).connect(out);
+tone.start(toneStart);
+tone.stop(toneStart+8);
+});
+/* The context's clock only runs once sound is allowed, so the end timer starts then too. */
+var timer=null;
+function armTimer(){
+if(timer||ctx.state!=="running")return;
+timer=setTimeout(stopSiren,(toneStart-ctx.currentTime+8.5)*1000);
+}
+function unlock(event){
+if(event&&event.target&&event.target.closest&&event.target.closest(".ipx-nuke-buttons"))return;
+if(ctx.resume)ctx.resume().then(armTimer).catch(function(){});
+}
+ctx.onstatechange=armTimer;
+document.addEventListener("pointerdown",unlock,true);
+document.addEventListener("keydown",unlock,true);
+unlock();
+sirenStop=function(){
+clearTimeout(timer);
+document.removeEventListener("pointerdown",unlock,true);
+document.removeEventListener("keydown",unlock,true);
+try{ctx.close();}catch(e){}
+};
+}
+
+function closeNuclear(){
+stopSiren();
+var open=document.querySelector(".ipx-nuke-alert");
+if(open)open.remove();
+document.removeEventListener("keydown",nuclearKeydown);
+}
+
+function nuclearKeydown(event){
+if(event.key==="Escape"&&document.querySelector(".ipx-nuke-alert")){
+event.preventDefault();
+var close=document.querySelector(".ipx-nuke-close");
+if(close)close.click();
+}
+}
+
+/*
+ * options.details: a function for the Details... button (the
+ * Government page uses it); without it, only Acknowledge shows.
+ * options.onClose: called after Acknowledge.
+ */
+function showNuclear(options){
+options=options||{};
+closeNuclear();
+addNukeStyle();
+var alert=document.createElement("div");
+alert.className="fedcon-alert ipx-nuke-alert";
+alert.setAttribute("role","alertdialog");
+alert.setAttribute("aria-modal","true");
+alert.setAttribute("aria-label","Nuclear Alert");
+alert.innerHTML=NUKE_PAGE;
+var details=alert.querySelector(".ipx-nuke-details");
+if(options.details){
+details.hidden=false;
+details.addEventListener("click",function(){closeNuclear();options.details();});
+}
+alert.querySelector(".ipx-nuke-close").addEventListener("click",function(){
+closeNuclear();
+if(options.onClose)options.onClose();
+});
+/* On the page root, so page swaps and the maintenance screen don't remove it. */
+document.documentElement.appendChild(alert);
+document.addEventListener("keydown",nuclearKeydown);
+alert.querySelector(".ipx-nuke-close").focus();
+playSiren();
+return alert;
+}
+
+function showPublicNuclear(){
+if(getCookie("interphyr_fedcon1_ack")==="1")return;
+showNuclear({onClose:function(){
+/* A session cookie: the alert comes back after the browser is closed. */
+document.cookie="interphyr_fedcon1_ack=1; path=/";
+}});
+}
+
 window.interphyrEmergency={
 /* Used by the Government page after the FEDCON 0 blue screen. */
 show:function(){
@@ -166,7 +370,9 @@ render();
 },
 clear:function(){
 document.cookie="interphyr_fedcon0=; max-age=0; path=/";
-}
+},
+nuclear:showNuclear,
+closeNuclear:closeNuclear
 };
 
 if(isActive()){
@@ -174,6 +380,9 @@ addStyle();
 document.documentElement.classList.add("ipx-em-pending");
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render);
 else render();
+}else if(nuclearOn()&&getCookie("interphyr_fedcon1_ack")!=="1"){
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",showPublicNuclear);
+else showPublicNuclear();
 }
 
 })();

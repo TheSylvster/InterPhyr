@@ -855,6 +855,22 @@ canvas.height=window.innerHeight;
 resize();
 window.addEventListener("resize",resize);
 state.resize=resize;
+/* The glowing logo is drawn once per size, not every frame. */
+var GLOW=24,glowCache=null;
+function glowLogo(lw,lh){
+if(glowCache&&glowCache.lw===lw)return glowCache.canvas;
+var g=document.createElement("canvas");
+g.width=Math.ceil(lw+GLOW*2);
+g.height=Math.ceil(lh+GLOW*2);
+var gx=g.getContext("2d");
+gx.shadowColor="rgba(200,220,255,0.9)";
+gx.shadowBlur=16;
+for(var i=0;i<3;i++)gx.drawImage(logo,GLOW,GLOW,lw,lh);
+gx.shadowBlur=0;
+gx.drawImage(logo,GLOW,GLOW,lw,lh);
+glowCache={lw:lw,canvas:g};
+return g;
+}
 function draw(){
 var w=canvas.width,h=canvas.height,cx=w/2,cy=h/2;
 ctx.fillStyle="#000";
@@ -877,12 +893,9 @@ var lw=Math.min(220,w*0.45),lh=lw*logo.naturalHeight/logo.naturalWidth;
 logoX+=dx;logoY+=dy;
 if(logoX<=8||logoX+lw+8>=w){dx=-dx;logoX=Math.max(8,Math.min(logoX,w-lw-8));}
 if(logoY<=8||logoY+lh+8>=h){dy=-dy;logoY=Math.max(8,Math.min(logoY,h-lh-8));}
-/* On a light plate, as the logo is dark blue. */
-ctx.fillStyle="#c0c0c0";
-ctx.fillRect(logoX-8,logoY-8,lw+16,lh+16);
-ctx.fillStyle="#fff";
-ctx.fillRect(logoX-6,logoY-6,lw+12,lh+12);
-ctx.drawImage(logo,logoX,logoY,lw,lh);
+/* With a soft light glow, as the logo is dark blue. */
+var glow=glowLogo(lw,lh);
+ctx.drawImage(glow,logoX-GLOW,logoY-GLOW);
 }
 state.frame=requestAnimationFrame(draw);
 }

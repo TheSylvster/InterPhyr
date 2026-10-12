@@ -704,7 +704,7 @@ Service to the registered nation has been suspended for geopolitical reasons.
 
 <p>InterPhyr provides a common place for member nations to access information, coordinate projects, communicate and cooperate.</p>
 
-<p class="small">InterPhyr Version: V1.0.11</p>
+<p class="small">InterPhyr Version: V1.0.12</p>
 
 </section>
 
@@ -1547,6 +1547,15 @@ function revealWebsite(){
 
 document.cookie="interphyr_connected=1; path=/";
 
+/* Under FEDCON 0 there is no site to show (e.g. after the admin bypass). */
+if(federationDown()){
+window.interphyrEmergency.showNotice();
+return;
+}
+
+/* A site-wide FEDCON alert (see emergency.js) only shows once connected. */
+if(window.interphyrEmergency)window.interphyrEmergency.connected();
+
 screen.style.display="none";
 
 document.body.classList.remove("dialup-loading");
@@ -1640,6 +1649,59 @@ retry.style.display="inline-block";
 
 }
 
+function federationDown(){
+return !!(window.interphyrEmergency&&window.interphyrEmergency.active());
+}
+
+/*
+ * FEDCON 0: the connection fails and, after a moment, the
+ * ZapadTelecom Emergency Notice replaces the site.
+ */
+
+function collapseLine(){
+
+if(finished||busy)return;
+
+stopConnectionTimer();
+
+busy=true;
+started=false;
+
+stopAudioOnly();
+stopBlocks();
+
+playErrorSound();
+
+line1.textContent="Dialing InterPhyr.net...";
+line2.textContent="NO CARRIER";
+
+line3.innerHTML=
+'<div class="dialup-error">'+
+'<b>ERROR 651:</b><br><br>'+
+'Could not establish a connection with ZapadTelecom&copy; Network.<br>'+
+'The Federation network is not responding.<br><br>'+
+'Receiving emergency broadcast...'+
+'</div>';
+
+progress.classList.add("error");
+
+setProgress(100);
+
+percent.textContent="FAILED";
+
+connect.classList.remove("pressed");
+connect.disabled=true;
+connect.textContent="Connect";
+connect.style.display="inline-block";
+
+retry.style.display="none";
+
+setTimeout(function(){
+window.interphyrEmergency.showNotice();
+},4000);
+
+}
+
 function updateConnection(elapsed){
 
 if(!started||busy||finished)return;
@@ -1719,6 +1781,14 @@ const elapsed=(performance.now()-connectionStartedAt)/1000;
 if(shouldFail&&elapsed>=4.3){
 
 busyLine();
+return;
+
+}
+
+/* FEDCON 0 (see emergency.js): the phone rings, then nobody answers. */
+if(elapsed>=8&&federationDown()){
+
+collapseLine();
 return;
 
 }

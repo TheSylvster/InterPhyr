@@ -25,8 +25,8 @@ This file holds the owner's standing instructions. Follow them on every change. 
 ## Emergency switch (public FEDCON)
 
 - `emergency.js` holds `window.INTERPHYR_FEDCON = 5;`, the public FEDCON level for everyone on every page.
-  - **0:** every page shows the ZapadTelecom Emergency Notice (Federation collapse) instead of the site. The ZapTel_IT admin gets a "Return to full site" button.
-  - **1:** every visitor gets the full-screen Nuclear Alert with the EAS sound. After Acknowledge it stays away until the browser is closed (session cookie `interphyr_fedcon1_ack`).
+  - **0:** every page shows the ZapadTelecom Emergency Notice (Federation collapse) instead of the site. On the main page, visitors register and dial up first, then the connection fails and the notice appears. The ZapTel_IT admin gets a "Return to full site" button.
+  - **1:** every visitor gets the full-screen Nuclear Alert once they have registered and connected, with the EAS sound. After Acknowledge it stays away until the browser is closed (session cookie `interphyr_fedcon1_ack`).
   - **2 to 5:** normal.
 - The public level is separate from the Government page's FEDCON, which lives in the encrypted documents. When the level changes, set both.
 - For quick switching, prebuilt vaults for every level are kept privately next to the private builder, with a `use-fedcon.pl <level>` script that sets both the vault and the public switch. Rebuild them all when the documents or logins change.

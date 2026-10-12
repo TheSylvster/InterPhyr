@@ -412,6 +412,14 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <h2>Version History</h2>
 
 <div class="log-entry">
+<h3>V1.0.12 <span class="log-date">12.10.2026</span></h3>
+<ul>
+<li>The site-wide FEDCON 1 Nuclear Alert now only shows after the visitor has registered and connected, not on the registration screen.</li>
+<li>Under FEDCON 0 the main page no longer jumps straight to the Emergency Notice: visitors register and dial up, the line rings, then the connection fails (ERROR 651, the Federation network is not responding) and the Emergency Notice takes over. Other pages still show the notice straight away.</li>
+</ul>
+</div>
+
+<div class="log-entry">
 <h3>V1.0.11 <span class="log-date">12.10.2026</span></h3>
 <ul>
 <li>FEDCON 1 can now go site-wide: the public switch in <code>emergency.js</code> is now <code>INTERPHYR_FEDCON</code> (0 = Emergency Notice on every page, 1 = Nuclear Alert for every visitor, 2-5 = normal). The Nuclear Alert shows once per browser session, until Acknowledge is pressed.</li>

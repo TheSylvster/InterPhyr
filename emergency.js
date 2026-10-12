@@ -6,7 +6,8 @@
  *   0 = FEDCON 0, Federation Collapse: every page of the site shows
  *       the ZapadTelecom Emergency Notice instead of InterPhyr.net.
  *       The ZapTel_IT admin can still return to the full site.
- *   1 = FEDCON 1, Nuclear Alert: every visitor gets the full-screen
+ *   1 = FEDCON 1, Nuclear Alert: once they have registered and
+ *       connected, every visitor gets the full-screen
  *       Nuclear Alert with the EAS sound. Once they press Acknowledge
  *       it stays away until they close the browser.
  *   5 = normal (2, 3 and 4 are also normal on the public site).
@@ -353,8 +354,10 @@ playSiren();
 return alert;
 }
 
+/* Only once the visitor has registered and connected (dial-up or the admin bypass). */
 function showPublicNuclear(){
-if(getCookie("interphyr_fedcon1_ack")==="1")return;
+if(!nuclearOn()||getCookie("interphyr_connected")!=="1")return;
+if(getCookie("interphyr_fedcon1_ack")==="1"||document.querySelector(".ipx-nuke-alert"))return;
 showNuclear({onClose:function(){
 /* A session cookie: the alert comes back after the browser is closed. */
 document.cookie="interphyr_fedcon1_ack=1; path=/";
@@ -372,15 +375,23 @@ clear:function(){
 document.cookie="interphyr_fedcon0=; max-age=0; path=/";
 },
 nuclear:showNuclear,
-closeNuclear:closeNuclear
+closeNuclear:closeNuclear,
+/* Called by the main page when the connection is made. */
+connected:showPublicNuclear,
+/* The main page asks these during dial-up: under FEDCON 0 the connection fails, then the notice shows. */
+active:isActive,
+showNotice:render
 };
 
-if(isActive()){
+/* The main page (registration and dial-up) shows the notice itself, when the connection fails. */
+var dialupPage=/^(index\.html)?$/.test(location.pathname.slice(new URL(root).pathname.length));
+
+if(isActive()&&!dialupPage){
 addStyle();
 document.documentElement.classList.add("ipx-em-pending");
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",render);
 else render();
-}else if(nuclearOn()&&getCookie("interphyr_fedcon1_ack")!=="1"){
+}else if(nuclearOn()){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",showPublicNuclear);
 else showPublicNuclear();
 }

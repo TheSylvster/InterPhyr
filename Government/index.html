@@ -239,6 +239,34 @@ hr{height:1px;margin:14px 0;border:0;border-top:1px solid #808080}
 .fedcon-issued{color:#404040;font-size:10px}
 .fedcon-buttons{display:flex;justify-content:flex-end}
 @keyframes fedcon-blink{50%{opacity:.45}}
+/* FEDCON 2-0 emergency alerts */
+.gov-fedcon-severe .fedcon-lamp{animation-duration:.5s}
+.fedcon-alert{position:fixed;inset:0;z-index:100001;display:flex;align-items:center;justify-content:center;padding:12px}
+.fedcon-alert-2{background:rgba(128,0,0,.45)}
+.fedcon-alert-window{width:460px;max-width:100%}
+.fedcon-alert-window>.title-bar{background:linear-gradient(90deg,#800000,#e00000)}
+.fedcon-alert-window .window-body{margin:8px 10px 10px;font-size:11px;line-height:1.45}
+.fedcon-alert-window p{margin:0 0 7px}
+.fedcon-alert-flash{margin:0 0 10px;padding:8px;background:#e00000;color:#fff;border:2px solid #000;font-family:"Courier New",Courier,monospace;font-size:18px;font-weight:bold;letter-spacing:3px;text-align:center;animation:fedcon-blink .6s steps(1) infinite}
+.fedcon-alert .fedcon-buttons{gap:6px}
+.fedcon-alert-1{background:#000;color:#fff;font-family:"Courier New",Courier,monospace;text-align:center;animation:fedcon-red-border 1s steps(1) infinite}
+.fedcon-nuke{max-width:620px}
+.fedcon-nuke-symbol{font-size:110px;line-height:1;color:#ffd800;animation:fedcon-blink 1s steps(1) infinite}
+.fedcon-nuke-title{margin:6px 0;font-size:40px;font-weight:bold;letter-spacing:8px;color:#ff2020}
+.fedcon-nuke-level{margin-bottom:14px;font-size:14px;font-weight:bold;letter-spacing:3px}
+.fedcon-nuke p{margin:0 0 8px;font-size:13px;line-height:1.5}
+.fedcon-nuke-drill{color:#ffd800;font-size:16px!important;font-weight:bold;letter-spacing:4px}
+.fedcon-nuke-buttons{display:flex;justify-content:center;gap:8px;margin-top:16px}
+.fedcon-alert-0{background:#0000aa;color:#fff;cursor:pointer}
+.fedcon-bsod{max-width:640px;font-family:"Courier New",Courier,monospace;font-size:15px;line-height:1.45}
+.fedcon-bsod p{margin:0 0 16px}
+.fedcon-bsod-head{margin-bottom:18px;text-align:center}
+.fedcon-bsod-head span{padding:0 6px;background:#aaa;color:#0000aa;font-weight:bold}
+.fedcon-bsod-continue{text-align:center}
+.fedcon-bsod-cursor{animation:fedcon-blink 1s steps(1) infinite}
+@keyframes fedcon-red-border{0%{box-shadow:inset 0 0 0 10px #e00000}50%{box-shadow:inset 0 0 0 10px #000}}
+@media (max-width:760px){.fedcon-nuke-symbol{font-size:72px}.fedcon-nuke-title{font-size:28px;letter-spacing:4px}.fedcon-bsod{font-size:12px}}
+@media (prefers-reduced-motion:reduce){.fedcon-alert-flash,.fedcon-nuke-symbol,.fedcon-alert-1,.fedcon-bsod-cursor{animation:none}}
 @media (prefers-reduced-motion:reduce){.gov-fedcon .fedcon-lamp,.fedcon-cell.active{animation:none}}
 .gov-doc-window{margin:10px 0 18px;max-width:760px}
 .gov-doc-window>.title-bar .title-bar-text{display:flex;align-items:center;gap:4px}
@@ -750,8 +778,10 @@ cells+='<div class="fedcon-cell'+(n===fedcon.level?" active selected":"")+'" dat
 }
 const currentInfo=
 '<p>'+info.desc+'</p>'+
-(fedcon.reason?'<p><b>Reason:</b> '+escapeHtml(fedcon.reason)+'</p>':'')+
-'<p class="fedcon-issued">Issued'+(fedcon.date?" "+escapeHtml(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>';
+(fedcon.reason?'<p><b>'+(fedcon.preview?"Used when:":"Reason:")+'</b> '+escapeHtml(fedcon.reason)+'</p>':'')+
+(fedcon.preview&&realFedcon
+?'<p class="fedcon-issued">PREVIEW ONLY. The real level is FEDCON '+realFedcon.level+'. Type FEDCON = null in the console to go back.</p>'
+:'<p class="fedcon-issued">Issued'+(fedcon.date?" "+escapeHtml(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>');
 const backdrop=document.createElement("div");
 backdrop.className="fedcon-backdrop";
 backdrop.innerHTML=
@@ -800,20 +830,147 @@ document.addEventListener("keydown",fedconKeydown);
 backdrop.querySelector(".fedcon-buttons button").focus();
 }
 
-function showFedcon(){
+/*
+ * EMERGENCY ALERTS for FEDCON 2, 1 and 0, shown automatically on
+ * logon (and whenever the level changes).
+ */
+
+function playFedconSound(){
+try{
+const sound=new Audio("../sounds/windows-98-error.mp3");
+const played=sound.play();
+if(played&&played.catch)played.catch(function(){});
+}catch(e){}
+}
+
+function closeFedconAlert(){
+const open=document.querySelector(".fedcon-alert");
+if(open)open.remove();
+document.removeEventListener("keydown",fedconAlertKeydown);
+}
+
+function fedconAlertKeydown(event){
+const open=document.querySelector(".fedcon-alert");
+if(!open)return;
+if(open.classList.contains("fedcon-alert-0")||event.key==="Escape"){
+event.preventDefault();
+closeFedconAlert();
+}
+}
+
+function showFedconAlert(fedcon){
+closeFedconAlert();
+const level=fedcon.level;
+if(level>2)return;
+const info=FEDCON_LEVELS[level];
+const alert=document.createElement("div");
+alert.className="fedcon-alert fedcon-alert-"+level;
+alert.setAttribute("role","alertdialog");
+alert.setAttribute("aria-modal","true");
+if(level===2){
+alert.innerHTML=
+'<div class="window fedcon-alert-window">'+
+'<div class="title-bar"><div class="title-bar-text">EMERGENCY ALERT - Federation Defence Condition</div>'+
+'<div class="title-bar-controls"><button aria-label="Close" data-fedcon-close></button></div></div>'+
+'<div class="window-body">'+
+'<div class="fedcon-alert-flash">FEDCON 2 &mdash; WAR FOOTING</div>'+
+'<p><b>ATTENTION ALL MEMBER GOVERNMENTS.</b></p>'+
+'<p>The Phyrrian Astral Federation is on war footing. Federation forces are mobilised and ready to engage within six hours. Civil defence measures are in effect in every member nation.</p>'+
+'<p>Await further instructions through official channels.</p>'+
+'<div class="fedcon-buttons"><button type="button" data-fedcon-details>Details...</button><button type="button" data-fedcon-close>Acknowledge</button></div>'+
+'</div></div>';
+}else if(level===1){
+alert.innerHTML=
+'<div class="fedcon-nuke">'+
+'<div class="fedcon-nuke-symbol" aria-hidden="true">☢︎</div>'+
+'<div class="fedcon-nuke-title">NUCLEAR ALERT</div>'+
+'<div class="fedcon-nuke-level">FEDCON 1 &mdash; MAXIMUM READINESS</div>'+
+'<p class="fedcon-nuke-drill">THIS IS NOT A DRILL</p>'+
+'<p>All citizens must proceed immediately to the nearest fallout shelter.</p>'+
+'<p>Member governments are relocating to protected shelters. Federation strategic forces are ready for immediate use.</p>'+
+'<p>Remain tuned to ZapadTV&copy; for official instructions.</p>'+
+'<div class="fedcon-nuke-buttons"><button type="button" data-fedcon-details>Details...</button><button type="button" data-fedcon-close>Acknowledge</button></div>'+
+'</div>';
+}else{
+alert.innerHTML=
+'<div class="fedcon-bsod">'+
+'<div class="fedcon-bsod-head"><span>FEDERATION</span></div>'+
+'<p>A fatal exception 0F has occurred at PAF:00000000 in FEDERATION.SYS. The Phyrrian Astral Federation has been terminated.</p>'+
+'<p>*&nbsp; Contact with Federation government has been lost.<br>'+
+'*&nbsp; Continuity-of-government protocol is now in effect.<br>'+
+'*&nbsp; Each member nation must now act alone to survive.</p>'+
+'<p>FEDCON 0 &mdash; '+info.name+'</p>'+
+'<p class="fedcon-bsod-continue">Press any key to continue <span class="fedcon-bsod-cursor">_</span></p>'+
+'</div>';
+alert.addEventListener("click",closeFedconAlert);
+}
+alert.querySelectorAll("[data-fedcon-close]").forEach(function(b){b.addEventListener("click",closeFedconAlert);});
+alert.querySelectorAll("[data-fedcon-details]").forEach(function(b){
+b.addEventListener("click",function(){closeFedconAlert();showFedconPopup(fedcon);});
+});
+document.body.appendChild(alert);
+document.addEventListener("keydown",fedconAlertKeydown);
+const focus=alert.querySelector("[data-fedcon-close]:not([aria-label])");
+if(focus)focus.focus();
+playFedconSound();
+}
+
+/*
+ * ONE VARIABLE drives the whole FEDCON display: window.FEDCON.
+ * It is set from the encrypted content when you log on. To preview
+ * another level, log on, open the browser console (F12) and type
+ * for example  FEDCON = 1  (FEDCON = null goes back to the real
+ * level). A preview only changes what you see in your own browser.
+ */
+
+let realFedcon=null;
+let fedconState=null;
+
+function renderFedcon(withAlert){
 fedconBar.innerHTML="";
-const fedcon=readFedcon();
-if(!fedcon)return;
+closeFedconPopup();
+closeFedconAlert();
+if(!fedconState)return;
+const fedcon=fedconState;
 const info=FEDCON_LEVELS[fedcon.level];
 const bar=document.createElement("button");
 bar.type="button";
-bar.className="gov-fedcon";
+bar.className="gov-fedcon"+(fedcon.level<=2?" gov-fedcon-severe":"");
 bar.style.background=info.c;
 bar.style.color=info.t;
-bar.innerHTML='<span class="fedcon-lamp"></span><span>FEDCON '+fedcon.level+' &mdash; '+info.name+'</span><span class="fedcon-more">Details...</span>';
+bar.innerHTML='<span class="fedcon-lamp"></span><span>FEDCON '+fedcon.level+' &mdash; '+info.name+(fedcon.preview?" (PREVIEW)":"")+'</span><span class="fedcon-more">Details...</span>';
 bar.addEventListener("click",function(){showFedconPopup(fedcon);});
 fedconBar.appendChild(bar);
+if(withAlert)showFedconAlert(fedcon);
 }
+
+function showFedcon(){
+realFedcon=readFedcon();
+fedconState=realFedcon;
+renderFedcon(true);
+}
+
+function clearFedcon(){
+realFedcon=null;
+fedconState=null;
+renderFedcon(false);
+}
+
+Object.defineProperty(window,"FEDCON",{
+configurable:true,
+get:function(){return fedconState?fedconState.level:null;},
+set:function(value){
+if(!realFedcon){console.info("FEDCON: log on to Government Access first.");return;}
+if(value===null||value===undefined){
+fedconState=realFedcon;
+}else{
+const n=Number(value);
+if(!(n in FEDCON_LEVELS)){console.warn("FEDCON must be a number from 0 to 5.");return;}
+fedconState=n===realFedcon.level?realFedcon:{level:n,date:"",reason:FEDCON_LEVELS[n].when,preview:true};
+}
+renderFedcon(true);
+}
+});
 
 function fromB64(s){
 const bin=atob(s);
@@ -917,8 +1074,7 @@ submit.textContent="Log On";
 
 logoff.addEventListener("click",function(){
 contentBody.innerHTML="";
-fedconBar.innerHTML="";
-closeFedconPopup();
+clearFedcon();
 content.hidden=true;
 login.hidden=false;
 userInput.value="";

@@ -44,6 +44,7 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Never commit passwords, credential lists or document text.
 - To change a document or login, edit the private source and rebuild the vault with the private builder. Let browsers save the government login if the user wants that.
 - Three failed logons lock that browser out of the site.
+- **FEDCON** (the alert level) is stored in the encrypted content. After logging on, `window.FEDCON` drives the bar, the alert window and the emergency popups (FEDCON 2, 1 and 0 each have their own). To preview a level, type `FEDCON = 1` in the browser console. `FEDCON = null` goes back to the real level. A preview only changes what that browser shows.
 
 ## Testing
 

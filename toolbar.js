@@ -446,7 +446,7 @@ showWindow("ZapadTV© Channel Guide","images/toolbar/channels.webp",
 '<table class="ipx-tv"><tr><th>Channel</th><th>Programme</th></tr>'+
 rows.map(function(r){
 return "<tr><td><b>"+r[0]+"</b><br>"+escapeHtml(r[1])+"</td><td>"+
-(r[2]?"<b>"+escapeHtml(r[2])+"</b><br>"+escapeHtml(r[3]):'<span class="ipx-nosignal">NO SIGNAL</span><br>This channel is not available in your region.')+
+(r[2]?"<b>"+escapeHtml(r[2])+"</b><br>"+escapeHtml(r[3]):'<span class="ipx-nosignal">NO SIGNAL</span><br>This channel has ceased broadcasting.')+
 "</td></tr>";
 }).join("")+"</table>"+
 '<div class="ipx-buttons"><button type="button" data-ipx-close>Close</button></div>',true);

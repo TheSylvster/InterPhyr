@@ -779,8 +779,8 @@ cells+='<div class="fedcon-cell'+(n===fedcon.level?" active selected":"")+'" dat
 const currentInfo=
 '<p>'+info.desc+'</p>'+
 (fedcon.reason?'<p><b>'+(fedcon.preview?"Used when:":"Reason:")+'</b> '+escapeHtml(fedcon.reason)+'</p>':'')+
-(fedcon.preview&&realFedcon
-?'<p class="fedcon-issued">PREVIEW ONLY. The real level is FEDCON '+realFedcon.level+'. Type FEDCON = null in the console to go back.</p>'
+(fedcon.preview
+?'<p class="fedcon-issued">PREVIEW ONLY. '+(realFedcon?'The real level is FEDCON '+realFedcon.level+'. ':'Log on to Government Access to see the real level. ')+'Type SETFEDCONREAL to go back.</p>'
 :'<p class="fedcon-issued">Issued'+(fedcon.date?" "+escapeHtml(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>');
 const backdrop=document.createElement("div");
 backdrop.className="fedcon-backdrop";
@@ -956,21 +956,88 @@ fedconState=null;
 renderFedcon(false);
 }
 
+function isItAdmin(){
+return /(?:^|;\s*)interphyr_admin_session=1(?:;|$)/.test(document.cookie);
+}
+
+/* Shown when a FEDCON preview is tried without being able to see FEDCON. */
+function fedconNeedsLogon(){
+console.info("FEDCON: log on to Government Access first.");
+if(window.interphyrMessage)window.interphyrMessage("FEDCON Preview","msg_warning-0.png",["Log on to Government Access first.","FEDCON previews only work after you have logged on."]);
+}
+
+function previewState(n){
+return {level:n,date:"",reason:FEDCON_LEVELS[n].when,preview:true};
+}
+
 Object.defineProperty(window,"FEDCON",{
 configurable:true,
 get:function(){return fedconState?fedconState.level:null;},
 set:function(value){
-if(!realFedcon){console.info("FEDCON: log on to Government Access first.");return;}
-if(value===null||value===undefined){
-fedconState=realFedcon;
-}else{
+const reset=value===null||value===undefined;
 const n=Number(value);
-if(!(n in FEDCON_LEVELS)){console.warn("FEDCON must be a number from 0 to 5.");return;}
-fedconState=n===realFedcon.level?realFedcon:{level:n,date:"",reason:FEDCON_LEVELS[n].when,preview:true};
-}
+if(!reset&&!(n in FEDCON_LEVELS)){console.warn("FEDCON must be a number from 0 to 5.");return;}
+if(realFedcon){
+fedconState=reset?realFedcon:(n===realFedcon.level?realFedcon:previewState(n));
 renderFedcon(true);
+return;
+}
+/*
+ * The ZapTel_IT admin can preview without logging on to Government
+ * Access: the real level is unknown, so only the popups are shown.
+ */
+if(isItAdmin()){
+closeFedconPopup();
+closeFedconAlert();
+if(reset){fedconState=null;return;}
+fedconState=previewState(n);
+if(n<=2)showFedconAlert(fedconState);
+else showFedconPopup(fedconState);
+return;
+}
+fedconNeedsLogon();
 }
 });
+
+/*
+ * Preview codes: SETFEDCON0 ... SETFEDCON5 to preview a level, and
+ * SETFEDCONREAL to go back to the real one. Type a code into the
+ * console (F12) and press Enter, or just type it anywhere on this
+ * page (not in a text box).
+ */
+
+function runFedconCode(code){
+if(!realFedcon&&!isItAdmin()){fedconNeedsLogon();return "Log on to Government Access first.";}
+if(code==="REAL"){
+window.FEDCON=null;
+return realFedcon?"FEDCON back to the real level: FEDCON "+realFedcon.level+".":"FEDCON preview closed.";
+}
+window.FEDCON=Number(code);
+return "Previewing FEDCON "+code+". Type SETFEDCONREAL to go back.";
+}
+
+["0","1","2","3","4","5","REAL"].forEach(function(code){
+Object.defineProperty(window,"SETFEDCON"+code,{
+configurable:true,
+get:function(){return runFedconCode(code);}
+});
+});
+
+let fedconTyped="";
+/* This script re-runs after fullscreen page swaps, so replace any earlier listener. */
+if(window.interphyrFedconKeys)document.removeEventListener("keydown",window.interphyrFedconKeys);
+window.interphyrFedconKeys=function(event){
+if(event.ctrlKey||event.metaKey||event.altKey||event.key.length!==1)return;
+const target=event.target;
+if(target&&(target.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName)))return;
+fedconTyped=(fedconTyped+event.key.toUpperCase()).slice(-13);
+const match=/SETFEDCON([0-5])$/.exec(fedconTyped)||/SETFEDCON(REAL)$/.exec(fedconTyped);
+if(match){
+fedconTyped="";
+runFedconCode(match[1]);
+}
+};
+document.addEventListener("keydown",window.interphyrFedconKeys);
 
 function fromB64(s){
 const bin=atob(s);

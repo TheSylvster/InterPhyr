@@ -73,3 +73,7 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Styles live in `Modern/modern.css`, scoped to `body.modern`.
 - Moving between Modern pages happens in place (no page load): `navigate()` in `modern.js` slides the menu lens and animates the panels. New pages need a title in `TITLES` and a branch in `render()`. Use the system font (no downloads) and keep a non-blur fallback for browsers without `backdrop-filter`.
 - Maintenance mode, the lockout and the emergency switch apply here too. Modern pages set `window.INTERPHYR_NO_DIALUP=true` before `emergency.js`, so the FEDCON 1 alert shows without a dial-up.
+- **Motion rule (owner's request): everything must feel smooth, natural and modern. Nothing may jump or "teleport".**
+  - Buttons and links that go to a place on the same page (like "Member nations") glide there smoothly (`glideTo()` in `modern.js`) and stop just below the top bar. Every new travel button must use this.
+  - Changing page animates (`navigate()`): the menu lens slides and the panels fade out and rise in.
+  - Anything that opens, closes or moves should animate too. Visitors who turn on "reduce motion" get instant changes instead.

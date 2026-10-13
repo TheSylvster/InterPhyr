@@ -109,10 +109,147 @@ return null;
 
 /* ---------- Page frame ---------- */
 
+/*
+ * The background: flowing colour ribbons, like a modern wallpaper,
+ * with faint survey-map contour lines on top. It is drawn for the
+ * screen size (so it is always sharp) and drifts slowly (CSS). The
+ * ribbon edges and lines give the glass something to bend.
+ */
+
 function backdrop(){
-var b=el("div","m-backdrop","<span></span><span></span><span></span><span></span>");
+var b=el("div","m-backdrop");
 b.setAttribute("aria-hidden","true");
+var canvas=el("canvas","m-backdrop-art");
+b.appendChild(canvas);
+function draw(){paintBackdrop(canvas);}
+draw();
+var timer=0;
+window.addEventListener("resize",function(){
+clearTimeout(timer);
+timer=setTimeout(function(){
+/* Only redraw when the screen got bigger, or changed a lot. */
+if(window.innerWidth*1.15>canvas.cssWidth||window.innerHeight*1.15>canvas.cssHeight||window.innerWidth<canvas.cssWidth*0.6)draw();
+},250);
+});
 return b;
+}
+
+/* A repeatable random number generator, so the scene looks the same every visit. */
+function seeded(seed){
+return function(){
+seed=(seed*1664525+1013904223)>>>0;
+return seed/4294967296;
+};
+}
+
+function paintBackdrop(canvas){
+/* A little larger than the screen, so the slow drift never shows an edge. */
+var w=Math.round(window.innerWidth*1.15),h=Math.round(window.innerHeight*1.15);
+var dpr=Math.min(window.devicePixelRatio||1,2);
+canvas.width=Math.round(w*dpr);
+canvas.height=Math.round(h*dpr);
+canvas.style.width=w+"px";
+canvas.style.height=h+"px";
+canvas.cssWidth=w;canvas.cssHeight=h;
+var c=canvas.getContext("2d");
+c.setTransform(dpr,0,0,dpr,0,0);
+
+/* Deep night-blue base. */
+var base=c.createLinearGradient(0,0,w,h);
+base.addColorStop(0,"#0a1030");
+base.addColorStop(0.55,"#080b1f");
+base.addColorStop(1,"#120a26");
+c.fillStyle=base;
+c.fillRect(0,0,w,h);
+
+/* The ribbons: wide bands with wavy edges, each with its own colours. */
+var ribbons=[
+{y:0.18,thick:0.20,amp:0.10,freq:1.1,phase:0.4,tilt:0.18,colors:["#2f5bff","#7b4dff","#c04dff"],alpha:0.62},
+{y:0.46,thick:0.16,amp:0.08,freq:1.4,phase:2.1,tilt:-0.12,colors:["#16c7b0","#2f7dff","#5b4dff"],alpha:0.5},
+{y:0.70,thick:0.22,amp:0.11,freq:0.9,phase:4.0,tilt:0.1,colors:["#e8453a","#f07a3d","#a83dff"],alpha:0.5},
+{y:0.92,thick:0.14,amp:0.06,freq:1.6,phase:1.2,tilt:-0.08,colors:["#7b4dff","#2f5bff","#16c7b0"],alpha:0.42}
+];
+c.save();
+c.filter="blur(1.5px)";
+ribbons.forEach(function(r){
+function edge(x,offset){
+var u=x/w;
+return h*(r.y+offset+r.tilt*(u-0.5)+r.amp*Math.sin(u*Math.PI*2*r.freq+r.phase)+r.amp*0.35*Math.sin(u*Math.PI*5.3*r.freq+r.phase*1.7));
+}
+var steps=60,i,x;
+c.beginPath();
+for(i=0;i<=steps;i++){x=w*i/steps;if(i===0)c.moveTo(x,edge(x,-r.thick/2));else c.lineTo(x,edge(x,-r.thick/2));}
+for(i=steps;i>=0;i--){x=w*i/steps;c.lineTo(x,edge(x,r.thick/2)+h*0.04*Math.sin(i/steps*Math.PI*3+r.phase));}
+c.closePath();
+var g=c.createLinearGradient(0,0,w,0);
+g.addColorStop(0,r.colors[0]);
+g.addColorStop(0.5,r.colors[1]);
+g.addColorStop(1,r.colors[2]);
+c.globalAlpha=r.alpha;
+c.fillStyle=g;
+c.fill();
+/* A silky shine along the top edge of each ribbon. */
+c.globalAlpha=r.alpha*0.55;
+c.lineWidth=2;
+c.strokeStyle="rgba(255,255,255,.55)";
+c.beginPath();
+for(i=0;i<=steps;i++){x=w*i/steps;if(i===0)c.moveTo(x,edge(x,-r.thick/2));else c.lineTo(x,edge(x,-r.thick/2));}
+c.stroke();
+});
+c.restore();
+c.globalAlpha=1;
+
+/* Darken between the ribbons a little, so text stays easy to read. */
+var shade=c.createLinearGradient(0,0,0,h);
+shade.addColorStop(0,"rgba(6,9,24,.42)");
+shade.addColorStop(0.5,"rgba(6,9,24,.25)");
+shade.addColorStop(1,"rgba(6,9,24,.48)");
+c.fillStyle=shade;
+c.fillRect(0,0,w,h);
+
+/* Contour lines, like a survey map, from a smooth random height field. */
+var rand=seeded(1996);
+var cell=180,gx=Math.ceil(w/cell)+2,gy=Math.ceil(h/cell)+2,grid=[],gi;
+for(gi=0;gi<gx*gy;gi++)grid.push(rand());
+function smooth(t){return t*t*(3-2*t);}
+function noise(x,y){
+var fx=x/cell,fy=y/cell,ix=Math.floor(fx),iy=Math.floor(fy),tx=smooth(fx-ix),ty=smooth(fy-iy);
+/* Wraps around, so any position has a value. */
+function at(i,j){return grid[((j%gy)+gy)%gy*gx+((i%gx)+gx)%gx];}
+var a=at(ix,iy),b2=at(ix+1,iy),c2=at(ix,iy+1),d=at(ix+1,iy+1);
+return (a+(b2-a)*tx)+((c2+(d-c2)*tx)-(a+(b2-a)*tx))*ty;
+}
+function height(x,y){return noise(x,y)*0.7+noise(x*2.3+400,y*2.3+400)*0.3;}
+var step=6,cols=Math.ceil(w/step)+1,rows=Math.ceil(h/step)+1,field=new Float32Array(cols*rows),ix2,iy2;
+for(iy2=0;iy2<rows;iy2++)for(ix2=0;ix2<cols;ix2++)field[iy2*cols+ix2]=height(ix2*step,iy2*step);
+c.lineWidth=1;
+for(var level=0.1;level<0.95;level+=0.05){
+var major=Math.abs(level*10-Math.round(level*10))<0.01;
+c.strokeStyle=major?"rgba(255,255,255,.11)":"rgba(255,255,255,.055)";
+c.beginPath();
+for(iy2=0;iy2<rows-1;iy2++){
+for(ix2=0;ix2<cols-1;ix2++){
+/* Marching squares: where the line crosses each little square. */
+var v0=field[iy2*cols+ix2],v1=field[iy2*cols+ix2+1],v2=field[(iy2+1)*cols+ix2+1],v3=field[(iy2+1)*cols+ix2];
+var pts=[];
+var x0=ix2*step,y0=iy2*step;
+if((v0<level)!==(v1<level))pts.push([x0+step*(level-v0)/(v1-v0),y0]);
+if((v1<level)!==(v2<level))pts.push([x0+step,y0+step*(level-v1)/(v2-v1)]);
+if((v3<level)!==(v2<level))pts.push([x0+step*(level-v3)/(v2-v3),y0+step]);
+if((v0<level)!==(v3<level))pts.push([x0,y0+step*(level-v0)/(v3-v0)]);
+if(pts.length>=2){c.moveTo(pts[0][0],pts[0][1]);c.lineTo(pts[1][0],pts[1][1]);}
+if(pts.length===4){c.moveTo(pts[2][0],pts[2][1]);c.lineTo(pts[3][0],pts[3][1]);}
+}
+}
+c.stroke();
+}
+
+/* A soft vignette towards the edges. */
+var vignette=c.createRadialGradient(w/2,h*0.45,Math.min(w,h)*0.3,w/2,h/2,Math.max(w,h)*0.75);
+vignette.addColorStop(0,"rgba(5,7,20,0)");
+vignette.addColorStop(1,"rgba(5,7,20,.6)");
+c.fillStyle=vignette;
+c.fillRect(0,0,w,h);
 }
 
 function topbar(page){
@@ -523,6 +660,142 @@ main.appendChild(all);
 }).catch(function(){if(token===renderToken)failed(main);});
 }
 
+/*
+ * ---------- The phone menu ----------
+ *
+ * On phones the menu is a round glass button. Tapping it melts it open
+ * into a glass panel, joined to the button by a liquid "neck", and it
+ * melts back when closed. The whole shape is one outline (drawn by
+ * menuShape), so it always looks like a single piece of glass.
+ */
+
+var menu=null;
+var MENU_R=22,MENU_ITEM=46;
+
+function buildMenu(page){
+var box=el("div","m-menu");
+var ns="http://www.w3.org/2000/svg";
+box.innerHTML=
+'<svg class="m-menu-shadow" aria-hidden="true"><path/></svg>'+
+'<div class="m-menu-glass"></div>'+
+'<svg class="m-menu-rim" aria-hidden="true"><defs><linearGradient id="m-menu-rim-g" x1="0" y1="0" x2="0.4" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".75"/><stop offset=".45" stop-color="#fff" stop-opacity=".12"/><stop offset="1" stop-color="#fff" stop-opacity=".3"/></linearGradient></defs><path/></svg>'+
+'<button type="button" class="m-menu-button" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>';
+var links=el("nav","m-menu-links");
+links.setAttribute("aria-label","Main");
+NAV.forEach(function(item){
+var row;
+if(item.path==null){
+row=el("span","m-menu-soon",item.label+" <small>soon</small>");
+}else{
+row=el("a",null,item.label);
+row.href=new URL(item.path,modernRoot).href;
+row.setAttribute("data-path",item.path);
+if(item.path===page)row.className="active";
+}
+links.appendChild(row);
+});
+box.appendChild(links);
+document.body.appendChild(box);
+menu={box:box,links:links,open:false,amount:0,anim:0,
+glass:box.querySelector(".m-menu-glass"),
+rim:box.querySelector(".m-menu-rim path"),
+shadow:box.querySelector(".m-menu-shadow path"),
+button:box.querySelector(".m-menu-button")};
+menu.button.addEventListener("click",function(){setMenu(!menu.open);});
+document.addEventListener("click",function(event){
+if(menu.open&&!box.contains(event.target))setMenu(false);
+});
+document.addEventListener("keydown",function(event){
+if(event.key==="Escape"&&menu.open){setMenu(false);menu.button.focus();}
+});
+window.addEventListener("resize",function(){drawMenu(menu.amount);});
+drawMenu(0);
+}
+
+function lerp(a,b,t){return a+(b-a)*t;}
+
+/*
+ * The outline at "amount" (0 = just the round button, 1 = fully open).
+ * The panel grows down and to the left from the button; its top edge
+ * flows into the button through a curved neck.
+ */
+function menuShape(amount,W,H){
+var r=MENU_R,cx=W-r,cy=r;
+var ew=Math.min(1,amount*1.15),eh=amount;
+var x1=W,w=lerp(2*r,W,ew),x0=x1-w;
+var y0=cy,y1=lerp(2*r,H,eh);
+var Rb=Math.min(lerp(r,26,amount),(y1-y0),w/2);
+var f=lerp(0,24,Math.min(1,amount*1.6));
+var Rt=Math.min(lerp(0,24,amount),y1-y0-Rb);
+f=Math.max(0,Math.min(f,cx-r-x0-Rt));
+var nx=cx-r-f;
+var beta=Math.min(1.05,f/r*1.1);
+var px=cx-r*Math.cos(beta),py=cy-r*Math.sin(beta);
+var k1=f*0.6,k2=f*0.55;
+function n(v){return v.toFixed(2);}
+return "M"+n(cx)+","+n(cy-r)+
+" A"+r+","+r+" 0 0 1 "+n(x1)+","+n(cy)+
+" L"+n(x1)+","+n(y1-Rb)+
+" A"+n(Rb)+","+n(Rb)+" 0 0 1 "+n(x1-Rb)+","+n(y1)+
+" L"+n(x0+Rb)+","+n(y1)+
+" A"+n(Rb)+","+n(Rb)+" 0 0 1 "+n(x0)+","+n(y1-Rb)+
+" L"+n(x0)+","+n(y0+Rt)+
+(Rt>0.01?" A"+n(Rt)+","+n(Rt)+" 0 0 1 "+n(x0+Rt)+","+n(y0):"")+
+" L"+n(nx)+","+n(y0)+
+" C"+n(nx+k1)+","+n(y0)+" "+n(px-k2*Math.sin(beta))+","+n(py+k2*Math.cos(beta))+" "+n(px)+","+n(py)+
+" A"+r+","+r+" 0 0 1 "+n(cx)+","+n(cy-r)+" Z";
+}
+
+function menuSize(){
+var count=menu.links.children.length;
+return {W:Math.min(260,window.innerWidth-32),H:2*MENU_R+12+count*MENU_ITEM+14};
+}
+
+function drawMenu(amount){
+var size=menuSize(),W=size.W,H=size.H;
+menu.box.style.width=W+"px";
+/* A little taller than the panel, so the opening overshoot has room. */
+menu.box.style.height=(H+16)+"px";
+var d=menuShape(amount,W,H);
+menu.glass.style.clipPath="path('"+d+"')";
+menu.glass.style.webkitClipPath="path('"+d+"')";
+/* The links are cut to the same shape, so they only ever show inside the glass. */
+menu.links.style.clipPath="path('"+d+"')";
+menu.links.style.webkitClipPath="path('"+d+"')";
+menu.rim.setAttribute("d",d);
+menu.shadow.setAttribute("d",d);
+/* The links appear once the panel is mostly open, one after another. */
+Array.prototype.forEach.call(menu.links.children,function(row,i){
+var show=Math.max(0,Math.min(1,(amount-0.45-i*0.05)/0.35));
+row.style.opacity=show;
+row.style.transform="translateY("+((1-show)*-8)+"px)";
+});
+menu.links.style.visibility=amount>0.4?"visible":"hidden";
+menu.box.classList.toggle("open",amount>0.02);
+}
+
+function setMenu(open){
+if(!menu||open===menu.open)return;
+menu.open=open;
+menu.button.setAttribute("aria-expanded",open?"true":"false");
+menu.box.classList.toggle("opening",open);
+cancelAnimationFrame(menu.anim);
+if(reducedMotion()){menu.amount=open?1:0;drawMenu(menu.amount);return;}
+var from=menu.amount,to=open?1:0;
+var duration=open?620:420;
+var started=performance.now();
+function frame(now){
+var t=Math.min(1,(now-started)/duration);
+/* Opening overshoots a little and settles, like liquid; closing is quicker and smooth. */
+var e=open?1+2.1*Math.pow(t-1,3)+1.1*Math.pow(t-1,2):1-Math.pow(1-t,3);
+menu.amount=lerp(from,to,e);
+drawMenu(Math.max(0,menu.amount));
+if(t<1)menu.anim=requestAnimationFrame(frame);
+else{menu.amount=to;drawMenu(to);}
+}
+menu.anim=requestAnimationFrame(frame);
+}
+
 /* ---------- Page changes ---------- */
 
 /*
@@ -575,6 +848,10 @@ if(page===currentPage)return;
 currentPage=page;
 if(push)history.pushState({page:page},"",new URL(page,modernRoot).href);
 if(pill)pill.items.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+if(menu){
+setMenu(false);
+menu.links.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+}
 movePill(page);
 var wait=reducedMotion()?0:220;
 mainEl.classList.remove("m-enter");
@@ -586,6 +863,38 @@ resolve();
 render(page,ready);
 }
 
+/*
+ * Smooth travel: buttons and links that go somewhere on the same page
+ * (like "Member nations") glide there instead of jumping, and stop just
+ * below the top bar. Scrolling with the mouse or a finger takes over.
+ */
+var glideAnim=0;
+
+function glideTo(target){
+cancelAnimationFrame(glideAnim);
+var bar=document.querySelector(".m-topbar");
+var offset=(bar?bar.offsetHeight+bar.offsetTop:0)+24;
+var startY=window.scrollY;
+var maxY=document.documentElement.scrollHeight-window.innerHeight;
+var endY=Math.max(0,Math.min(maxY,target.getBoundingClientRect().top+startY-offset));
+var distance=endY-startY;
+if(reducedMotion()||Math.abs(distance)<2){window.scrollTo(0,endY);return;}
+var duration=Math.min(1100,Math.max(450,320+Math.abs(distance)*0.35));
+var started=performance.now();
+function stop(){cancelAnimationFrame(glideAnim);removeEventListener("wheel",stop);removeEventListener("touchstart",stop);}
+addEventListener("wheel",stop,{passive:true});
+addEventListener("touchstart",stop,{passive:true});
+function frame(now){
+var t=Math.min(1,(now-started)/duration);
+/* Ease in and out: starts gently, glides, settles softly. */
+var e=t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+window.scrollTo(0,startY+distance*e);
+if(t<1)glideAnim=requestAnimationFrame(frame);
+else stop();
+}
+glideAnim=requestAnimationFrame(frame);
+}
+
 /* Links to other Modern pages (menu, buttons, "All stories") change page in place. */
 function onLinkClick(event){
 if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
@@ -595,7 +904,14 @@ var url=new URL(link.href);
 if(url.origin!==location.origin)return;
 var page=pageOf(url);
 if(page===null)return;
-if(page===currentPage&&url.hash)return;
+if(page===currentPage&&url.hash){
+var target=document.getElementById(decodeURIComponent(url.hash.slice(1)));
+if(!target)return;
+event.preventDefault();
+history.replaceState(history.state,"",url.href);
+glideTo(target);
+return;
+}
 event.preventDefault();
 navigate(page,true);
 }
@@ -617,6 +933,7 @@ shell.appendChild(footer());
 document.body.appendChild(shell);
 placePill(page);
 window.addEventListener("resize",function(){placePill(currentPage);});
+buildMenu(page);
 
 /* The same locks as the classic site. */
 if(getCookie("interphyr_lockout")==="1"){

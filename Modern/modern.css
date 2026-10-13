@@ -40,37 +40,47 @@ overflow-x:hidden;
 /* ---------- Background: slow-moving colour blobs ---------- */
 
 .m-backdrop{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
-.m-backdrop span{position:absolute;border-radius:50%;filter:blur(80px);opacity:.55;animation:m-drift 28s ease-in-out infinite alternate}
-.m-backdrop span:nth-child(1){width:46vw;height:46vw;left:-8vw;top:-10vw;background:var(--m-blue)}
-.m-backdrop span:nth-child(2){width:38vw;height:38vw;right:-6vw;top:12vh;background:var(--m-violet);animation-duration:34s;animation-delay:-8s}
-.m-backdrop span:nth-child(3){width:34vw;height:34vw;left:22vw;bottom:-14vw;background:var(--m-red);opacity:.38;animation-duration:40s;animation-delay:-16s}
-.m-backdrop span:nth-child(4){width:24vw;height:24vw;right:18vw;bottom:6vh;background:var(--m-teal);opacity:.3;animation-duration:31s;animation-delay:-4s}
-.m-backdrop::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(7,11,26,0) 0%,rgba(7,11,26,.55) 100%)}
+/* The painted scene (see paintBackdrop in modern.js), a little larger than the screen, drifting slowly. */
+.m-backdrop-art{position:absolute;left:-7.5vw;top:-7.5vh;animation:m-drift 80s ease-in-out infinite alternate;will-change:transform}
 @keyframes m-drift{
 0%{transform:translate(0,0) scale(1)}
-50%{transform:translate(6vw,4vh) scale(1.12)}
-100%{transform:translate(-4vw,8vh) scale(.94)}
+50%{transform:translate(3vw,2vh) scale(1.03)}
+100%{transform:translate(-2vw,4vh) scale(1.015)}
 }
 
 /* ---------- Glass ---------- */
 
+/*
+ * Thick, clear glass: a light tint and a lighter blur, so the scene
+ * behind stays visible; a bright top edge and a darker lower edge
+ * give it depth, like a slab of glass catching the light from above.
+ */
 body.modern .glass{
 position:relative;
-background:linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.04));
-border:1px solid rgba(255,255,255,.14);
+/* The dark tint underneath keeps text readable over bright parts of the scene. */
+background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.03) 45%,rgba(255,255,255,.02) 70%,rgba(255,255,255,.06)),rgba(8,12,32,.34);
+border:0;
 border-radius:var(--m-radius);
--webkit-backdrop-filter:blur(28px) saturate(170%);
-backdrop-filter:blur(28px) saturate(170%);
-box-shadow:inset 0 1px 0 rgba(255,255,255,.32),inset 0 -1px 0 rgba(0,0,0,.18),0 24px 60px -24px rgba(0,0,0,.65);
+-webkit-backdrop-filter:blur(14px) saturate(185%) brightness(1.06);
+backdrop-filter:blur(14px) saturate(185%) brightness(1.06);
+box-shadow:
+inset 0 1.5px 0 rgba(255,255,255,.42),
+inset 1px 0 0 rgba(255,255,255,.1),
+inset -1px 0 0 rgba(255,255,255,.06),
+inset 0 -1px 0 rgba(255,255,255,.14),
+inset 0 22px 34px -30px rgba(255,255,255,.35),
+inset 0 -26px 40px -30px rgba(0,0,10,.55),
+0 30px 70px -30px rgba(0,0,0,.75),
+0 2px 6px rgba(0,0,0,.18);
 }
-/* The bright rim along the top-left edge, like light catching glass. */
+/* The rim: bright where the light catches it, with a faint colour fringe. */
 body.modern .glass::before{
 content:"";
 position:absolute;
 inset:0;
 border-radius:inherit;
-padding:1px;
-background:linear-gradient(155deg,rgba(255,255,255,.6),rgba(255,255,255,0) 38%,rgba(255,255,255,0) 64%,rgba(255,255,255,.22));
+padding:1.5px;
+background:conic-gradient(from 210deg at 50% 50%,rgba(255,255,255,.65),rgba(255,255,255,.08) 18%,rgba(120,180,255,.35) 30%,rgba(255,255,255,.04) 42%,rgba(255,255,255,.04) 55%,rgba(255,150,90,.3) 66%,rgba(255,255,255,.12) 78%,rgba(255,255,255,.65));
 -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
 -webkit-mask-composite:xor;
 mask-composite:exclude;
@@ -151,7 +161,7 @@ body.modern .m-nav-track>*{color:#fff;background:none}
 /* Extra room below the line, so letters like y and p are not cut off by the gradient. */
 body.modern .m-hero h1{font-size:clamp(44px,7vw,84px);padding-bottom:.14em;margin-bottom:-.14em;line-height:1.12;letter-spacing:-.045em;background:linear-gradient(120deg,#fff 20%,#c9d4ff 55%,#e7c9ff 85%);-webkit-background-clip:text;background-clip:text;color:transparent}
 .m-hero .m-lead{max-width:640px;margin-top:18px;font-size:19px;color:var(--m-muted)}
-.m-hero-orb{position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.55),rgba(255,255,255,.08) 45%,rgba(255,255,255,0) 70%);opacity:.5;pointer-events:none}
+.m-hero-orb{position:absolute;right:-60px;top:-60px;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle at 35% 35%,rgba(255,255,255,.55),rgba(255,255,255,.08) 45%,rgba(255,255,255,0) 70%);opacity:.22;pointer-events:none}
 
 /* ---------- Lists ---------- */
 
@@ -199,6 +209,25 @@ body.modern .m-story-featured h3{font-size:26px}
 .m-contact .m-muted{font-size:14px}
 .m-contact a{margin-top:6px;font-size:14px;font-weight:600}
 
+/* ---------- Phone menu: a glass button that melts open into a panel ---------- */
+
+.m-menu{display:none;position:fixed;top:10px;right:16px;z-index:30;pointer-events:none}
+.m-menu-glass{position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.15),rgba(255,255,255,.04) 50%,rgba(255,255,255,.08)),rgba(8,12,32,.45);-webkit-backdrop-filter:blur(16px) saturate(185%) brightness(1.06);backdrop-filter:blur(16px) saturate(185%) brightness(1.06)}
+.m-menu-rim,.m-menu-shadow{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.m-menu-rim path{fill:none;stroke:url(#m-menu-rim-g);stroke-width:1.5}
+.m-menu-shadow{filter:blur(12px);opacity:.75}
+.m-menu-shadow path{fill:rgba(0,0,8,.6);transform:translateY(8px)}
+.m-menu-button{position:absolute;right:0;top:0;width:44px;height:44px;padding:0;border:0;border-radius:50%;background:none;display:grid;place-content:center;gap:5px;cursor:pointer;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+.m-menu-button span{display:block;width:18px;height:2px;border-radius:2px;background:#fff;transition:transform .4s cubic-bezier(.3,1.5,.5,1)}
+.m-menu.opening .m-menu-button span:first-child{transform:translateY(3.5px) rotate(45deg)}
+.m-menu.opening .m-menu-button span:last-child{transform:translateY(-3.5px) rotate(-45deg)}
+.m-menu-links{position:absolute;inset:0;padding:56px 10px 0;display:flex;flex-direction:column;pointer-events:auto}
+.m-menu:not(.open) .m-menu-links{pointer-events:none}
+body.modern .m-menu-links a,.m-menu-soon{display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border-radius:14px;font-size:16px;font-weight:600;color:#fff;text-decoration:none}
+body.modern .m-menu-links a.active{background:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.m-menu-soon{color:var(--m-faint);font-weight:500}
+.m-menu-soon small{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+
 /* ---------- Placeholders, notices, footer ---------- */
 
 /* Links to pages Modern doesn't have yet: plain text with a "Coming soon" bubble on hover. */
@@ -225,18 +254,21 @@ body.modern .m-notice h1{font-size:32px;margin-bottom:12px}
 @media (max-width:600px){
 .m-shell{padding:12px 16px 32px}
 .m-topbar{top:10px;gap:10px;padding:8px 8px 8px 14px}
-.m-brand span:last-child{display:none}
+/* Phones: the round glass menu button replaces the menu bar (see buildMenu in modern.js). */
+.m-nav{display:none}
+.m-topbar{margin-right:56px}
+.m-menu{display:block}
 body.modern .m-nav a,.m-nav-soon,.m-nav-track>span{padding:7px 11px;font-size:13px}
 .m-card{padding:22px 20px}
 .m-hero .m-lead{font-size:17px}
 .m-section{margin-top:40px}
 body.modern h2{font-size:24px}
 /* Lighter blur on phones, which have less graphics power. */
-body.modern .glass{-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+body.modern .glass{-webkit-backdrop-filter:blur(12px) saturate(180%) brightness(1.06);backdrop-filter:blur(12px) saturate(180%) brightness(1.06)}
 }
 @media (prefers-reduced-motion:reduce){
 #main .glass,#main .m-section-head{transition:none}
 #main.m-enter .glass,#main.m-enter .m-section-head{animation:none}
-.m-backdrop span,.m-skeleton::after{animation:none}
+.m-backdrop-art,.m-skeleton::after{animation:none}
 .m-btn{transition:none}
 }

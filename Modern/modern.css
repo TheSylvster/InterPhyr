@@ -114,6 +114,8 @@ body.modern a:hover{color:#fff;text-decoration:underline}
 .m-muted{color:var(--m-muted)}
 .m-small{font-size:13px;color:var(--m-faint)}
 .m-grid{display:grid;gap:18px}
+/* Cards keep their own height, so opening one story doesn't stretch the one next to it. */
+.m-grid:has(.m-story){align-items:start}
 .m-grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}
 .m-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .m-card{padding:26px 28px}
@@ -275,3 +277,31 @@ body.modern .glass{-webkit-backdrop-filter:blur(12px) saturate(180%) brightness(
 .m-backdrop-art,.m-skeleton::after{animation:none}
 .m-btn{transition:none}
 }
+
+/* Glass buttons (like Update Logs): turn into clear liquid glass while pressed (see glassButton in the script). */
+.m-glass-btn{position:relative;flex-shrink:0;display:inline-flex;border-radius:999px;color:#fff;text-decoration:none!important;background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 0 0 1px rgba(255,255,255,.08);transition:transform .45s cubic-bezier(.3,1.7,.5,1),background .25s ease,box-shadow .25s ease;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.m-glass-btn:hover{background:rgba(255,255,255,.14)}
+.m-glass-face{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;font-size:14px;font-weight:600;color:#fff}
+.m-glass-face svg{width:16px;height:16px;flex-shrink:0}
+.m-glass-btn::before{content:"";position:absolute;inset:0;z-index:1;border-radius:inherit;padding:1.5px;background:conic-gradient(from 200deg,rgba(255,90,90,0),rgba(255,140,60,.6) 8%,rgba(255,230,90,0) 22%,rgba(255,255,255,0) 45%,rgba(80,190,255,.55) 62%,rgba(170,100,255,.5) 72%,rgba(255,90,90,0) 86%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:0;transition:opacity .25s ease;pointer-events:none}
+.m-glass-btn::after{content:"";position:absolute;inset:0;z-index:1;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,.04) 45%,rgba(255,255,255,0) 60%,rgba(255,255,255,.08));opacity:0;transition:opacity .25s ease;pointer-events:none}
+.m-glass-btn.pressed{transform:scale(1.14);background:rgba(255,255,255,.035);box-shadow:inset 0 1px 1px rgba(255,255,255,.75),inset 0 -1px 1px rgba(255,255,255,.2),inset 0 0 10px rgba(255,255,255,.14),0 8px 22px rgba(0,0,0,.38);transition:transform .25s cubic-bezier(.2,.8,.2,1),background .2s ease,box-shadow .2s ease}
+.m-glass-btn.pressed::before,.m-glass-btn.pressed::after{opacity:1}
+@media (max-width:600px){
+.m-glass-text{display:none}
+.m-glass-face{padding:9px}
+}
+@media (prefers-reduced-motion:reduce){
+.m-glass-btn,.m-glass-btn.pressed{transition:none}
+}
+
+/* Update Logs: one glass card per version, newest first. */
+.m-log{display:flex;flex-direction:column;gap:16px}
+.m-log-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 16px;margin-bottom:10px}
+body.modern .m-log-head h3{font-size:21px}
+.m-log-date{padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;color:var(--m-muted);background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+.m-log-items{margin:0;padding-left:20px}
+.m-log-items li{margin:6px 0;color:var(--m-text)}
+.m-log-items code{padding:1px 6px;border-radius:6px;font-size:.9em;background:rgba(255,255,255,.08)}
+/* The menu lens fades out on pages that aren't in the menu, and back in. */
+.m-lens{transition:opacity .25s ease}

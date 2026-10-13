@@ -19,7 +19,7 @@ var modernRoot=new URL(".",document.currentScript.src).href;
 var siteRoot=new URL("../",modernRoot).href;
 
 /* Classic pages that have a Modern version so far (paths from the site root). */
-var MODERN_PAGES=["","News/"];
+var MODERN_PAGES=["","News/","UpdateLogs/"];
 
 var NAV=[
 {label:"Home",path:""},
@@ -255,6 +255,7 @@ c.fillRect(0,0,w,h);
 function topbar(page){
 var bar=el("header","m-topbar glass");
 bar.innerHTML='<a class="m-brand" href="'+modernRoot+'"><span class="m-brand-mark" aria-hidden="true"></span><span>InterPhyr</span></a>';
+bar.appendChild(makeGlassButton(new URL("UpdateLogs/",modernRoot).href,"Update Logs",ICON_LOG));
 var nav=el("nav","m-nav");
 nav.setAttribute("aria-label","Main");
 var items=el("span","m-nav-items");
@@ -366,6 +367,13 @@ items.classList.add(axis==="y"?"m-lens-cut-y":"m-lens-cut-x");
 
 var lens={el:glass,x:0,y:0,w:0,h:0,anim:0};
 
+/* Hidden (on a page not in this menu): the real text shows again everywhere. */
+function hide(){
+glass.style.opacity="0";
+items.style.setProperty("--cut-a","0px");
+items.style.setProperty("--cut-b","0px");
+}
+
 function setBend(amount){bend.setAttribute("scale",amount.toFixed(1));}
 
 /* Draws the lens; "bulge" (0 to 1) is how far into a move it is: it swells and magnifies more. */
@@ -396,7 +404,7 @@ items.style.setProperty("--cut-b",(y-oy+h-1)+"px");
 
 lens.place=function(item){
 cancelAnimationFrame(lens.anim);
-if(!item){glass.style.opacity="0";return;}
+if(!item){hide();return;}
 glass.style.opacity="";
 lens.x=item.offsetLeft;lens.y=item.offsetTop;lens.w=item.offsetWidth;lens.h=item.offsetHeight;
 draw(lens.x,lens.y,lens.w,lens.h,0);
@@ -404,7 +412,8 @@ setBend(LENS_REST);
 };
 
 lens.move=function(item){
-if(!item)return;
+/* A page that isn't in this menu (like Update Logs): the lens fades away. */
+if(!item){hide();return;}
 if(reducedMotion()||!lens.w){lens.place(item);return;}
 cancelAnimationFrame(lens.anim);
 glass.style.opacity="";
@@ -460,6 +469,79 @@ var navLens=null,navItems=null;
 
 function placePill(page){if(navLens)navLens.place(itemFor(navItems,page));}
 function movePill(page){if(navLens)navLens.move(itemFor(navItems,page));}
+
+/*
+ * ---------- Glass buttons ----------
+ *
+ * A button that turns into clear liquid glass while it is pressed,
+ * like the menu lens: it swells, its rim catches the light (with the
+ * faint rainbow fringe) and its text bends; on release it springs back.
+ */
+
+function glassButton(button){
+lensCount++;
+var id="m-press-"+lensCount;
+var holder=document.createElement("div");
+holder.innerHTML=
+'<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'+
+'<filter id="'+id+'" x="0" y="0" width="100" height="40" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'+
+'<feImage href="'+lensMap()+'" x="0" y="0" width="100" height="40" preserveAspectRatio="none" result="map"/>'+
+'<feDisplacementMap in="SourceGraphic" in2="map" scale="0" xChannelSelector="R" yChannelSelector="G"/>'+
+'</filter></svg>';
+var svg=holder.firstChild;
+document.body.appendChild(svg);
+var filter=svg.querySelector("filter"),map=svg.querySelector("feImage"),bend=svg.querySelector("feDisplacementMap");
+var face=button.querySelector(".m-glass-face");
+var amount=0,anim=0,pressed=false;
+function size(){
+var w=Math.ceil(face.offsetWidth),h=Math.ceil(face.offsetHeight);
+filter.setAttribute("width",w);filter.setAttribute("height",h);
+map.setAttribute("width",w);map.setAttribute("height",h);
+}
+/* The bend grows while pressed and fades away after release. */
+function bendTo(target){
+cancelAnimationFrame(anim);
+var from=amount,started=performance.now(),duration=target?220:380;
+if(target)face.style.filter="url(#"+id+")";
+function frame(now){
+var t=Math.min(1,(now-started)/duration);
+amount=from+(target-from)*(1-Math.pow(1-t,3));
+bend.setAttribute("scale",amount.toFixed(1));
+if(t<1)anim=requestAnimationFrame(frame);
+else if(!target)face.style.filter="";
+}
+anim=requestAnimationFrame(frame);
+}
+function down(){
+if(pressed)return;
+pressed=true;
+size();
+button.classList.add("pressed");
+if(!reducedMotion())bendTo(14);
+}
+function up(){
+if(!pressed)return;
+pressed=false;
+button.classList.remove("pressed");
+if(!reducedMotion())bendTo(0);
+}
+button.addEventListener("pointerdown",down);
+["pointerup","pointerleave","pointercancel","blur"].forEach(function(type){button.addEventListener(type,up);});
+button.addEventListener("keydown",function(event){if(event.key===" "||event.key==="Enter")down();});
+button.addEventListener("keyup",up);
+return button;
+}
+
+/* A glass button with an icon and a label (the label hides on narrow phones). */
+function makeGlassButton(href,label,icon){
+var a=el("a","m-glass-btn");
+a.href=href;
+a.setAttribute("aria-label",label);
+a.innerHTML='<span class="m-glass-face">'+icon+'<span class="m-glass-text">'+label+'</span></span>';
+return glassButton(a);
+}
+
+var ICON_LOG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><path d="M3.05 11a9 9 0 1 1 .5 4"/><path d="M3 4v5h5"/></svg>';
 
 
 function footer(){
@@ -682,6 +764,49 @@ main.appendChild(all);
 }).catch(function(){if(token===renderToken)failed(main);});
 }
 
+/* ---------- Update Logs ---------- */
+
+/* Every version, newest first, read from the classic Update Logs page. */
+function renderUpdates(main,token,ready){
+Promise.all([fetchClassic("UpdateLogs/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0];
+enter(main);
+
+var hero=el("section","m-hero glass");
+hero.innerHTML=
+'<div class="m-hero-orb" aria-hidden="true"></div>'+
+'<span class="m-eyebrow">InterPhyr.net</span>'+
+'<h1>Update Logs</h1>'+
+'<p class="m-lead">Every change to InterPhyr.net, newest first.</p>';
+main.appendChild(hero);
+
+var list=el("section","m-section m-log");
+r.doc.querySelectorAll(".log-entry").forEach(function(entry){
+var heading=entry.querySelector("h3");
+if(!heading)return;
+var date=heading.querySelector(".log-date");
+var dateText=text(date);
+if(date)date.remove();
+var card=el("article","m-card glass m-log-entry");
+var head=el("div","m-log-head");
+head.appendChild(el("h3",null,escapeText(text(heading))));
+if(dateText)head.appendChild(el("span","m-log-date",escapeText(dateText)));
+card.appendChild(head);
+var items=adopt(entry,r.url).querySelectorAll("li");
+var ul=el("ul","m-log-items");
+items.forEach(function(li){ul.appendChild(el("li",null,li.innerHTML));});
+card.appendChild(ul);
+list.appendChild(card);
+});
+main.appendChild(list);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+function escapeText(s){
+return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
 /*
  * ---------- The phone menu ----------
  *
@@ -834,7 +959,8 @@ menu.anim=requestAnimationFrame(frame);
 
 var TITLES={
 "":"InterPhyr — The Phyrrian Astral Federation",
-"News/":"The Zapadiyan Daily — InterPhyr"
+"News/":"The Zapadiyan Daily — InterPhyr",
+"UpdateLogs/":"Update Logs — InterPhyr"
 };
 
 var mainEl=null;
@@ -863,6 +989,7 @@ renderToken++;
 document.title=TITLES[page]||TITLES[""];
 document.body.setAttribute("data-page",page);
 if(page==="News/")renderNews(mainEl,renderToken,ready);
+else if(page==="UpdateLogs/")renderUpdates(mainEl,renderToken,ready);
 else renderHome(mainEl,renderToken,ready);
 }
 
@@ -947,6 +1074,40 @@ return;
 event.preventDefault();
 navigate(page,true);
 }
+
+/*
+ * "Read more" on news stories opens and closes smoothly (the story
+ * slides open and shut) instead of jumping.
+ */
+function toggleStory(details){
+var summary=details.querySelector("summary");
+if(reducedMotion()){details.open=!details.open;return;}
+if(details.animating)return;
+details.animating=true;
+var start=details.offsetHeight;
+var opening=!details.open;
+if(opening)details.open=true;
+var end=opening?details.offsetHeight:summary.getBoundingClientRect().bottom-details.getBoundingClientRect().top;
+details.style.overflow="hidden";
+details.style.height=start+"px";
+details.offsetHeight;
+details.style.transition="height .45s cubic-bezier(.2,.8,.2,1)";
+details.style.height=end+"px";
+setTimeout(function(){
+if(!opening)details.open=false;
+details.style.transition="";
+details.style.height="";
+details.style.overflow="";
+details.animating=false;
+},460);
+}
+
+document.addEventListener("click",function(event){
+var summary=event.target.closest&&event.target.closest(".m-more>summary");
+if(!summary)return;
+event.preventDefault();
+toggleStory(summary.parentNode);
+});
 
 /* ---------- Start ---------- */
 

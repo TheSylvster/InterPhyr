@@ -26,7 +26,7 @@ var OUTSIDE=["Eisenreich","Pancake","Swissland","Luminara","MerchantsUnion","Fro
  * is Modern's own overview of the member nations; every other page is a
  * classic page restyled.
  */
-var MODERN_PAGES=["","News/","Nations/","ZPR/","Astralyia/","Rendale/","Doctrines/","Relations/","Projects/","ZapadTelecom/","About/","UpdateLogs/"].concat(OUTSIDE.map(function(n){return "Relations/"+n+"/";}));
+var MODERN_PAGES=["","News/","Nations/","ZPR/","Astralyia/","Rendale/","Doctrines/","Relations/","Projects/","Map/","ZapadTelecom/","About/","UpdateLogs/"].concat(OUTSIDE.map(function(n){return "Relations/"+n+"/";}));
 
 var NAV=[
 {label:"Home",path:""},
@@ -1422,6 +1422,204 @@ card.appendChild(form);
 copy.querySelectorAll(":scope > p.small").forEach(function(p){card.appendChild(p.cloneNode(true));});
 wrap.appendChild(card);
 return wrap;
+}
+
+/*
+ * ---------- World Map ----------
+ *
+ * The classic map with glass pins. It zooms smoothly (the + and -
+ * buttons, or a double-click / double-tap on a spot) and can be dragged
+ * around once zoomed in. Pins stay the same size at every zoom level.
+ * As on the classic map, only member nations see the relations: for
+ * everyone else the other nations' pins are grey.
+ */
+var ICON_PLUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>';
+var ICON_MINUS='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"/></svg>';
+var ICON_FIT='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+
+function mapButton(icon,label){
+var b=el("button","m-glass-btn m-map-btn");
+b.type="button";
+b.setAttribute("aria-label",label);
+b.title=label;
+b.innerHTML='<span class="m-glass-face">'+icon+'</span>';
+return glassButton(b);
+}
+
+function renderMap(main,token,ready){
+Promise.all([fetchClassic("Map/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+enter(main);
+var intro=doc.querySelectorAll("#information > p");
+main.appendChild(heroPanel("Federation Cartographic Survey","World Map",intro[0]?intro[0].innerHTML:""));
+var restricted=!seesRelations();
+
+var section=el("section","m-section");
+var card=el("div","m-card glass m-map-card");
+var frame=el("div","m-map");
+var canvas=el("div","m-map-canvas");
+var classicImg=doc.querySelector(".map-image");
+var img=el("img","m-map-image");
+img.src=new URL(classicImg.getAttribute("src"),r.url).href;
+img.alt=classicImg.getAttribute("alt")||"Map of the world";
+img.draggable=false;
+var ratio=(+classicImg.getAttribute("width")||1)/(+classicImg.getAttribute("height")||1);
+canvas.style.aspectRatio=ratio;
+/* The whole map fits on the screen (below the top bar), however wide the window is. */
+frame.style.maxWidth="max(280px, calc((100vh - 170px) * "+ratio.toFixed(4)+"))";
+canvas.appendChild(img);
+var tip=el("div","m-map-tip");
+tip.setAttribute("role","tooltip");
+doc.querySelectorAll(".map-pin").forEach(function(classic){
+var member=classic.getAttribute("data-status")==="Member nation";
+var status=restricted&&!member?"":classic.getAttribute("data-status");
+var name=classic.getAttribute("data-name");
+var pin=adopt(classic,r.url);
+var target=new URL(classic.getAttribute("href"),r.url);
+pin.href=modernHref(target.pathname.slice(new URL(siteRoot).pathname.length));
+pin.className="m-map-pin m-pin-"+(status?(relationTone("Relation",status)||"none"):"none");
+pin.style.left=classic.style.left;
+pin.style.top=classic.style.top;
+pin.setAttribute("aria-label",name+(status?" – "+status:""));
+pin.setAttribute("data-label",name);
+pin.setAttribute("data-status",status);
+pin.removeAttribute("title");
+canvas.appendChild(pin);
+});
+frame.appendChild(canvas);
+frame.appendChild(tip);
+
+var controls=el("div","m-map-controls");
+var zoomIn=mapButton(ICON_PLUS,"Zoom in"),zoomOut=mapButton(ICON_MINUS,"Zoom out"),fit=mapButton(ICON_FIT,"Show the whole map");
+controls.appendChild(zoomIn);controls.appendChild(zoomOut);controls.appendChild(fit);
+frame.appendChild(controls);
+card.appendChild(frame);
+var hint=el("p","m-small m-map-hint",intro[1]?intro[1].innerHTML.replace(/Point at/,"Point at (or tap)"):"");
+card.appendChild(hint);
+section.appendChild(card);
+main.appendChild(section);
+
+/* Zoom and pan. */
+var z=1,tx=0,ty=0,ZOOMS=[1,1.8,3];
+function clamp(){
+var w=frame.clientWidth,h=frame.clientHeight;
+tx=Math.min(0,Math.max(w-w*z,tx));
+ty=Math.min(0,Math.max(h-h*z,ty));
+}
+function apply(animate){
+canvas.classList.toggle("m-animate",!!animate&&!reducedMotion());
+canvas.style.transform="translate("+tx+"px,"+ty+"px) scale("+z+")";
+canvas.style.setProperty("--z",z);
+frame.classList.toggle("m-zoomed",z>1);
+zoomOut.toggleAttribute("disabled",z<=1);
+fit.toggleAttribute("disabled",z<=1);
+zoomIn.toggleAttribute("disabled",z>=ZOOMS[ZOOMS.length-1]);
+hideTip();
+}
+function zoomTo(nz,px,py){
+var w=frame.clientWidth,h=frame.clientHeight;
+if(px==null){px=w/2;py=h/2;}
+tx=px-(px-tx)*(nz/z);
+ty=py-(py-ty)*(nz/z);
+z=nz;
+clamp();
+apply(true);
+}
+function step(dir){
+var i=ZOOMS.indexOf(z);
+if(i<0)i=0;
+var next=ZOOMS[Math.max(0,Math.min(ZOOMS.length-1,i+dir))];
+if(next!==z)zoomTo(next);
+}
+zoomIn.addEventListener("click",function(){step(1);});
+zoomOut.addEventListener("click",function(){step(-1);});
+fit.addEventListener("click",function(){zoomTo(1);});
+frame.addEventListener("dblclick",function(event){
+if(event.target.closest(".m-map-pin,.m-map-controls"))return;
+var box=frame.getBoundingClientRect();
+var i=ZOOMS.indexOf(z);
+zoomTo(i>=ZOOMS.length-1?1:ZOOMS[i+1],event.clientX-box.left,event.clientY-box.top);
+});
+/* Dragging moves the map when zoomed in. */
+var drag=null;
+frame.addEventListener("pointerdown",function(event){
+if(z<=1||event.target.closest(".m-map-controls"))return;
+drag={x:event.clientX,y:event.clientY,tx:tx,ty:ty,moved:false,id:event.pointerId};
+});
+frame.addEventListener("pointermove",function(event){
+if(!drag||event.pointerId!==drag.id)return;
+var dx=event.clientX-drag.x,dy=event.clientY-drag.y;
+if(!drag.moved&&Math.abs(dx)+Math.abs(dy)<5)return;
+if(!drag.moved){drag.moved=true;frame.classList.add("m-dragging");try{frame.setPointerCapture(drag.id);}catch(e){}}
+tx=drag.tx+dx;ty=drag.ty+dy;
+clamp();
+apply(false);
+});
+function endDrag(event){
+if(!drag)return;
+var moved=drag.moved;
+drag=null;
+frame.classList.remove("m-dragging");
+/* A drag doesn't count as a click on the pin it ended on. */
+if(moved){frame.addEventListener("click",function stop(e){e.preventDefault();e.stopPropagation();frame.removeEventListener("click",stop,true);},true);}
+}
+frame.addEventListener("pointerup",endDrag);
+frame.addEventListener("pointercancel",endDrag);
+window.addEventListener("resize",function(){if(document.body.contains(frame)){clamp();apply(false);}});
+
+/* The glass name tag above a pin. */
+function showTip(pin){
+var status=pin.getAttribute("data-status");
+tip.innerHTML="<b>"+escapeText(pin.getAttribute("data-label"))+"</b>"+(status?'<span class="m-tone m-tone-'+(relationTone("Relation",status)||"none")+'">'+escapeText(status)+"</span>":"");
+var fb=frame.getBoundingClientRect(),pb=pin.getBoundingClientRect();
+var x=pb.left+pb.width/2-fb.left,y=pb.top-fb.top;
+tip.style.left="0px";
+var half=tip.offsetWidth/2;
+x=Math.max(half+8,Math.min(fb.width-half-8,x));
+var below=y<tip.offsetHeight+18;
+tip.classList.toggle("m-below",below);
+tip.style.left=x+"px";
+tip.style.top=(below?pb.bottom-fb.top+10:y-10)+"px";
+tip.classList.add("show");
+}
+function hideTip(){tip.classList.remove("show");}
+canvas.querySelectorAll(".m-map-pin").forEach(function(pin){
+pin.addEventListener("pointerenter",function(){showTip(pin);});
+pin.addEventListener("focus",function(){showTip(pin);});
+pin.addEventListener("pointerleave",hideTip);
+pin.addEventListener("blur",hideTip);
+});
+apply(false);
+
+/* Legend. */
+var legend=doc.querySelector("#map-legend");
+if(legend){
+var ls=sectionWithHead(escapeText(text(legend.querySelector("h2"))));
+var lcard=el("div","m-card glass");
+var list=el("div","m-legend");
+adopt(legend,r.url).querySelectorAll("tbody tr").forEach(function(tr){
+var cells=tr.querySelectorAll("td");
+if(cells.length<3)return;
+var hidden=restricted&&tr.classList.contains("map-relation");
+var relation=hidden?"Not available in your region":text(cells[2]);
+var tone=hidden?"none":(relationTone("Relation",relation)||"none");
+var row=el("div","m-legend-row");
+row.innerHTML='<span class="m-legend-dot m-pin-'+tone+'" aria-hidden="true"></span>';
+var name=cells[1].querySelector("a,.soon-link")||el("span",null,escapeText(text(cells[1])));
+row.appendChild(name);
+row.appendChild(el("span","m-tone m-tone-"+tone,escapeText(relation)));
+list.appendChild(row);
+});
+lcard.appendChild(list);
+var note=adopt(legend,r.url).querySelector("p.small");
+if(note){note.className="m-small m-legend-note";lcard.appendChild(note);}
+ls.appendChild(lcard);
+main.appendChild(ls);
+}
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
 }
 
 /*

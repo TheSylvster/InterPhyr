@@ -444,6 +444,52 @@ body.modern .m-dialog-body h2{margin-bottom:10px}
 .m-dialog-body .m-facts{margin:6px 0 14px}
 .m-dialog-body .m-actions{justify-content:flex-end;margin-top:8px}
 
+/* ---------- World Map ---------- */
+
+.m-map-card{padding:16px}
+.m-map{position:relative;margin:0 auto;overflow:hidden;border-radius:20px;background:#0b1d33;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.m-map.m-zoomed{cursor:grab;touch-action:none}
+.m-map.m-dragging{cursor:grabbing}
+.m-map-canvas{position:relative;width:100%;transform-origin:0 0;will-change:transform}
+.m-map-canvas.m-animate{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.m-map-image{display:block;width:100%;height:100%;object-fit:cover;pointer-events:none}
+/* Glass pins: a clear bead with a glowing coloured core; they stay the same size at every zoom. */
+.m-map-pin{position:absolute;width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;color:#8fb0ff;background:radial-gradient(circle at 50% 50%,currentColor 0 4px,rgba(255,255,255,.18) 5px,rgba(255,255,255,.08) 70%);box-shadow:inset 0 1px 1px rgba(255,255,255,.85),inset 0 -1px 1px rgba(255,255,255,.2),0 0 0 1px rgba(255,255,255,.35),0 0 14px currentColor,0 4px 10px rgba(0,0,0,.5);-webkit-backdrop-filter:blur(3px) saturate(160%);backdrop-filter:blur(3px) saturate(160%);transform:scale(calc(1 / var(--z,1)));transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.m-map-canvas.m-animate .m-map-pin{transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.m-map-pin:hover,.m-map-pin:focus-visible{transform:scale(calc(1.35 / var(--z,1)));outline:none}
+.m-map-pin::after{content:"";position:absolute;inset:-6px;border-radius:50%;box-shadow:0 0 0 1.5px currentColor;opacity:0;animation:m-pin-pulse 2.6s ease-out infinite}
+@keyframes m-pin-pulse{0%{opacity:.6;transform:scale(.6)}70%,100%{opacity:0;transform:scale(1.6)}}
+.m-pin-member{color:#8fb0ff}
+.m-pin-excellent{color:#38e8a0}
+.m-pin-good{color:#6fe07a}
+.m-pin-positive{color:#b6e35a}
+.m-pin-neutral{color:#ffd166}
+.m-pin-hostile{color:#ff6b5b}
+.m-pin-none{color:#a0a6bd}
+.m-pin-none::after{animation:none}
+/* The glass name tag above a pin. */
+.m-map-tip{position:absolute;z-index:3;display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:999px;white-space:nowrap;font-size:13px;color:#fff;background:rgba(20,26,56,.6);-webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 0 0 1px rgba(255,255,255,.1),0 10px 24px rgba(0,0,0,.45);transform:translate(-50%,calc(-100% + 6px));opacity:0;pointer-events:none;transition:opacity .18s ease,transform .25s cubic-bezier(.2,.8,.2,1)}
+.m-map-tip.show{opacity:1;transform:translate(-50%,-100%)}
+.m-map-tip.m-below{transform:translate(-50%,-6px)}
+.m-map-tip.m-below.show{transform:translate(-50%,0)}
+.m-map-tip .m-tone{font-size:12px}
+.m-map-controls{position:absolute;right:12px;top:12px;z-index:4;display:flex;flex-direction:column;gap:8px}
+.m-map-btn{border:0;padding:0;cursor:pointer;background:rgba(20,26,56,.5);-webkit-backdrop-filter:blur(12px) saturate(170%);backdrop-filter:blur(12px) saturate(170%)}
+.m-map-btn .m-glass-face{padding:10px}
+.m-map-btn .m-glass-face svg{width:18px;height:18px}
+.m-map-btn:disabled{opacity:.4;cursor:default}
+.m-map-hint{margin:12px 6px 2px}
+/* Legend. */
+.m-legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px 24px}
+.m-legend-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--m-line);min-width:0}
+.m-legend-row>a,.m-legend-row>span:nth-child(2){flex:1;min-width:0;font-weight:600}
+.m-legend-row .m-tone{flex-shrink:0;font-size:12px}
+.m-legend-dot{flex-shrink:0;width:12px;height:12px;border-radius:50%;background:currentColor;box-shadow:0 0 10px currentColor,inset 0 1px 1px rgba(255,255,255,.7)}
+.m-legend-note{margin:14px 4px 0}
+@media (max-width:860px){.m-legend{grid-template-columns:1fr}}
+@media (max-width:600px){.m-map-card{padding:10px}.m-map{border-radius:16px}.m-map-controls{right:8px;top:8px}}
+@media (prefers-reduced-motion:reduce){.m-map-canvas.m-animate,.m-map-canvas.m-animate .m-map-pin,.m-map-pin,.m-map-tip{transition:none}.m-map-pin::after{animation:none}}
+
 /* Footer links. */
 .m-footer-links{display:flex;gap:16px}
 

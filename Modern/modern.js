@@ -93,7 +93,7 @@ a.href=new URL(path,modernRoot).href+url.hash;
 return;
 }
 var soon=el("span","soon-link",a.innerHTML);
-soon.title="Coming soon to InterPhyr Modern";
+soon.tabIndex=0;
 a.replaceWith(soon);
 });
 return copy;

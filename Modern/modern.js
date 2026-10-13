@@ -120,20 +120,157 @@ var bar=el("header","m-topbar glass");
 bar.innerHTML='<a class="m-brand" href="'+modernRoot+'"><span class="m-brand-mark" aria-hidden="true"></span><span>InterPhyr</span></a>';
 var nav=el("nav","m-nav");
 nav.setAttribute("aria-label","Main");
+var items=el("span","m-nav-items");
+nav.appendChild(items);
 NAV.forEach(function(item){
 if(item.path==null){
-var soon=el("span",null,item.label);
+var soon=el("span","m-nav-soon",item.label);
 soon.title="Coming soon";
-nav.appendChild(soon);
+items.appendChild(soon);
 return;
 }
 var link=el("a",null,item.label);
 link.href=new URL(item.path,modernRoot).href;
+link.setAttribute("data-path",item.path);
 if(item.path===page)link.className="active";
-nav.appendChild(link);
+items.appendChild(link);
 });
 bar.appendChild(nav);
+addPill(nav);
 return bar;
+}
+
+/*
+ * ---------- The sliding glass lens in the menu ----------
+ *
+ * One glass "lens" marks the current page and slides to the next one,
+ * stretching a little on the way like liquid. Inside it is a copy of
+ * the menu text, kept lined up with the real text and bent by an SVG
+ * refraction filter: barely at rest, strongly while it travels.
+ */
+
+var pill=null;
+var pillX=0,pillW=0;
+var pillAnim=0;
+var LENS_REST=0.05,LENS_MOVING=0.2;
+
+function lensFilter(){
+if(document.getElementById("m-lens"))return;
+/* A refraction map: no bending in the middle, more towards the rim. */
+var canvas=document.createElement("canvas");
+canvas.width=128;canvas.height=48;
+var c=canvas.getContext("2d");
+var img=c.createImageData(128,48);
+for(var j=0;j<48;j++){
+for(var i=0;i<128;i++){
+var u=i/127*2-1,v=j/47*2-1;
+var k=(j*128+i)*4;
+img.data[k]=128-Math.sign(u)*Math.pow(Math.abs(u),3)*127;
+img.data[k+1]=128-Math.sign(v)*Math.pow(Math.abs(v),3)*127;
+img.data[k+2]=128;
+img.data[k+3]=255;
+}
+}
+c.putImageData(img,0,0);
+var holder=document.createElement("div");
+holder.innerHTML=
+'<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'+
+'<filter id="m-lens" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">'+
+'<feImage href="'+canvas.toDataURL()+'" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>'+
+'<feDisplacementMap in="SourceGraphic" in2="map" scale="'+LENS_REST+'" xChannelSelector="R" yChannelSelector="G"/>'+
+'</filter></svg>';
+document.body.appendChild(holder.firstChild);
+}
+
+function setLens(amount){
+var map=document.querySelector("#m-lens feDisplacementMap");
+if(map)map.setAttribute("scale",amount.toFixed(3));
+}
+
+function addPill(nav){
+pill=el("span","m-nav-pill");
+pill.setAttribute("aria-hidden","true");
+var lens=el("span","m-nav-lens");
+var track=el("span","m-nav-track");
+nav.querySelectorAll(".m-nav-items > *").forEach(function(item){
+var copy=el("span",null,item.innerHTML);
+track.appendChild(copy);
+});
+lens.appendChild(track);
+pill.appendChild(lens);
+nav.insertBefore(pill,nav.firstChild);
+pill.track=track;
+pill.items=nav.querySelector(".m-nav-items");
+pill.lens=lens;
+}
+
+function navItem(page){
+if(!pill)return null;
+var links=pill.items.querySelectorAll(":scope > a");
+for(var i=0;i<links.length;i++){
+if(links[i].getAttribute("data-path")===page)return links[i];
+}
+return null;
+}
+
+/*
+ * Draws the lens at x with width w over a menu item. "bulge" (0 to 1)
+ * is how far into a move it is: the lens swells and magnifies more.
+ */
+function drawPill(x,w,item,bulge){
+bulge=bulge||0;
+var h=item.offsetHeight,grow=h*0.16*bulge;
+var ph=h+grow,py=item.offsetTop-grow/2;
+pill.style.width=w+"px";
+pill.style.height=ph+"px";
+pill.style.transform="translate("+x+"px,"+py+"px)";
+/* The copied text: lined up with the real text, magnified around the lens centre. */
+var items=pill.items,ox=items.offsetLeft,oy=items.offsetTop;
+var cx=w/2,cy=ph/2,scale=1+0.12*bulge;
+pill.track.style.transform="translate("+cx+"px,"+cy+"px) scale("+scale+") translate("+(ox-x-cx)+"px,"+(oy-py-cy)+"px)";
+/* Hide the real text under the lens. */
+items.style.setProperty("--cut-a",(x-ox+1)+"px");
+items.style.setProperty("--cut-b",(x-ox+w-1)+"px");
+}
+
+function placePill(page){
+var item=navItem(page);
+if(!item){if(pill)pill.style.opacity="0";return;}
+cancelAnimationFrame(pillAnim);
+pill.style.opacity="1";
+pillX=item.offsetLeft;
+pillW=item.offsetWidth;
+drawPill(pillX,pillW,item);
+setLens(LENS_REST);
+}
+
+function movePill(page){
+var item=navItem(page);
+if(!item)return;
+if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){placePill(page);return;}
+cancelAnimationFrame(pillAnim);
+pill.style.opacity="1";
+var fromX=pillX,fromW=pillW;
+var toX=item.offsetLeft,toW=item.offsetWidth;
+var distance=Math.abs(toX-fromX);
+var duration=Math.min(650,320+distance*0.9);
+var started=performance.now();
+function frame(now){
+var t=Math.min(1,(now-started)/duration);
+/* Ease out with a small overshoot at the end, like a spring. */
+var e=1+1.9*Math.pow(t-1,3)+0.9*Math.pow(t-1,2);
+/* Stretch in the middle of the trip, staying centred. */
+var bulge=Math.sin(Math.PI*t);
+var stretch=bulge*Math.min(28,distance*0.18);
+var x=fromX+(toX-fromX)*e-stretch/2;
+var w=fromW+(toW-fromW)*e+stretch;
+pillX=x;pillW=w;
+drawPill(x,w,item,bulge);
+setLens(LENS_REST+(LENS_MOVING-LENS_REST)*bulge);
+if(t<1)pillAnim=requestAnimationFrame(frame);
+else{pillX=toX;pillW=toW;drawPill(toX,toW,item);setLens(LENS_REST);}
+}
+pillAnim=requestAnimationFrame(frame);
 }
 
 function footer(){
@@ -166,11 +303,11 @@ main.appendChild(box);
 
 /* ---------- Home ---------- */
 
-function renderHome(main){
-Promise.all([fetchClassic("index.html"),fetchClassic("News/index.html")]).then(function(results){
-if(takenOver())return;
+function renderHome(main,token,ready){
+Promise.all([fetchClassic("index.html"),fetchClassic("News/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
 var home=results[0],news=results[1],doc=home.doc;
-main.innerHTML="";
+enter(main);
 
 /* Hero, from the classic welcome text. */
 var intro=doc.querySelector(".page-intro");
@@ -277,7 +414,7 @@ contactGrid.appendChild(card);
 contactSection.appendChild(contactGrid);
 main.appendChild(contactSection);
 }
-}).catch(function(){failed(main);});
+}).catch(function(){if(token===renderToken)failed(main);});
 }
 
 /* ---------- News ---------- */
@@ -308,11 +445,11 @@ card.appendChild(details);
 return card;
 }
 
-function renderNews(main){
-fetchClassic("News/index.html").then(function(r){
-if(takenOver())return;
-var doc=r.doc;
-main.innerHTML="";
+function renderNews(main,token,ready){
+Promise.all([fetchClassic("News/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+enter(main);
 
 var hero=el("section","m-hero glass");
 hero.innerHTML=
@@ -353,7 +490,84 @@ grid.appendChild(storyCard(a,r.url,false,false));
 });
 all.appendChild(grid);
 main.appendChild(all);
-}).catch(function(){failed(main);});
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/* ---------- Page changes ---------- */
+
+/*
+ * Moving between Modern pages doesn't load a new page: the menu lens
+ * slides over, the old panels fade out and the new ones rise in.
+ * The address bar, Back and Forward still work as normal.
+ */
+
+var TITLES={
+"":"InterPhyr — The Phyrrian Astral Federation",
+"News/":"The Zapadiyan Daily — InterPhyr"
+};
+
+var mainEl=null;
+var currentPage=null;
+var renderToken=0;
+
+function reducedMotion(){
+return !!(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+/* Clears the page for new content, just before it is drawn. */
+function enter(main){
+main.classList.remove("m-leaving","m-enter");
+main.innerHTML="";
+/* After the new content is in place: number the panels and let them rise in. */
+requestAnimationFrame(function(){
+var parts=main.querySelectorAll(".glass,.m-section-head");
+parts.forEach(function(part,i){part.style.setProperty("--i",Math.min(i,10));});
+main.classList.add("m-enter");
+setTimeout(function(){main.classList.remove("m-enter");},1400);
+});
+}
+
+function render(page,ready){
+renderToken++;
+document.title=TITLES[page]||TITLES[""];
+document.body.setAttribute("data-page",page);
+if(page==="News/")renderNews(mainEl,renderToken,ready);
+else renderHome(mainEl,renderToken,ready);
+}
+
+function pageOf(url){
+var path=url.pathname.slice(new URL(modernRoot).pathname.length).replace(/index\.html$/,"");
+return MODERN_PAGES.indexOf(path)>=0?path:null;
+}
+
+function navigate(page,push){
+if(page===currentPage)return;
+currentPage=page;
+if(push)history.pushState({page:page},"",new URL(page,modernRoot).href);
+if(pill)pill.items.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+movePill(page);
+var wait=reducedMotion()?0:220;
+mainEl.classList.remove("m-enter");
+mainEl.classList.add("m-leaving");
+var ready=new Promise(function(resolve){setTimeout(function(){
+window.scrollTo({top:0,behavior:"instant"});
+resolve();
+},wait);});
+render(page,ready);
+}
+
+/* Links to other Modern pages (menu, buttons, "All stories") change page in place. */
+function onLinkClick(event){
+if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return;
+var link=event.target.closest&&event.target.closest("a[href]");
+if(!link||link.target==="_blank")return;
+var url=new URL(link.href);
+if(url.origin!==location.origin)return;
+var page=pageOf(url);
+if(page===null)return;
+if(page===currentPage&&url.hash)return;
+event.preventDefault();
+navigate(page,true);
 }
 
 /* ---------- Start ---------- */
@@ -362,14 +576,17 @@ function start(){
 if(takenOver())return;
 var page=document.body.getAttribute("data-page")||"";
 document.body.insertBefore(backdrop(),document.body.firstChild);
+lensFilter();
 var shell=el("div","m-shell");
 shell.appendChild(topbar(page));
-var main=el("main");
-main.id="main";
-main.appendChild(el("div","m-skeleton glass"));
-shell.appendChild(main);
+mainEl=el("main");
+mainEl.id="main";
+mainEl.appendChild(el("div","m-skeleton glass"));
+shell.appendChild(mainEl);
 shell.appendChild(footer());
 document.body.appendChild(shell);
+placePill(page);
+window.addEventListener("resize",function(){placePill(currentPage);});
 
 /* The same locks as the classic site. */
 if(getCookie("interphyr_lockout")==="1"){
@@ -381,8 +598,14 @@ notice("This website is under maintenance","InterPhyr.net is being worked on by 
 return;
 }
 
-if(page==="")renderHome(main);
-else if(page==="News/")renderNews(main);
+currentPage=page;
+history.replaceState({page:page},"");
+document.addEventListener("click",onLinkClick);
+window.addEventListener("popstate",function(){
+var back=pageOf(location);
+if(back!==null)navigate(back,false);
+});
+render(page,Promise.resolve());
 }
 
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);

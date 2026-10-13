@@ -70,5 +70,6 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - A modern "liquid glass" version of the site at `/Modern/`. It is open to anyone, but **nothing on the classic site may link to it**, and its pages carry `<meta name="robots" content="noindex, nofollow">`.
 - It has no content of its own: `Modern/modern.js` reads the classic pages (`index.html`, `News/index.html`, ...) and restyles them. Edit content on the classic pages only.
 - Pages so far: Home and News. To add one, create `Modern/<Page>/index.html` like the existing ones, add the path to `MODERN_PAGES` and `NAV` in `modern.js`, and write its renderer.
-- Styles live in `Modern/modern.css`, scoped to `body.modern`. Use the system font (no downloads) and keep a non-blur fallback for browsers without `backdrop-filter`.
+- Styles live in `Modern/modern.css`, scoped to `body.modern`.
+- Moving between Modern pages happens in place (no page load): `navigate()` in `modern.js` slides the menu lens and animates the panels. New pages need a title in `TITLES` and a branch in `render()`. Use the system font (no downloads) and keep a non-blur fallback for browsers without `backdrop-filter`.
 - Maintenance mode, the lockout and the emergency switch apply here too. Modern pages set `window.INTERPHYR_NO_DIALUP=true` before `emergency.js`, so the FEDCON 1 alert shows without a dial-up.

@@ -18,17 +18,33 @@
 var modernRoot=new URL(".",document.currentScript.src).href;
 var siteRoot=new URL("../",modernRoot).href;
 
-/* Classic pages that have a Modern version so far (paths from the site root). */
-var MODERN_PAGES=["","News/","UpdateLogs/"];
+/* Outside Relations nations (folder names under Relations/). */
+var OUTSIDE=["Eisenreich","Pancake","Swissland","Luminara","MerchantsUnion","Frostborn"];
+
+/*
+ * Pages that have a Modern version (paths from the site root). "Nations/"
+ * is Modern's own overview of the member nations; every other page is a
+ * classic page restyled.
+ */
+var MODERN_PAGES=["","News/","Nations/","ZPR/","Astralyia/","Rendale/","Doctrines/","Relations/","Projects/","ZapadTelecom/","About/","UpdateLogs/"].concat(OUTSIDE.map(function(n){return "Relations/"+n+"/";}));
 
 var NAV=[
 {label:"Home",path:""},
 {label:"News",path:"News/"},
-{label:"Nations"},
-{label:"Relations"},
-{label:"World Map"},
-{label:"Government"}
+{label:"Nations",path:"Nations/"},
+{label:"Relations",path:"Relations/"},
+{label:"Projects",path:"Projects/"},
+{label:"World Map",path:"Map/"},
+{label:"Government",path:"Government/"}
 ];
+
+/* The menu item a page belongs to: a nation page lights up "Nations", and so on. */
+function navPathFor(page){
+if(page==null)return null;
+if(/^(Nations|ZPR|Astralyia|Rendale|Doctrines)\/$/.test(page))return "Nations/";
+if(page.indexOf("Relations/")===0)return "Relations/";
+return page;
+}
 
 function getCookie(name){
 var cookies=document.cookie.split(";");
@@ -37,6 +53,91 @@ var c=cookies[i].trim();
 if(c.indexOf(name+"=")===0)return decodeURIComponent(c.substring(name.length+1));
 }
 return null;
+}
+
+/*
+ * ---------- Who may see what (the same rules as the classic site) ----------
+ *
+ * Modern has no dial-up, but it shares the classic site's cookies: a nation
+ * registered there is registered here too. Outside Relations and the
+ * relations on the World Map are for member nations only, and Swissland
+ * is blocked from the whole network.
+ */
+
+function normalizeNationName(name){
+return name.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"");
+}
+
+function isPafMember(name){
+var s=name.normalize("NFD").toLowerCase().replace(/[^a-z0-9]/g,"").replace(/^the/,"");
+return s==="zpr"||/^(astralyia|zapadiya|zapadyia|rendale|kingdomofrendale)/.test(s);
+}
+
+/* Lowercase letters only, number stand-ins read as letters, doubled letters collapsed. */
+function looseLetters(value){
+var leet={"0":"o","1":"l","3":"e","4":"a","5":"s","7":"t","$":"s","@":"a","|":"l","!":"i"};
+return value.normalize("NFKD").replace(/[̀-ͯ]/g,"").toLowerCase()
+.replace(/[013457$@|!]/g,function(c){return leet[c];})
+.replace(/[^a-z]/g,"").replace(/(.)\1+/g,"$1");
+}
+
+function editDistance(a,b){
+var prev=[],i,j;
+for(j=0;j<=b.length;j++)prev[j]=j;
+for(i=1;i<=a.length;i++){
+var cur=[i];
+for(j=1;j<=b.length;j++)cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+prev=cur;
+}
+return prev[b.length];
+}
+
+/* Swissland in any spelling close enough to it (the same check as the classic registration). */
+function isBlockedNation(name){
+var target="swisland";
+var words=name.split(/[\s\-_.,;:'"\/\\()]+/).filter(Boolean);
+for(var i=0;i<words.length;i++){
+var chunk="";
+for(var j=i;j<words.length;j++){
+chunk+=words[j];
+var loose=looseLetters(chunk);
+if(loose.length<5)continue;
+if(loose.length>target.length+3)break;
+var d=editDistance(loose,target);
+if(d<=1||(d<=2&&loose[0]==="s"))return true;
+}
+}
+return false;
+}
+
+function isAdmin(){return getCookie("interphyr_admin_session")==="1";}
+function registeredNation(){return getCookie("interphyr_registered_nation");}
+
+function regionBlocked(){
+if(isAdmin())return false;
+if(getCookie("interphyr_nation_status")==="invalid")return true;
+var nation=registeredNation();
+return !!(nation&&isBlockedNation(nation));
+}
+
+/* Member nations (and the ZapTel_IT admin) see Outside Relations and the relations on the map. */
+function seesRelations(){
+if(isAdmin())return true;
+var nation=registeredNation();
+return !!(nation&&isPafMember(nation));
+}
+
+/* Registers a nation exactly like the classic registration screen. Returns "admin", "blocked" or "ok". */
+function registerNation(name){
+if(normalizeNationName(name)==="zaptelit"){
+document.cookie="interphyr_admin_session=1; path=/";
+return "admin";
+}
+var blocked=isBlockedNation(name);
+document.cookie="interphyr_nation_status="+(blocked?"invalid":"valid")+"; max-age=31536000; path=/";
+if(blocked)return "blocked";
+document.cookie="interphyr_registered_nation="+encodeURIComponent(name)+"; max-age=31536000; path=/";
+return "ok";
 }
 
 function el(tag,className,html){
@@ -76,7 +177,11 @@ copy.querySelectorAll("script,style").forEach(function(s){s.remove();});
 copy.querySelectorAll("img[src]").forEach(function(img){
 img.src=new URL(img.getAttribute("src"),base).href;
 img.classList.remove("win98-16bit");
+img.removeAttribute("style");
 img.loading="lazy";
+});
+copy.querySelectorAll("video[src],audio[src],source[src]").forEach(function(media){
+media.src=new URL(media.getAttribute("src"),base).href;
 });
 copy.querySelectorAll("a[href]").forEach(function(a){
 var href=a.getAttribute("href");
@@ -261,7 +366,7 @@ nav.setAttribute("aria-label","Main");
 var items=el("span","m-nav-items");
 nav.appendChild(items);
 NAV.forEach(function(item){
-if(item.path==null){
+if(item.path==null||MODERN_PAGES.indexOf(item.path)<0){
 var soon=el("span","m-nav-soon",item.label);
 soon.title="Coming soon";
 items.appendChild(soon);
@@ -270,7 +375,7 @@ return;
 var link=el("a",null,item.label);
 link.href=new URL(item.path,modernRoot).href;
 link.setAttribute("data-path",item.path);
-if(item.path===page)link.className="active";
+if(item.path===navPathFor(page))link.className="active";
 items.appendChild(link);
 });
 bar.appendChild(nav);
@@ -467,8 +572,8 @@ return null;
 
 var navLens=null,navItems=null;
 
-function placePill(page){if(navLens)navLens.place(itemFor(navItems,page));}
-function movePill(page){if(navLens)navLens.move(itemFor(navItems,page));}
+function placePill(page){if(navLens)navLens.place(itemFor(navItems,navPathFor(page)));}
+function movePill(page){if(navLens)navLens.move(itemFor(navItems,navPathFor(page)));}
 
 /*
  * ---------- Glass buttons ----------
@@ -547,7 +652,8 @@ var ICON_LOG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-
 function footer(){
 var f=el("footer","m-footer glass");
 f.innerHTML=
-'<span>&copy; 1996&ndash;1998 The Phyrrian Astral Federation &middot; Hosted by ZapadTelecom&copy;</span>'+
+'<span>&copy; 1996&ndash;1998 The Phyrrian Astral Federation &middot; Hosted by <a href="'+new URL("ZapadTelecom/",modernRoot).href+'">ZapadTelecom&copy;</a></span>'+
+'<span class="m-footer-links"><a href="'+new URL("Doctrines/",modernRoot).href+'">Doctrines</a><a href="'+new URL("About/",modernRoot).href+'">About</a><a href="'+new URL("UpdateLogs/",modernRoot).href+'">Update Logs</a></span>'+
 '<span><span class="m-version"></span> &middot; <a href="'+siteRoot+'">Classic InterPhyr.net</a></span>';
 fetchClassic("index.html").then(function(r){
 var v=r.doc.querySelector(".page-intro .small");
@@ -570,6 +676,163 @@ main.innerHTML="";
 var box=el("div","m-notice glass");
 box.innerHTML='<h1>Page could not be loaded</h1><p class="m-muted">The ZapadTelecom&copy; network did not respond. Please try again.</p>';
 main.appendChild(box);
+}
+
+/* ---------- Shared building blocks ---------- */
+
+/* The member nation pages, by the id of their section on the classic main page. */
+var NATION_PAGES={astralyia:"Astralyia/",zpr:"ZPR/",rendale:"Rendale/"};
+
+function modernHref(path){return new URL(path,modernRoot).href;}
+
+/*
+ * The facts of a nation or project: every "<b>Label:</b> value" line of
+ * a classic .nation-info block becomes a row; other lines become text.
+ * Returns {facts, notes}.
+ */
+function factsFrom(info){
+var facts=el("dl","m-facts");
+var notes=[];
+if(info)info.querySelectorAll(":scope > p").forEach(function(p){
+var label=p.querySelector("b");
+if(!label||p.firstElementChild!==label){notes.push(el("p","m-muted",p.innerHTML));return;}
+var name=text(label).replace(/:$/,"");
+label.remove();
+var item=el("div");
+item.appendChild(el("dt",null,escapeText(name)));
+var dd=el("dd",null,p.innerHTML.trim());
+var tone=relationTone(name,text(dd));
+if(tone)dd.innerHTML='<span class="m-tone m-tone-'+tone+'">'+dd.innerHTML+'</span>';
+item.appendChild(dd);
+facts.appendChild(item);
+});
+return {facts:facts,notes:notes};
+}
+
+/* A colour for a relation or status, so they can be read at a glance. */
+function relationTone(label,value){
+if(!/relation|status/i.test(label))return null;
+var v=value.toLowerCase();
+if(/excellent/.test(v))return "excellent";
+if(/positive/.test(v))return "positive";
+if(/^good/.test(v))return "good";
+if(/neutral/.test(v))return "neutral";
+if(/hostile|war|enemy|poor|bad/.test(v))return "hostile";
+if(/dissolved|none/.test(v))return "none";
+if(/member nation/.test(v))return "member";
+if(/complete/.test(v))return "good";
+if(/progress|construction/.test(v))return "neutral";
+return null;
+}
+
+/* A member nation as a glass card (main page and Nations page). */
+function nationCard(section,base){
+var nation=adopt(section,base);
+var href=NATION_PAGES[section.id]?modernHref(NATION_PAGES[section.id]):null;
+var card=el("article","m-card glass m-nation");
+var head=el("div","m-nation-head");
+var img=nation.querySelector("img");
+if(img)head.appendChild(img);
+head.appendChild(el("h3",null,escapeText(text(nation.querySelector(".nation-name")))));
+card.appendChild(head);
+var info=factsFrom(nation.querySelector(".nation-info"));
+info.notes.forEach(function(n){card.appendChild(n);});
+card.appendChild(info.facts);
+if(href){
+var more=el("a","m-card-more","View profile <span aria-hidden=\"true\">&rarr;</span>");
+more.href=href;
+card.appendChild(more);
+}
+return card;
+}
+
+/* The big panel at the top of a page. "image" is an optional roundel or flag. */
+function heroPanel(eyebrow,title,lead,image){
+var hero=el("section","m-hero glass"+(image?" m-hero-with-art":""));
+hero.innerHTML='<div class="m-hero-orb" aria-hidden="true"></div>';
+var copy=el("div","m-hero-copy");
+copy.appendChild(el("span","m-eyebrow",eyebrow));
+copy.appendChild(el("h1",null,escapeText(title)));
+if(lead){
+var p=el("p","m-lead");
+if(typeof lead==="string")p.innerHTML=lead;else p.appendChild(lead);
+copy.appendChild(p);
+}
+hero.appendChild(copy);
+if(image){
+var art=el("div","m-hero-art");
+art.appendChild(image);
+hero.appendChild(art);
+}
+return hero;
+}
+
+function sectionWithHead(title,extra){
+var section=el("section","m-section");
+var head=el("div","m-section-head");
+head.appendChild(el("h2",null,title));
+if(extra)head.appendChild(extra);
+section.appendChild(head);
+return section;
+}
+
+/* A classic .notice (a Ministry assessment, a citizens' note) as a glass callout. */
+function calloutFrom(notice,tone){
+var copy=notice.cloneNode(true);
+var bold=copy.querySelector("b");
+var label=bold?text(bold).replace(/:$/,""):"";
+if(bold)bold.remove();
+var box=el("div","m-callout glass"+(tone?" m-callout-"+tone:""));
+box.innerHTML='<span class="m-callout-icon" aria-hidden="true">'+(tone==="info"?"i":"!")+'</span>';
+var body=el("div","m-callout-body");
+if(label)body.appendChild(el("span","m-callout-label",escapeText(label.charAt(0)+label.slice(1).toLowerCase())));
+body.appendChild(el("p",null,copy.innerHTML.trim()));
+box.appendChild(body);
+return box;
+}
+
+/*
+ * The rest of a classic section as a glass card: headings, paragraphs and
+ * lists keep their order. Notices become callouts, and old-style windows
+ * (like the ZapadTV(c) anthem player) become a glass panel with a caption.
+ */
+function proseCard(section,base,options){
+options=options||{};
+var copy=adopt(section,base);
+copy.querySelectorAll(":scope > h2").forEach(function(h){h.remove();});
+var card=el("div","m-card glass m-prose");
+if(options.title)card.appendChild(el("h2",null,options.title));
+Array.prototype.slice.call(copy.childNodes).forEach(function(node){
+if(node.nodeType!==1){return;}
+if(node.classList.contains("notice")){card.appendChild(calloutFrom(node,"info"));return;}
+if(node.classList.contains("window")){
+var panel=el("figure","m-media");
+var caption=text(node.querySelector(".title-bar-text"));
+var body=node.querySelector(".window-body");
+if(body)Array.prototype.slice.call(body.childNodes).forEach(function(c){panel.appendChild(c);});
+if(caption)panel.appendChild(el("figcaption",null,escapeText(caption)));
+card.appendChild(panel);
+return;
+}
+card.appendChild(node);
+});
+return card;
+}
+
+/* "Related" links as a row of glass chips. */
+function relatedChips(section,base){
+if(!section)return null;
+var copy=adopt(section,base);
+var links=copy.querySelectorAll("li > a, li > .soon-link");
+if(!links.length)return null;
+var wrap=sectionWithHead("Related");
+var row=el("div","m-chips");
+links.forEach(function(a){
+a.classList.add("m-chip");
+row.appendChild(a);
+});
+wrap.appendChild(row);
+return wrap;
 }
 
 /* ---------- Home ---------- */
@@ -628,26 +891,7 @@ section.id="nations";
 section.innerHTML='<div class="m-section-head"><h2>Member Nations</h2><span class="m-small">Founded 1996</span></div>';
 var grid=el("div","m-grid m-grid-3");
 nations.forEach(function(n){
-var nation=adopt(n,home.url);
-var card=el("article","m-card glass m-nation");
-var head=el("div","m-nation-head");
-var img=nation.querySelector("img");
-if(img)head.appendChild(img);
-head.appendChild(el("h3",null,text(nation.querySelector(".nation-name"))));
-card.appendChild(head);
-var facts=el("dl","m-facts");
-nation.querySelectorAll(".nation-info p").forEach(function(p){
-var label=p.querySelector("b");
-if(!label){card.appendChild(el("p","m-muted",p.innerHTML));return;}
-var name=text(label).replace(/:$/,"");
-label.remove();
-var item=el("div");
-item.appendChild(el("dt",null,name));
-item.appendChild(el("dd",null,text(p)));
-facts.appendChild(item);
-});
-card.appendChild(facts);
-grid.appendChild(card);
+grid.appendChild(nationCard(n,home.url));
 });
 section.appendChild(grid);
 main.appendChild(section);
@@ -788,6 +1032,435 @@ main.appendChild(all);
 }).catch(function(){if(token===renderToken)failed(main);});
 }
 
+/* ---------- Classic sub-pages ---------- */
+
+/*
+ * Splits a card's content into blocks that each start with an <h3>
+ * (a doctrine, a group of members, a version...). Two or more blocks
+ * are laid out side by side as smaller glass panels.
+ */
+function arrangeBlocks(card){
+var nodes=Array.prototype.slice.call(card.children);
+var blocks=[],current=null,lead=[];
+nodes.forEach(function(node){
+if(node.tagName==="H2")return;
+if(node.tagName==="H3"){current=[node];blocks.push(current);return;}
+if(current)current.push(node);else lead.push(node);
+});
+if(blocks.length<2)return;
+var grid=el("div","m-blocks"+(blocks.length===2?" m-blocks-2":""));
+blocks.forEach(function(block){
+var panel=el("div","m-block");
+block.forEach(function(n){panel.appendChild(n);});
+grid.appendChild(panel);
+});
+/* Paragraphs after the last block that don't belong to it (a closing line) stay below. */
+var last=blocks[blocks.length-1];
+var tail=[];
+while(last.length>2&&last[last.length-1].tagName==="P"&&last[last.length-2].tagName!=="H3"&&last[last.length-2].tagName==="UL"){tail.unshift(last.pop());}
+card.appendChild(grid);
+tail.forEach(function(n){grid.parentNode.appendChild(n);});
+}
+
+/* The classic page's own sections, in order, skipping the general introduction and "Related". */
+function pageSections(doc){
+return Array.prototype.filter.call(doc.querySelectorAll(".webpage > section"),function(s){
+if(s.id==="related"||s.classList.contains("page-intro"))return false;
+if(s.id==="information"&&/^InterPhyr is the official information service/.test(text(s.querySelector("p"))))return false;
+return true;
+});
+}
+
+/* A nation, project or office with its own heading (roundel, name, facts). */
+function profileCard(block,base,options){
+options=options||{};
+var copy=adopt(block,base);
+var card=el("article","m-card glass m-profile");
+if(!options.noHead){
+var head=el("div","m-nation-head");
+var img=copy.querySelector(".nation-heading img");
+if(img)head.appendChild(img);
+var name=copy.querySelector(".nation-name");
+var h=el("h3");
+if(name)h.innerHTML=name.innerHTML;
+head.appendChild(h);
+card.appendChild(head);
+}else if(options.title){
+card.appendChild(el("h2",null,options.title));
+}
+var info=factsFrom(copy.querySelector(".nation-info"));
+card.appendChild(info.facts);
+info.notes.forEach(function(n){card.appendChild(n);});
+copy.querySelectorAll(":scope > .notice").forEach(function(n){card.appendChild(calloutFrom(n,"info"));});
+return card;
+}
+
+/* The Ministry's notices at the top of a section (archived pages, citizens' notes). */
+function topNotices(section,base,main){
+adopt(section,base).querySelectorAll(":scope > .archived-notice, :scope > .notice").forEach(function(n){
+var box=calloutFrom(n,n.classList.contains("archived-notice")?"archived":"info");
+box.classList.add("m-section");
+main.appendChild(box);
+});
+}
+
+/* Re-draws the current page in place (after registering a nation, for example). */
+function redraw(){
+var page=currentPage;
+mainEl.classList.add("m-leaving");
+var ready=new Promise(function(resolve){setTimeout(resolve,reducedMotion()?0:220);});
+render(page,ready);
+}
+
+/*
+ * Outside Relations is for member nations only. Visitors who haven't
+ * registered a nation yet can do it here (it is the same registration
+ * as the classic site); other nations see the classic "blocked" line.
+ */
+function relationsGate(main){
+enter(main);
+if(registeredNation()){
+var box=el("div","m-notice glass");
+box.appendChild(el("h1",null,"This page is blocked in your region"));
+main.appendChild(box);
+return;
+}
+var card=el("form","m-notice glass m-register");
+card.noValidate=true;
+card.innerHTML=
+'<span class="m-eyebrow">ZapadTelecom&copy; Nation Registration</span>'+
+'<h1>Which nation are you from?</h1>'+
+'<p class="m-muted">Outside Relations is only available to the member nations of the Phyrrian Astral Federation. Register your nation with ZapadTelecom&copy; to continue.</p>'+
+'<label class="m-field"><span>Nation name</span><input type="text" autocomplete="off" autocapitalize="words" spellcheck="false" required></label>'+
+'<p class="m-form-error" role="alert"></p>'+
+'<div class="m-actions"><button type="submit" class="m-btn m-btn-primary">Register</button></div>'+
+'<p class="m-small">Your registered nation is stored on this computer for future ZapadTelecom&copy; connections, on InterPhyr Modern and the classic site.</p>';
+var input=card.querySelector("input");
+card.addEventListener("submit",function(event){
+event.preventDefault();
+var name=input.value.trim();
+if(!name){card.querySelector(".m-form-error").textContent="Please enter the name of your nation.";input.focus();return;}
+var result=registerNation(name);
+if(result==="blocked"){blockedNotice();return;}
+redraw();
+});
+main.appendChild(card);
+setTimeout(function(){try{input.focus({preventScroll:true});}catch(e){}},400);
+}
+
+function blockedNotice(){
+notice("This page is blocked in your region","Due to geopolitical reasons, InterPhyr.net cannot be accessed from the registered region.");
+}
+
+/* Overview of the member nations (Modern's own page, built from the classic main page). */
+function renderNations(main,token,ready){
+Promise.all([fetchClassic("index.html"),fetchClassic("Doctrines/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var home=results[0],doctrines=results[1];
+enter(main);
+var sections=home.doc.querySelectorAll("section.nation");
+var names=Array.prototype.map.call(sections,function(s){return text(s.querySelector(".nation-name"));});
+var since=text(home.doc.querySelector(".nations-table tbody td:last-child"))||"1996";
+var lead=names.length?names.slice(0,-1).join(", ")+(names.length>1?" and ":"")+names[names.length-1]+": the member nations of the Phyrrian Astral Federation since "+since+".":"";
+main.appendChild(heroPanel("The Phyrrian Astral Federation","Member Nations",escapeText(lead)));
+var section=el("section","m-section");
+var grid=el("div","m-grid m-grid-3");
+sections.forEach(function(s){grid.appendChild(nationCard(s,home.url));});
+section.appendChild(grid);
+main.appendChild(section);
+
+var info=doctrines.doc.querySelector("#information p");
+var doc=sectionWithHead("Doctrines");
+var card=el("div","m-card glass m-cta");
+if(info)card.appendChild(el("p","m-muted",info.innerHTML));
+var go=el("a","m-btn m-btn-primary","Read about the doctrines");
+go.href=modernHref("Doctrines/");
+card.appendChild(go);
+doc.appendChild(card);
+main.appendChild(doc);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/*
+ * A member nation's page, or an Outside Relations nation's page:
+ * the roundel or flag and name at the top, then the profile, then
+ * the page's other sections (members, doctrines, the anthem...).
+ */
+function renderProfilePage(main,token,ready,path,outside){
+Promise.all([fetchClassic(path+"index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+if(outside&&!seesRelations()){relationsGate(main);return;}
+var r=results[0],doc=r.doc;
+enter(main);
+var profile=doc.querySelector("#nation-profile");
+var copy=profile?adopt(profile,r.url):null;
+var img=copy?copy.querySelector(".nation-heading img"):null;
+var name=copy?text(copy.querySelector(".nation-name")):text(doc.querySelector("h2"));
+var leadNode=outside?doc.querySelector("#information > p"):(copy?Array.prototype.filter.call(copy.querySelectorAll(".nation-info p"),function(p){return !p.querySelector("b");})[0]:null);
+main.appendChild(heroPanel(outside?"Outside Relations":"Member nation",name,leadNode?leadNode.innerHTML:"",img));
+var information=doc.querySelector("#information");
+if(information)topNotices(information,r.url,main);
+pageSections(doc).forEach(function(section){
+if(section.id==="information")return;
+if(section===profile){
+var s=sectionWithHead("Profile");
+var card=profileCard(profile,r.url,{noHead:true});
+/* The line already shown at the top ("Member of the ...") isn't repeated. */
+if(leadNode)card.querySelectorAll(":scope > p.m-muted").forEach(function(p){if(text(p)===text(leadNode))p.remove();});
+s.appendChild(card);
+main.appendChild(s);
+return;
+}
+if(section.id==="report-lie"){main.appendChild(reportSection(section,r.url));return;}
+var titled=sectionWithHead(escapeText(text(section.querySelector("h2"))));
+if(section.id)titled.id=section.id;
+var card=proseCard(section,r.url);
+arrangeBlocks(card);
+titled.appendChild(card);
+main.appendChild(titled);
+});
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/* Doctrines: the three profiles side by side, then the glossary. */
+function renderDoctrines(main,token,ready){
+Promise.all([fetchClassic("Doctrines/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+enter(main);
+var info=doc.querySelector("#information p");
+main.appendChild(heroPanel("Political &amp; Economic Profiles","Doctrines",info?info.innerHTML:""));
+var profiles=doc.querySelectorAll("#nation-profile .nation");
+if(profiles.length){
+var s=sectionWithHead(escapeText(text(doc.querySelector("#nation-profile h2"))));
+var grid=el("div","m-grid m-grid-3");
+profiles.forEach(function(p){grid.appendChild(profileCard(p,r.url));});
+s.appendChild(grid);
+main.appendChild(s);
+}
+var glossary=doc.querySelector("#explainer");
+if(glossary){
+var g=sectionWithHead(escapeText(text(glossary.querySelector("h2"))));
+var card=proseCard(glossary,r.url);
+arrangeBlocks(card);
+g.appendChild(card);
+main.appendChild(g);
+}
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/* Outside Relations: one glass card per nation, with its relation to the Federation. */
+function renderRelations(main,token,ready){
+Promise.all([fetchClassic("Relations/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+if(!seesRelations()){relationsGate(main);return;}
+var r=results[0],doc=r.doc;
+enter(main);
+var info=doc.querySelector("#information p");
+main.appendChild(heroPanel("Ministry of Outside Relations","Outside Relations",info?info.innerHTML:""));
+var table=doc.querySelector(".relations-table");
+var heads=table?Array.prototype.map.call(table.querySelectorAll("thead th"),text):[];
+var s=sectionWithHead(escapeText(text(doc.querySelector("#nation-profile h2"))));
+var grid=el("div","m-grid m-grid-3");
+if(table)adopt(table,r.url).querySelectorAll("tbody tr").forEach(function(tr){
+var cells=tr.querySelectorAll("td");
+if(cells.length<4)return;
+var link=cells[1].querySelector("a");
+var card=el(link?"a":"div","m-card glass m-relation");
+if(link)card.href=link.href;
+var head=el("div","m-nation-head");
+var img=cells[0].querySelector("img");
+if(img)head.appendChild(img);
+else head.appendChild(el("span","m-noflag","No flag<br>on file"));
+var nameBox=el("div");
+nameBox.appendChild(el("h3",null,escapeText(link?text(link):text(cells[1]))));
+var extra=Array.prototype.filter.call(cells[1].childNodes,function(n){return n!==link&&text(n.nodeType===1?n:{textContent:n.textContent});});
+if(extra.length)nameBox.appendChild(el("span","m-small",escapeText(extra.map(function(n){return n.textContent;}).join(" ").trim())));
+head.appendChild(nameBox);
+card.appendChild(head);
+var facts=el("dl","m-facts");
+[2,3].forEach(function(i){
+var row=el("div");
+row.appendChild(el("dt",null,escapeText(heads[i]||"")));
+var tone=relationTone(heads[i]||"Relation",text(cells[i]));
+row.appendChild(el("dd",null,tone?'<span class="m-tone m-tone-'+tone+'">'+cells[i].innerHTML+'</span>':cells[i].innerHTML));
+facts.appendChild(row);
+});
+card.appendChild(facts);
+grid.appendChild(card);
+});
+s.appendChild(grid);
+main.appendChild(s);
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/* Projects: one glass card per project. */
+function renderProjects(main,token,ready){
+Promise.all([fetchClassic("Projects/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+enter(main);
+var info=doc.querySelector("#information p");
+main.appendChild(heroPanel("The Phyrrian Astral Federation","Projects",info?info.innerHTML:""));
+var s=sectionWithHead(escapeText(text(doc.querySelector("#nation-profile h2"))));
+var grid=el("div","m-grid m-grid-2");
+doc.querySelectorAll("#nation-profile .nation").forEach(function(p){grid.appendChild(profileCard(p,r.url));});
+s.appendChild(grid);
+main.appendChild(s);
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/* ZapadTelecom(c) and About: the first section becomes the top panel, the rest follow. */
+function renderInfoPage(main,token,ready,path,eyebrow,title){
+Promise.all([fetchClassic(path+"index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+enter(main);
+var sections=pageSections(doc);
+var first=sections.shift();
+if(first){
+var copy=adopt(first,r.url);
+var img=copy.querySelector(":scope > img, :scope > p > img");
+var paragraphs=Array.prototype.filter.call(copy.querySelectorAll(":scope > p"),function(p){return !p.querySelector("img");});
+var lead=paragraphs.shift();
+main.appendChild(heroPanel(eyebrow,title||text(copy.querySelector("h2")),lead?lead.innerHTML:"",img));
+if(paragraphs.length){
+var more=el("div","m-card glass m-prose m-section");
+paragraphs.forEach(function(p){more.appendChild(p);});
+main.appendChild(more);
+}
+}
+sections.forEach(function(section){
+var titled=sectionWithHead(escapeText(text(section.querySelector("h2"))));
+if(section.id)titled.id=section.id;
+if(section.querySelector(".nation-heading")){
+titled.appendChild(profileCard(section,r.url));
+}else{
+var card=proseCard(section,r.url);
+arrangeBlocks(card);
+titled.appendChild(card);
+}
+main.appendChild(titled);
+});
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+/*
+ * The "Report a Swisslandian Lie" form, in glass. Like the classic one,
+ * it doesn't send anything: it thanks the citizen with a report number.
+ */
+function reportSection(section,base){
+var copy=adopt(section,base);
+var wrap=sectionWithHead(escapeText(text(copy.querySelector("h2"))));
+if(section.id)wrap.id=section.id;
+var card=el("div","m-card glass m-prose");
+copy.querySelectorAll(":scope > p:not(.small)").forEach(function(p){card.appendChild(p.cloneNode(true));});
+var classicForm=copy.querySelector("form");
+if(classicForm){
+var form=el("form","m-form");
+form.noValidate=true;
+var options=Array.prototype.map.call(classicForm.querySelectorAll("select option"),function(o){return '<option>'+escapeText(text(o))+'</option>';}).join("");
+var radios=Array.prototype.map.call(classicForm.querySelectorAll('input[type="radio"]'),function(input,i){
+var label=classicForm.querySelector('label[for="'+input.id+'"]');
+return '<label class="m-choice"><input type="radio" name="m-certainty" value="'+escapeText(input.value)+'"'+(i===0?" checked":"")+'><span>'+escapeText(text(label))+'</span></label>';
+}).join("");
+var labels=classicForm.querySelectorAll("label");
+function labelFor(id){var l=classicForm.querySelector('label[for="'+id+'"]');return l?escapeText(text(l).replace(/:$/,"")):"";}
+var legend=text(classicForm.querySelector("legend"));
+form.innerHTML=
+'<label class="m-field"><span>'+labelFor("report-nation")+'</span><input type="text" readonly class="m-report-nation"></label>'+
+'<label class="m-field"><span>'+labelFor("report-source")+'</span><select class="m-report-source">'+options+'</select></label>'+
+'<label class="m-field"><span>'+labelFor("report-text")+'</span><textarea rows="4" class="m-report-text" placeholder="'+escapeText(classicForm.querySelector("textarea").getAttribute("placeholder")||"")+'"></textarea></label>'+
+'<fieldset class="m-field"><legend>'+escapeText(legend)+'</legend><div class="m-choices">'+radios+'</div></fieldset>'+
+'<label class="m-check"><input type="checkbox" class="m-report-confirm"><span>'+labelFor("report-confirm")+'</span></label>'+
+'<p class="m-form-error" role="alert"></p>'+
+'<div class="m-actions"><button type="reset" class="m-btn">Clear</button><button type="submit" class="m-btn m-btn-primary">Send Report</button></div>';
+var nation=form.querySelector(".m-report-nation");
+function fill(){nation.value=isAdmin()?"ZapadTelecom© IT":(registeredNation()||"Unknown");}
+fill();
+form.addEventListener("reset",function(){form.querySelector(".m-form-error").textContent="";setTimeout(fill,0);});
+form.addEventListener("submit",function(event){
+event.preventDefault();
+var error=form.querySelector(".m-form-error");
+var lie=form.querySelector(".m-report-text");
+var confirm=form.querySelector(".m-report-confirm");
+error.textContent="";
+if(lie.value.trim().length<10){error.textContent="Please describe the lie in a little more detail.";lie.focus();return;}
+if(!confirm.checked){error.textContent="Please confirm that your report is truthful.";confirm.focus();return;}
+var send=form.querySelector('button[type="submit"]');
+send.disabled=true;send.textContent="Sending…";
+setTimeout(function(){
+var number="ZPR/PIM/RL/98-"+String(Math.floor(10000+Math.random()*90000));
+var source=form.querySelector(".m-report-source").value;
+var picked=form.querySelector('input[name="m-certainty"]:checked');
+form.reset();
+send.disabled=false;send.textContent="Send Report";
+var box=el("div","m-dialog-body");
+box.innerHTML=
+'<img class="m-dialog-art" src="'+new URL("images/zaptel-ministry-logo.webp",siteRoot).href+'" alt="People\'s Information Ministry">'+
+'<span class="m-eyebrow">People\'s Information Ministry</span>'+
+'<h2>Report received</h2>'+
+'<p class="m-muted">Thank you, citizen. Your report has been received by the People\'s Information Ministry.</p>'+
+'<dl class="m-facts"><div><dt>Report No.</dt><dd>'+number+'</dd></div><div><dt>Source</dt><dd>'+escapeText(source)+'</dd></div><div><dt>Certainty</dt><dd>'+escapeText(picked?picked.value:"Certain")+'</dd></div><div><dt>Status</dt><dd>Forwarded to the Ministry</dd></div></dl>'+
+'<p class="m-small">The truth thanks you for your vigilance.</p>'+
+'<div class="m-actions"><button type="button" class="m-btn m-btn-primary" data-close>OK</button></div>';
+openDialog(box);
+},900);
+});
+card.appendChild(form);
+}
+copy.querySelectorAll(":scope > p.small").forEach(function(p){card.appendChild(p.cloneNode(true));});
+wrap.appendChild(card);
+return wrap;
+}
+
+/*
+ * ---------- Glass dialogs ----------
+ *
+ * A glass panel over the page (the page behind dims and softens). It
+ * rises in and settles, and sinks away when closed, never just appearing.
+ * Escape, the backdrop and any [data-close] button close it.
+ */
+function openDialog(content,options){
+options=options||{};
+var backdrop=el("div","m-dialog-backdrop"+(options.tone?" m-dialog-"+options.tone:""));
+var panel=el("div","m-dialog glass");
+panel.setAttribute("role",options.alert?"alertdialog":"dialog");
+panel.setAttribute("aria-modal","true");
+panel.appendChild(content);
+backdrop.appendChild(panel);
+document.body.appendChild(backdrop);
+var closed=false;
+function close(){
+if(closed)return;
+closed=true;
+document.removeEventListener("keydown",onKey);
+backdrop.classList.remove("open");
+backdrop.classList.add("closing");
+setTimeout(function(){backdrop.remove();if(options.onClose)options.onClose();},reducedMotion()?0:260);
+}
+function onKey(event){if(event.key==="Escape"&&options.dismissable!==false)close();}
+document.addEventListener("keydown",onKey);
+backdrop.addEventListener("click",function(event){
+if(event.target===backdrop&&options.dismissable!==false)close();
+if(event.target.closest&&event.target.closest("[data-close]"))close();
+});
+requestAnimationFrame(function(){requestAnimationFrame(function(){backdrop.classList.add("open");});});
+var focus=panel.querySelector("[data-focus]")||panel.querySelector("button");
+if(focus)setTimeout(function(){try{focus.focus({preventScroll:true});}catch(e){}},50);
+return {close:close,panel:panel,backdrop:backdrop};
+}
+
 /* ---------- Update Logs ---------- */
 
 /* Every version, newest first, read from the classic Update Logs page. */
@@ -862,13 +1535,13 @@ var rows=el("div","m-menu-items");
 links.appendChild(rows);
 NAV.forEach(function(item){
 var row;
-if(item.path==null){
+if(item.path==null||MODERN_PAGES.indexOf(item.path)<0){
 row=el("span","m-menu-soon",item.label+" <small>soon</small>");
 }else{
 row=el("a",null,item.label);
 row.href=new URL(item.path,modernRoot).href;
 row.setAttribute("data-path",item.path);
-if(item.path===page)row.className="active";
+if(item.path===navPathFor(page))row.className="active";
 }
 rows.appendChild(row);
 });
@@ -960,7 +1633,7 @@ menu.open=open;
 menu.button.setAttribute("aria-expanded",open?"true":"false");
 menu.box.classList.toggle("opening",open);
 /* Put the lens on the current page before the panel opens. */
-if(open)menu.lens.place(itemFor(menu.items,currentPage));
+if(open)menu.lens.place(itemFor(menu.items,navPathFor(currentPage)));
 cancelAnimationFrame(menu.anim);
 if(reducedMotion()){menu.amount=open?1:0;drawMenu(menu.amount);return;}
 var from=menu.amount,to=open?1:0;
@@ -989,6 +1662,23 @@ menu.anim=requestAnimationFrame(frame);
 var TITLES={
 "":"InterPhyr — The Phyrrian Astral Federation",
 "News/":"The Zapadiyan Daily — InterPhyr",
+"Nations/":"Member Nations — InterPhyr",
+"ZPR/":"The Zapadiyan People's Republic — InterPhyr",
+"Astralyia/":"The Astralyian Republic — InterPhyr",
+"Rendale/":"The Kingdom of Rendale — InterPhyr",
+"Doctrines/":"Doctrines — InterPhyr",
+"Relations/":"Outside Relations — InterPhyr",
+"Relations/Eisenreich/":"The Eisenreich — InterPhyr",
+"Relations/Pancake/":"The Royal Kingdom of Pancake — InterPhyr",
+"Relations/Swissland/":"Swissland — InterPhyr",
+"Relations/Luminara/":"Luminara — InterPhyr",
+"Relations/MerchantsUnion/":"Merchants' Union — InterPhyr",
+"Relations/Frostborn/":"The Frostborn — InterPhyr",
+"Projects/":"Projects — InterPhyr",
+"Map/":"World Map — InterPhyr",
+"Government/":"Government Access — InterPhyr",
+"ZapadTelecom/":"ZapadTelecom© — InterPhyr",
+"About/":"About InterPhyr.net — InterPhyr",
 "UpdateLogs/":"Update Logs — InterPhyr"
 };
 
@@ -1017,9 +1707,20 @@ function render(page,ready){
 renderToken++;
 document.title=TITLES[page]||TITLES[""];
 document.body.setAttribute("data-page",page);
-if(page==="News/")renderNews(mainEl,renderToken,ready);
-else if(page==="UpdateLogs/")renderUpdates(mainEl,renderToken,ready);
-else renderHome(mainEl,renderToken,ready);
+var t=renderToken;
+if(page==="News/")renderNews(mainEl,t,ready);
+else if(page==="UpdateLogs/")renderUpdates(mainEl,t,ready);
+else if(page==="Nations/")renderNations(mainEl,t,ready);
+else if(page==="Doctrines/")renderDoctrines(mainEl,t,ready);
+else if(page==="Relations/")renderRelations(mainEl,t,ready);
+else if(page.indexOf("Relations/")===0)renderProfilePage(mainEl,t,ready,page,true);
+else if(/^(ZPR|Astralyia|Rendale)\/$/.test(page))renderProfilePage(mainEl,t,ready,page,false);
+else if(page==="Projects/")renderProjects(mainEl,t,ready);
+else if(page==="ZapadTelecom/")renderInfoPage(mainEl,t,ready,page,"Hosting provider","ZapadTelecom©");
+else if(page==="About/")renderInfoPage(mainEl,t,ready,page,"InterPhyr.net","About InterPhyr.net");
+else if(page==="Map/")renderMap(mainEl,t,ready);
+else if(page==="Government/")renderGovernment(mainEl,t,ready);
+else renderHome(mainEl,t,ready);
 }
 
 function pageOf(url){
@@ -1031,12 +1732,12 @@ function navigate(page,push){
 if(page===currentPage)return;
 currentPage=page;
 if(push)history.pushState({page:page},"",new URL(page,modernRoot).href);
-if(navItems)navItems.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+if(navItems)navItems.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===navPathFor(page));});
 if(menu){
-menu.items.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+menu.items.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===navPathFor(page));});
 /* In the phone menu, the lens slides to the new page first, then the menu melts shut. */
 if(menu.open){
-menu.lens.move(itemFor(menu.items,page));
+menu.lens.move(itemFor(menu.items,navPathFor(page)));
 setTimeout(function(){setMenu(false);},reducedMotion()?0:480);
 }
 }
@@ -1163,6 +1864,11 @@ return;
 }
 if(String(window.INTERPHYR_MAINTENANCE)==="1"&&getCookie("interphyr_admin_session")!=="1"){
 notice("This website is under maintenance","InterPhyr.net is being worked on by ZapadTelecom&copy;. Please try again later.");
+return;
+}
+/* Swissland is blocked from the whole network, in any spelling. */
+if(regionBlocked()){
+blockedNotice();
 return;
 }
 

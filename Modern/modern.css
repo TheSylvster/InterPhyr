@@ -310,3 +310,153 @@ body.modern .m-log-head h3{font-size:21px}
 .m-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
 .m-column{display:flex;flex-direction:column;gap:18px;min-width:0}
 @media (max-width:860px){.m-columns{grid-template-columns:1fr}}
+
+/* ---------- Sub-pages (nations, relations, projects, doctrines, about) ---------- */
+
+/* Top panel with a roundel, flag or logo on the right. */
+.m-hero-with-art{display:flex;align-items:center;gap:40px}
+.m-hero-copy{flex:1;min-width:0;position:relative}
+.m-hero-art{flex-shrink:0;width:180px;display:grid;place-items:center;position:relative}
+.m-hero-art img{display:block;max-width:180px;max-height:170px;width:auto;height:auto;object-fit:contain;filter:drop-shadow(0 18px 30px rgba(0,0,0,.5))}
+/* Flags are rectangles: give them a soft frame like a glass picture. */
+.m-hero-art img[src*="/flags/"]{border-radius:14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+body.modern .m-hero-with-art h1{font-size:clamp(36px,5.2vw,64px)}
+
+/* A link at the bottom of a card ("View profile ->"). */
+.m-card-more{display:inline-flex;align-items:center;gap:6px;margin-top:auto;padding-top:6px;font-size:14px;font-weight:600}
+.m-card-more span{transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.m-card-more:hover span{transform:translateX(4px)}
+
+/* Relation and status colours. */
+.m-tone{display:inline-block;padding:2px 10px;border-radius:999px;font-size:13px;font-weight:600;line-height:1.5;background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1)}
+.m-tone::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;vertical-align:1px;background:currentColor;box-shadow:0 0 8px currentColor}
+.m-tone-excellent{color:#38e8a0}
+.m-tone-good{color:#6fe07a}
+.m-tone-positive{color:#b6e35a}
+.m-tone-neutral{color:#ffd166}
+.m-tone-hostile{color:#ff6b5b}
+.m-tone-none{color:rgba(255,255,255,.55)}
+.m-tone-member{color:#8fb0ff}
+.m-tone a{color:inherit}
+
+/* Text cards: headings, paragraphs and lists from the classic page. */
+.m-prose{display:flex;flex-direction:column}
+body.modern .m-prose h3{margin:0 0 8px;font-size:18px}
+.m-prose>p,.m-prose>ul{margin:0 0 14px;color:var(--m-text)}
+.m-prose>:last-child{margin-bottom:0}
+.m-prose ul{padding-left:20px}
+.m-prose li{margin:4px 0}
+.m-prose .small,.m-block .small{font-size:13px;color:var(--m-faint)}
+.m-prose .m-callout{margin:4px 0 14px}
+
+/* Blocks side by side inside a card (doctrines, groups of members, versions). */
+.m-blocks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:4px 0 14px}
+.m-blocks-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.m-blocks:last-child{margin-bottom:0}
+/* Versions are read in order, newest first, so they stack. */
+#release-notes .m-blocks{grid-template-columns:1fr}
+.m-block{padding:18px 20px;border-radius:20px;background:rgba(255,255,255,.05);box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 0 0 1px rgba(255,255,255,.06)}
+.m-block p,.m-block ul{margin:0 0 8px}
+.m-block>:last-child{margin-bottom:0}
+.m-block ul{padding-left:18px}
+.m-block .doctrine-users{display:inline-block;margin:0 0 10px;padding:3px 11px;border-radius:11px;font-size:12px;font-weight:600;color:var(--m-muted);background:rgba(255,255,255,.08)}
+
+/* Videos and pictures from old-style windows (the ZapadTV(c) anthem player). */
+.m-media{margin:4px 0 14px;padding:0}
+.m-media video,.m-media img{display:block;width:100%;max-width:720px;border-radius:18px;background:#000;box-shadow:0 20px 50px -20px rgba(0,0,0,.8),inset 0 0 0 1px rgba(255,255,255,.12)}
+.m-media figcaption{margin-top:10px;font-size:13px;color:var(--m-faint)}
+
+/* Callouts (Ministry assessments, archived pages, notices). */
+.m-callout-body{min-width:0}
+.m-callout-label{display:block;margin-bottom:2px;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--m-muted)}
+.m-callout-info .m-callout-icon{background:linear-gradient(135deg,var(--m-blue),var(--m-violet));font-family:Georgia,serif;font-style:italic}
+.m-callout-archived .m-callout-icon{background:linear-gradient(135deg,#8a8fa8,#5d6380)}
+.m-callout-archived{box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.m-callout.m-section{margin-top:22px}
+
+/* Profiles (nations, projects, offices). */
+.m-profile{display:flex;flex-direction:column;gap:14px}
+/* No line above the first row when the card starts with its facts. */
+.m-profile>.m-facts:first-child>div:first-child{border-top:0;padding-top:0}
+body.modern .m-profile .m-nation-head h3{font-size:20px}
+.m-profile .m-callout{margin-top:4px}
+.m-nation-head img[src*="/flags/"]{width:76px;height:52px;border-radius:10px;object-fit:cover}
+
+/* Outside Relations cards: the whole card is a link. */
+a.m-relation{display:flex;flex-direction:column;gap:14px;color:var(--m-text)!important;text-decoration:none!important;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+a.m-relation:hover{transform:translateY(-4px)}
+a.m-relation h3{margin:0}
+.m-relation .m-small{display:block;margin-top:2px}
+.m-noflag{flex-shrink:0;width:76px;height:52px;display:grid;place-items:center;border-radius:10px;border:1px dashed rgba(255,255,255,.3);font-size:10px;line-height:1.2;text-align:center;color:var(--m-faint)}
+
+/* A card with one button (Doctrines on the Nations page). */
+.m-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px 28px}
+.m-cta p{flex:1 1 320px;margin:0}
+
+/* Related links as glass chips. */
+.m-chips{display:flex;flex-wrap:wrap;gap:10px}
+body.modern .m-chip{display:inline-flex;align-items:center;padding:9px 16px;border-radius:999px;font-size:14px;font-weight:600;color:#fff;background:rgba(255,255,255,.08);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),inset 0 0 0 1px rgba(255,255,255,.08);text-decoration:none;transition:background .2s,transform .35s cubic-bezier(.2,.8,.2,1)}
+body.modern .m-chip:hover{background:rgba(255,255,255,.16);transform:translateY(-2px);text-decoration:none}
+.m-chip.soon-link{border-bottom:0;color:var(--m-muted)}
+
+/* Forms (nation registration, reports, Government logon). */
+.m-register{text-align:left}
+body.modern .m-register h1{font-size:30px;margin-bottom:10px}
+.m-form{display:flex;flex-direction:column;gap:16px;margin-top:6px}
+.m-field{display:flex;flex-direction:column;gap:7px;margin:0;padding:0;border:0;font-size:14px;font-weight:600;color:var(--m-muted)}
+.m-register .m-field{margin-top:18px}
+.m-field legend{padding:0;margin-bottom:8px}
+body.modern .m-field input,body.modern .m-field select,body.modern .m-field textarea{width:100%;box-sizing:border-box;padding:12px 16px;border:0;border-radius:16px;font:inherit;font-weight:500;color:#fff;background:rgba(0,0,10,.28);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.12);outline:none;transition:box-shadow .2s ease,background .2s ease}
+body.modern .m-field textarea{resize:vertical;min-height:110px}
+body.modern .m-field select{appearance:none;-webkit-appearance:none;background-image:linear-gradient(45deg,transparent 50%,rgba(255,255,255,.7) 50%),linear-gradient(135deg,rgba(255,255,255,.7) 50%,transparent 50%);background-position:calc(100% - 22px) 52%,calc(100% - 16px) 52%;background-size:6px 6px;background-repeat:no-repeat;padding-right:40px}
+body.modern .m-field select option{color:#000}
+body.modern .m-field input:focus,body.modern .m-field select:focus,body.modern .m-field textarea:focus{background:rgba(0,0,10,.36);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),inset 0 0 0 1.5px rgba(150,175,255,.75),0 0 0 4px rgba(91,124,255,.18)}
+body.modern .m-field input[readonly]{color:var(--m-muted)}
+.m-field input::placeholder,.m-field textarea::placeholder{color:var(--m-faint)}
+.m-choices{display:flex;flex-wrap:wrap;gap:10px}
+.m-choice,.m-check{display:inline-flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--m-text)}
+.m-choice{padding:8px 14px;border-radius:999px;background:rgba(255,255,255,.06);box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);transition:background .2s}
+.m-choice:has(input:checked){background:rgba(91,124,255,.28);box-shadow:inset 0 0 0 1px rgba(150,175,255,.55)}
+.m-choice{white-space:nowrap}
+/* Glass radio buttons and tick boxes. */
+body.modern .m-choice input,body.modern .m-check input{-webkit-appearance:none;appearance:none;flex-shrink:0;width:20px;height:20px;margin:0;border-radius:50%;background:rgba(0,0,10,.3);box-shadow:inset 0 1px 2px rgba(0,0,0,.45),inset 0 0 0 1.5px rgba(255,255,255,.4);cursor:pointer;transition:background .2s ease,box-shadow .2s ease}
+body.modern .m-check input{border-radius:6px}
+body.modern .m-choice input:checked{background:radial-gradient(circle,#fff 0 4px,transparent 4.5px),linear-gradient(135deg,var(--m-blue),var(--m-violet));box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 0 12px rgba(123,140,255,.6)}
+body.modern .m-check input:checked{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3.2 3.2L15 7' fill='none' stroke='%23fff' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/100% no-repeat,linear-gradient(135deg,var(--m-blue),var(--m-violet));box-shadow:inset 0 0 0 1px rgba(255,255,255,.35),0 0 12px rgba(123,140,255,.6)}
+body.modern .m-choice input:focus-visible,body.modern .m-check input:focus-visible{outline:2px solid rgba(150,175,255,.8);outline-offset:2px}
+.m-form .m-actions{margin-top:0}
+.m-form-error{min-height:1.2em;margin:0;font-size:14px;font-weight:600;color:#ff8a78}
+.m-register .m-form-error{margin-top:8px}
+.m-register .m-actions{margin-top:8px}
+.m-register .m-small{margin:16px 0 0}
+button.m-btn{font:inherit;font-size:15px;font-weight:600;cursor:pointer}
+button.m-btn:disabled{opacity:.6;cursor:default;transform:none}
+
+/* Glass dialogs: the page behind dims and softens, the panel rises in. */
+.m-dialog-backdrop{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:20px;background:rgba(4,6,18,0);-webkit-backdrop-filter:blur(0);backdrop-filter:blur(0);transition:background .3s ease,backdrop-filter .3s ease,-webkit-backdrop-filter .3s ease}
+.m-dialog-backdrop.open{background:rgba(4,6,18,.45);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.m-dialog{width:min(480px,100%);max-height:calc(100vh - 40px);overflow:auto;padding:30px 32px;opacity:0;transform:translateY(24px) scale(.96);transition:opacity .3s ease,transform .45s cubic-bezier(.2,1.2,.3,1)}
+.m-dialog-backdrop.open .m-dialog{opacity:1;transform:none}
+.m-dialog-backdrop.closing .m-dialog{opacity:0;transform:translateY(12px) scale(.97);transition:opacity .22s ease,transform .25s ease}
+.m-dialog-body{display:flex;flex-direction:column}
+body.modern .m-dialog-body h2{margin-bottom:10px}
+.m-dialog-art{width:64px;height:64px;object-fit:contain;margin-bottom:14px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.5))}
+.m-dialog-body .m-facts{margin:6px 0 14px}
+.m-dialog-body .m-actions{justify-content:flex-end;margin-top:8px}
+
+/* Footer links. */
+.m-footer-links{display:flex;gap:16px}
+
+@media (max-width:860px){
+.m-blocks,.m-blocks-2{grid-template-columns:1fr}
+.m-hero-with-art{flex-direction:column-reverse;align-items:flex-start;gap:20px}
+.m-hero-art{width:auto;place-items:start}
+.m-hero-art img{max-width:120px;max-height:110px}
+}
+@media (max-width:600px){
+.m-dialog{padding:24px 22px}
+.m-footer-links{flex-wrap:wrap;gap:10px 16px}
+}
+@media (prefers-reduced-motion:reduce){
+.m-dialog-backdrop,.m-dialog,a.m-relation,.m-chip,.m-card-more span{transition:none}
+}

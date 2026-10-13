@@ -127,22 +127,25 @@ body.modern .m-card>h2{margin-bottom:14px}
 /* Room above and below the menu, so the lens can swell while it moves. */
 .m-nav{position:relative;display:flex;margin:-10px -10px -10px auto;padding:10px}
 /* The real menu text is cut out under the lens, where its refracted copy shows instead. */
-.m-nav-items{display:flex;gap:4px;-webkit-mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px));mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px))}
+.m-nav-items{display:flex;gap:4px}
+.m-lens-cut-x{-webkit-mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px));mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px))}
+.m-lens-cut-y{-webkit-mask-image:linear-gradient(180deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px));mask-image:linear-gradient(180deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px))}
 .m-nav::-webkit-scrollbar{display:none}
-body.modern .m-nav a,.m-nav-soon,.m-nav-track>span{padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;color:var(--m-muted);text-decoration:none!important;transition:background .2s,color .2s}
+body.modern .m-nav a,.m-nav-soon{padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;color:var(--m-muted);text-decoration:none!important;transition:background .2s,color .2s}
 body.modern .m-nav a:hover{background:rgba(255,255,255,.1);color:#fff}
 body.modern .m-nav a.active{color:#fff}
 body.modern .m-nav a.active:hover{background:none}
 /* The sliding glass lens that marks the current page (see modern.js). */
-.m-nav-pill{position:absolute;left:0;top:0;z-index:2;border-radius:999px;overflow:hidden;pointer-events:none;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(255,255,255,.2),inset 0 0 10px rgba(255,255,255,.12),0 4px 12px rgba(0,0,0,.34);will-change:transform,width,height}
+.m-lens{position:absolute;left:0;top:0;z-index:2;border-radius:999px;overflow:hidden;pointer-events:none;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(255,255,255,.2),inset 0 0 10px rgba(255,255,255,.12),0 4px 12px rgba(0,0,0,.34);will-change:transform,width,height}
 /* A faint rainbow fringe around the rim, like light split by thick glass. */
-.m-nav-pill::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1.5px;background:conic-gradient(from 200deg,rgba(255,90,90,0),rgba(255,140,60,.6) 8%,rgba(255,230,90,0) 22%,rgba(255,255,255,0) 45%,rgba(80,190,255,.55) 62%,rgba(170,100,255,.5) 72%,rgba(255,90,90,0) 86%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:blur(.3px)}
+.m-lens::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1.5px;background:conic-gradient(from 200deg,rgba(255,90,90,0),rgba(255,140,60,.6) 8%,rgba(255,230,90,0) 22%,rgba(255,255,255,0) 45%,rgba(80,190,255,.55) 62%,rgba(170,100,255,.5) 72%,rgba(255,90,90,0) 86%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:blur(.3px)}
 /* The shine across the top of the glass. */
-.m-nav-pill::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.04) 45%,rgba(255,255,255,0) 60%,rgba(255,255,255,.08));pointer-events:none}
+.m-lens::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.04) 45%,rgba(255,255,255,0) 60%,rgba(255,255,255,.08));pointer-events:none}
 /* Larger than the lens, so the rim has something to bend in (the lens clips it). */
-.m-nav-lens{position:absolute;inset:-14px;z-index:1;filter:url(#m-lens)}
-.m-nav-track{position:absolute;left:0;top:0;display:flex;gap:4px;transform-origin:0 0}
-body.modern .m-nav-track>*{color:#fff;background:none}
+.m-lens-inner{position:absolute;inset:-14px;z-index:1}
+.m-lens-track{position:absolute;left:0;top:0;transform-origin:0 0;-webkit-mask-image:none;mask-image:none}
+body.modern .m-lens-copy{color:#fff;background:none;box-shadow:none}
+.m-menu-links .m-lens{opacity:var(--lens-appear,1)}
 
 .m-nav-soon{color:var(--m-faint);cursor:default}
 
@@ -224,7 +227,7 @@ body.modern .m-story-featured h3{font-size:26px}
 .m-menu-links{position:absolute;inset:0;padding:56px 10px 0;display:flex;flex-direction:column;pointer-events:auto}
 .m-menu:not(.open) .m-menu-links{pointer-events:none}
 body.modern .m-menu-links a,.m-menu-soon{display:flex;align-items:center;justify-content:space-between;height:46px;padding:0 14px;border-radius:14px;font-size:16px;font-weight:600;color:#fff;text-decoration:none}
-body.modern .m-menu-links a.active{background:rgba(255,255,255,.14);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.m-menu-items{display:flex;flex-direction:column}
 .m-menu-soon{color:var(--m-faint);font-weight:500}
 .m-menu-soon small{font-size:11px;letter-spacing:.08em;text-transform:uppercase}
 
@@ -258,7 +261,7 @@ body.modern .m-notice h1{font-size:32px;margin-bottom:12px}
 .m-nav{display:none}
 .m-topbar{margin-right:56px}
 .m-menu{display:block}
-body.modern .m-nav a,.m-nav-soon,.m-nav-track>span{padding:7px 11px;font-size:13px}
+body.modern .m-nav a,.m-nav-soon{padding:7px 11px;font-size:13px}
 .m-card{padding:22px 20px}
 .m-hero .m-lead{font-size:17px}
 .m-section{margin-top:40px}

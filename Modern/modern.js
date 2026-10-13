@@ -273,33 +273,35 @@ if(item.path===page)link.className="active";
 items.appendChild(link);
 });
 bar.appendChild(nav);
-addPill(nav);
+navItems=items;
+navLens=makeLens(nav,items,"x");
 return bar;
 }
 
 /*
- * ---------- The sliding glass lens in the menu ----------
+ * ---------- Clear liquid-glass lenses (sliding highlights) ----------
  *
- * One glass "lens" marks the current page and slides to the next one,
- * stretching a little on the way like liquid. Inside it is a copy of
- * the menu text, kept lined up with the real text and bent by an SVG
- * refraction filter: barely at rest, strongly while it travels.
+ * A lens marks the selected item in a menu and slides to the next one,
+ * stretching a little on the way like liquid. It is CLEAR glass (no
+ * frosted fill): a bright rim, a faint rainbow fringe, a soft shadow,
+ * and inside it a copy of the menu text, lined up with the real text
+ * and bent by an SVG refraction filter: barely at rest, strongly while
+ * it travels. Used by the menu bar (sideways) and the phone menu (up
+ * and down). Every slider like this must use makeLens.
  */
 
-var pill=null;
-var pillX=0,pillW=0;
-var pillAnim=0;
 /* How far the rim bends things, in pixels: a little at rest, more while moving. */
 var LENS_REST=5,LENS_MOVING=26;
 /* The refracted copy reaches this far past the edge of the lens. */
 var LENS_BLEED=14;
+var lensMapURL=null,lensCount=0;
 
-function lensFilter(){
-if(document.getElementById("m-lens"))return;
 /*
- * A refraction map: no bending in the middle, more and more towards
+ * The refraction map: no bending in the middle, more and more towards
  * the rim, where the glass bends in what is just outside it.
  */
+function lensMap(){
+if(lensMapURL)return lensMapURL;
 var canvas=document.createElement("canvas");
 canvas.width=128;canvas.height=48;
 var c=canvas.getContext("2d");
@@ -315,99 +317,101 @@ img.data[k+3]=255;
 }
 }
 c.putImageData(img,0,0);
-var holder=document.createElement("div");
-holder.innerHTML=
-'<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'+
-/* Sized in pixels to the lens on every frame (see drawPill): relative sizes place the map wrongly in Chrome. */
-'<filter id="m-lens" x="0" y="0" width="100" height="40" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'+
-'<feImage href="'+canvas.toDataURL()+'" x="0" y="0" width="100" height="40" preserveAspectRatio="none" result="map"/>'+
-'<feDisplacementMap in="SourceGraphic" in2="map" scale="'+LENS_REST+'" xChannelSelector="R" yChannelSelector="G"/>'+
-'</filter></svg>';
-document.body.appendChild(holder.firstChild);
-}
-
-function sizeLens(width,height){
-var filter=document.getElementById("m-lens");
-if(!filter)return;
-var map=filter.querySelector("feImage");
-width=Math.ceil(width);height=Math.ceil(height);
-filter.setAttribute("width",width);filter.setAttribute("height",height);
-map.setAttribute("width",width);map.setAttribute("height",height);
-}
-
-function setLens(amount){
-var map=document.querySelector("#m-lens feDisplacementMap");
-if(map)map.setAttribute("scale",amount.toFixed(1));
-}
-
-function addPill(nav){
-pill=el("span","m-nav-pill");
-pill.setAttribute("aria-hidden","true");
-var lens=el("span","m-nav-lens");
-var track=el("span","m-nav-track");
-nav.querySelectorAll(".m-nav-items > *").forEach(function(item){
-var copy=el("span",null,item.innerHTML);
-track.appendChild(copy);
-});
-lens.appendChild(track);
-pill.appendChild(lens);
-nav.insertBefore(pill,nav.firstChild);
-pill.track=track;
-pill.items=nav.querySelector(".m-nav-items");
-pill.lens=lens;
-}
-
-function navItem(page){
-if(!pill)return null;
-var links=pill.items.querySelectorAll(":scope > a");
-for(var i=0;i<links.length;i++){
-if(links[i].getAttribute("data-path")===page)return links[i];
-}
-return null;
+lensMapURL=canvas.toDataURL();
+return lensMapURL;
 }
 
 /*
- * Draws the lens at x with width w over a menu item. "bulge" (0 to 1)
- * is how far into a move it is: the lens swells and magnifies more.
+ * host: the positioned element the lens sits in.
+ * items: the element holding the menu items (inside host).
+ * axis: "x" for a row of items, "y" for a column.
  */
-function drawPill(x,w,item,bulge){
+function makeLens(host,items,axis){
+lensCount++;
+var id="m-lens-"+lensCount;
+var holder=document.createElement("div");
+holder.innerHTML=
+'<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'+
+/* Sized in pixels to the lens on every frame: relative sizes place the map wrongly in Chrome. */
+'<filter id="'+id+'" x="0" y="0" width="100" height="40" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'+
+'<feImage href="'+lensMap()+'" x="0" y="0" width="100" height="40" preserveAspectRatio="none" result="map"/>'+
+'<feDisplacementMap in="SourceGraphic" in2="map" scale="'+LENS_REST+'" xChannelSelector="R" yChannelSelector="G"/>'+
+'</filter></svg>';
+var svg=holder.firstChild;
+document.body.appendChild(svg);
+var filter=svg.querySelector("filter"),map=svg.querySelector("feImage"),bend=svg.querySelector("feDisplacementMap");
+
+var glass=el("span","m-lens");
+glass.setAttribute("aria-hidden","true");
+var inner=el("span","m-lens-inner");
+inner.style.filter="url(#"+id+")";
+/* The copy: the whole menu, cloned, so it has exactly the same layout. */
+var track=items.cloneNode(true);
+track.removeAttribute("style");
+track.classList.remove("m-lens-cut-x","m-lens-cut-y");
+track.classList.add("m-lens-track");
+track.querySelectorAll("*").forEach(function(node){
+node.removeAttribute("id");
+node.removeAttribute("href");
+node.removeAttribute("title");
+node.removeAttribute("data-path");
+node.removeAttribute("tabindex");
+node.classList.remove("active");
+node.classList.add("m-lens-copy");
+});
+inner.appendChild(track);
+glass.appendChild(inner);
+host.insertBefore(glass,host.firstChild);
+items.classList.add(axis==="y"?"m-lens-cut-y":"m-lens-cut-x");
+
+var lens={el:glass,x:0,y:0,w:0,h:0,anim:0};
+
+function setBend(amount){bend.setAttribute("scale",amount.toFixed(1));}
+
+/* Draws the lens; "bulge" (0 to 1) is how far into a move it is: it swells and magnifies more. */
+function draw(x,y,w,h,bulge){
 bulge=bulge||0;
-var h=item.offsetHeight,grow=h*0.16*bulge;
-var ph=h+grow,py=item.offsetTop-grow/2;
-pill.style.width=w+"px";
-pill.style.height=ph+"px";
-pill.style.transform="translate("+x+"px,"+py+"px)";
-/* The copied text: lined up with the real text, magnified around the lens centre. */
-var items=pill.items,ox=items.offsetLeft,oy=items.offsetTop;
-var cx=w/2,cy=ph/2,scale=1+0.12*bulge;
-pill.track.style.transform="translate("+(cx+LENS_BLEED)+"px,"+(cy+LENS_BLEED)+"px) scale("+scale+") translate("+(ox-x-cx)+"px,"+(oy-py-cy)+"px)";
+if(axis==="x"){var gy=h*0.16*bulge;y-=gy/2;h+=gy;}
+else{var gx=w*0.04*bulge;x-=gx/2;w+=gx;}
+glass.style.width=w+"px";
+glass.style.height=h+"px";
+glass.style.transform="translate("+x+"px,"+y+"px)";
+var ox=items.offsetLeft,oy=items.offsetTop;
+var cx=w/2,cy=h/2,scale=1+0.12*bulge;
+track.style.width=items.offsetWidth+"px";
+track.style.transform="translate("+(cx+LENS_BLEED)+"px,"+(cy+LENS_BLEED)+"px) scale("+scale+") translate("+(ox-x-cx)+"px,"+(oy-y-cy)+"px)";
 /* The refraction map covers the whole lens, including the part past its edge. */
-sizeLens(w+LENS_BLEED*2,ph+LENS_BLEED*2);
-/* Hide the real text under the lens. */
+var mw=Math.ceil(w+LENS_BLEED*2),mh=Math.ceil(h+LENS_BLEED*2);
+filter.setAttribute("width",mw);filter.setAttribute("height",mh);
+map.setAttribute("width",mw);map.setAttribute("height",mh);
+/* Hide the real text under the lens, where its refracted copy shows instead. */
+if(axis==="x"){
 items.style.setProperty("--cut-a",(x-ox+1)+"px");
 items.style.setProperty("--cut-b",(x-ox+w-1)+"px");
+}else{
+items.style.setProperty("--cut-a",(y-oy+1)+"px");
+items.style.setProperty("--cut-b",(y-oy+h-1)+"px");
+}
 }
 
-function placePill(page){
-var item=navItem(page);
-if(!item){if(pill)pill.style.opacity="0";return;}
-cancelAnimationFrame(pillAnim);
-pill.style.opacity="1";
-pillX=item.offsetLeft;
-pillW=item.offsetWidth;
-drawPill(pillX,pillW,item);
-setLens(LENS_REST);
-}
+lens.place=function(item){
+cancelAnimationFrame(lens.anim);
+if(!item){glass.style.opacity="0";return;}
+glass.style.opacity="";
+lens.x=item.offsetLeft;lens.y=item.offsetTop;lens.w=item.offsetWidth;lens.h=item.offsetHeight;
+draw(lens.x,lens.y,lens.w,lens.h,0);
+setBend(LENS_REST);
+};
 
-function movePill(page){
-var item=navItem(page);
+lens.move=function(item){
 if(!item)return;
-if(window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches){placePill(page);return;}
-cancelAnimationFrame(pillAnim);
-pill.style.opacity="1";
-var fromX=pillX,fromW=pillW;
-var toX=item.offsetLeft,toW=item.offsetWidth;
-var distance=Math.abs(toX-fromX);
+if(reducedMotion()||!lens.w){lens.place(item);return;}
+cancelAnimationFrame(lens.anim);
+glass.style.opacity="";
+var from=axis==="x"?{a:lens.x,s:lens.w}:{a:lens.y,s:lens.h};
+var to=axis==="x"?{a:item.offsetLeft,s:item.offsetWidth}:{a:item.offsetTop,s:item.offsetHeight};
+var other=axis==="x"?{a:item.offsetTop,s:item.offsetHeight}:{a:item.offsetLeft,s:item.offsetWidth};
+var distance=Math.abs(to.a-from.a);
 var duration=Math.min(650,320+distance*0.9);
 var started=performance.now();
 function frame(now){
@@ -422,23 +426,41 @@ var lead=1+1.9*Math.pow(p-1,3)+0.9*Math.pow(p-1,2);
 var trail=1-Math.pow(1-t,3);
 if(distance>0)trail=Math.max(trail,lead-40/distance);
 var bulge=Math.sin(Math.PI*t);
-var left,right;
-if(toX>=fromX){
-right=fromX+fromW+(toX+toW-fromX-fromW)*lead;
-left=fromX+(toX-fromX)*trail;
+var start,end;
+if(to.a>=from.a){
+end=from.a+from.s+(to.a+to.s-from.a-from.s)*lead;
+start=from.a+(to.a-from.a)*trail;
 }else{
-left=fromX+(toX-fromX)*lead;
-right=fromX+fromW+(toX+toW-fromX-fromW)*trail;
+start=from.a+(to.a-from.a)*lead;
+end=from.a+from.s+(to.a+to.s-from.a-from.s)*trail;
 }
-var x=left,w=Math.max(item.offsetHeight,right-left);
-pillX=x;pillW=w;
-drawPill(x,w,item,bulge);
-setLens(LENS_REST+(LENS_MOVING-LENS_REST)*bulge);
-if(t<1)pillAnim=requestAnimationFrame(frame);
-else{pillX=toX;pillW=toW;drawPill(toX,toW,item);setLens(LENS_REST);}
+var size=Math.max(Math.min(from.s,to.s)*0.6,end-start);
+if(axis==="x"){lens.x=start;lens.w=size;draw(start,other.a,size,other.s,bulge);}
+else{lens.y=start;lens.h=size;draw(other.a,start,other.s,size,bulge);}
+setBend(LENS_REST+(LENS_MOVING-LENS_REST)*bulge);
+if(t<1)lens.anim=requestAnimationFrame(frame);
+else lens.place(item);
 }
-pillAnim=requestAnimationFrame(frame);
+lens.anim=requestAnimationFrame(frame);
+};
+
+return lens;
 }
+
+/* The menu item for a page, in a list of items. */
+function itemFor(items,page){
+var links=items.querySelectorAll(":scope > a");
+for(var i=0;i<links.length;i++){
+if(links[i].getAttribute("data-path")===page)return links[i];
+}
+return null;
+}
+
+var navLens=null,navItems=null;
+
+function placePill(page){if(navLens)navLens.place(itemFor(navItems,page));}
+function movePill(page){if(navLens)navLens.move(itemFor(navItems,page));}
+
 
 function footer(){
 var f=el("footer","m-footer glass");
@@ -682,6 +704,8 @@ box.innerHTML=
 '<button type="button" class="m-menu-button" aria-label="Menu" aria-expanded="false"><span></span><span></span></button>';
 var links=el("nav","m-menu-links");
 links.setAttribute("aria-label","Main");
+var rows=el("div","m-menu-items");
+links.appendChild(rows);
 NAV.forEach(function(item){
 var row;
 if(item.path==null){
@@ -692,11 +716,11 @@ row.href=new URL(item.path,modernRoot).href;
 row.setAttribute("data-path",item.path);
 if(item.path===page)row.className="active";
 }
-links.appendChild(row);
+rows.appendChild(row);
 });
 box.appendChild(links);
 document.body.appendChild(box);
-menu={box:box,links:links,open:false,amount:0,anim:0,
+menu={box:box,links:links,items:rows,lens:makeLens(links,rows,"y"),open:false,amount:0,anim:0,
 glass:box.querySelector(".m-menu-glass"),
 rim:box.querySelector(".m-menu-rim path"),
 shadow:box.querySelector(".m-menu-shadow path"),
@@ -747,7 +771,7 @@ return "M"+n(cx)+","+n(cy-r)+
 }
 
 function menuSize(){
-var count=menu.links.children.length;
+var count=menu.items.children.length;
 return {W:Math.min(260,window.innerWidth-32),H:2*MENU_R+12+count*MENU_ITEM+14};
 }
 
@@ -765,7 +789,9 @@ menu.links.style.webkitClipPath="path('"+d+"')";
 menu.rim.setAttribute("d",d);
 menu.shadow.setAttribute("d",d);
 /* The links appear once the panel is mostly open, one after another. */
-Array.prototype.forEach.call(menu.links.children,function(row,i){
+/* The lens fades in with the links. */
+menu.links.style.setProperty("--lens-appear",Math.max(0,Math.min(1,(amount-0.5)/0.3)));
+Array.prototype.forEach.call(menu.items.children,function(row,i){
 var show=Math.max(0,Math.min(1,(amount-0.45-i*0.05)/0.35));
 row.style.opacity=show;
 row.style.transform="translateY("+((1-show)*-8)+"px)";
@@ -779,6 +805,8 @@ if(!menu||open===menu.open)return;
 menu.open=open;
 menu.button.setAttribute("aria-expanded",open?"true":"false");
 menu.box.classList.toggle("opening",open);
+/* Put the lens on the current page before the panel opens. */
+if(open)menu.lens.place(itemFor(menu.items,currentPage));
 cancelAnimationFrame(menu.anim);
 if(reducedMotion()){menu.amount=open?1:0;drawMenu(menu.amount);return;}
 var from=menu.amount,to=open?1:0;
@@ -847,10 +875,14 @@ function navigate(page,push){
 if(page===currentPage)return;
 currentPage=page;
 if(push)history.pushState({page:page},"",new URL(page,modernRoot).href);
-if(pill)pill.items.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+if(navItems)navItems.querySelectorAll(":scope > a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
 if(menu){
-setMenu(false);
-menu.links.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+menu.items.querySelectorAll("a").forEach(function(a){a.classList.toggle("active",a.getAttribute("data-path")===page);});
+/* In the phone menu, the lens slides to the new page first, then the menu melts shut. */
+if(menu.open){
+menu.lens.move(itemFor(menu.items,page));
+setTimeout(function(){setMenu(false);},reducedMotion()?0:480);
+}
 }
 movePill(page);
 var wait=reducedMotion()?0:220;
@@ -922,7 +954,6 @@ function start(){
 if(takenOver())return;
 var page=document.body.getAttribute("data-page")||"";
 document.body.insertBefore(backdrop(),document.body.firstChild);
-lensFilter();
 var shell=el("div","m-shell");
 shell.appendChild(topbar(page));
 mainEl=el("main");

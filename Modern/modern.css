@@ -115,7 +115,7 @@ body.modern .m-card>h2{margin-bottom:14px}
 .m-brand{display:flex;align-items:center;gap:10px;color:#fff!important;font-weight:700;font-size:18px;letter-spacing:-.02em;text-decoration:none!important;white-space:nowrap}
 .m-brand-mark{width:26px;height:26px;border-radius:50%;background:conic-gradient(from 200deg,var(--m-blue),var(--m-violet),var(--m-red),var(--m-teal),var(--m-blue));box-shadow:0 0 18px rgba(154,91,255,.6),inset 0 0 0 2px rgba(255,255,255,.35)}
 /* Room above and below the menu, so the lens can swell while it moves. */
-.m-nav{position:relative;display:flex;margin:-6px -4px -6px auto;padding:6px 4px;overflow-x:auto;scrollbar-width:none}
+.m-nav{position:relative;display:flex;margin:-10px -10px -10px auto;padding:10px}
 /* The real menu text is cut out under the lens, where its refracted copy shows instead. */
 .m-nav-items{display:flex;gap:4px;-webkit-mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px));mask-image:linear-gradient(90deg,#000 var(--cut-a,0px),transparent var(--cut-a,0px),transparent var(--cut-b,0px),#000 var(--cut-b,0px))}
 .m-nav::-webkit-scrollbar{display:none}
@@ -124,12 +124,13 @@ body.modern .m-nav a:hover{background:rgba(255,255,255,.1);color:#fff}
 body.modern .m-nav a.active{color:#fff}
 body.modern .m-nav a.active:hover{background:none}
 /* The sliding glass lens that marks the current page (see modern.js). */
-.m-nav-pill{position:absolute;left:0;top:0;z-index:2;border-radius:999px;pointer-events:none;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(255,255,255,.2),inset 0 0 10px rgba(255,255,255,.12),0 6px 18px rgba(0,0,0,.38);will-change:transform,width,height}
+.m-nav-pill{position:absolute;left:0;top:0;z-index:2;border-radius:999px;overflow:hidden;pointer-events:none;background:rgba(255,255,255,.035);box-shadow:inset 0 1px 1px rgba(255,255,255,.7),inset 0 -1px 1px rgba(255,255,255,.2),inset 0 0 10px rgba(255,255,255,.12),0 4px 12px rgba(0,0,0,.34);will-change:transform,width,height}
 /* A faint rainbow fringe around the rim, like light split by thick glass. */
 .m-nav-pill::before{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;padding:1.5px;background:conic-gradient(from 200deg,rgba(255,90,90,0),rgba(255,140,60,.6) 8%,rgba(255,230,90,0) 22%,rgba(255,255,255,0) 45%,rgba(80,190,255,.55) 62%,rgba(170,100,255,.5) 72%,rgba(255,90,90,0) 86%);-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;filter:blur(.3px)}
 /* The shine across the top of the glass. */
 .m-nav-pill::after{content:"";position:absolute;inset:0;z-index:2;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.26),rgba(255,255,255,.04) 45%,rgba(255,255,255,0) 60%,rgba(255,255,255,.08));pointer-events:none}
-.m-nav-lens{position:absolute;inset:0;z-index:1;overflow:hidden;border-radius:inherit;filter:url(#m-lens)}
+/* Larger than the lens, so the rim has something to bend in (the lens clips it). */
+.m-nav-lens{position:absolute;inset:-14px;z-index:1;filter:url(#m-lens)}
 .m-nav-track{position:absolute;left:0;top:0;display:flex;gap:4px;transform-origin:0 0}
 body.modern .m-nav-track>*{color:#fff;background:none}
 
@@ -212,6 +213,8 @@ body.modern .m-notice h1{font-size:32px;margin-bottom:12px}
 /* ---------- Phones and tablets ---------- */
 
 @media (max-width:860px){
+/* Narrow screens: the menu scrolls sideways when it does not fit. */
+.m-nav{overflow-x:auto;scrollbar-width:none}
 .m-grid-3{grid-template-columns:1fr}
 .m-grid-2{grid-template-columns:1fr}
 .m-hero{padding:38px 28px 34px}

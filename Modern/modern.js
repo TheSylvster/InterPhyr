@@ -152,11 +152,17 @@ return bar;
 var pill=null;
 var pillX=0,pillW=0;
 var pillAnim=0;
-var LENS_REST=0.05,LENS_MOVING=0.2;
+/* How far the rim bends things, in pixels: a little at rest, more while moving. */
+var LENS_REST=5,LENS_MOVING=26;
+/* The refracted copy reaches this far past the edge of the lens. */
+var LENS_BLEED=14;
 
 function lensFilter(){
 if(document.getElementById("m-lens"))return;
-/* A refraction map: no bending in the middle, more towards the rim. */
+/*
+ * A refraction map: no bending in the middle, more and more towards
+ * the rim, where the glass bends in what is just outside it.
+ */
 var canvas=document.createElement("canvas");
 canvas.width=128;canvas.height=48;
 var c=canvas.getContext("2d");
@@ -165,8 +171,8 @@ for(var j=0;j<48;j++){
 for(var i=0;i<128;i++){
 var u=i/127*2-1,v=j/47*2-1;
 var k=(j*128+i)*4;
-img.data[k]=128-Math.sign(u)*Math.pow(Math.abs(u),3)*127;
-img.data[k+1]=128-Math.sign(v)*Math.pow(Math.abs(v),3)*127;
+img.data[k]=128+Math.sign(u)*Math.pow(Math.abs(u),3)*127;
+img.data[k+1]=128+Math.sign(v)*Math.pow(Math.abs(v),3)*127;
 img.data[k+2]=128;
 img.data[k+3]=255;
 }
@@ -175,16 +181,26 @@ c.putImageData(img,0,0);
 var holder=document.createElement("div");
 holder.innerHTML=
 '<svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">'+
-'<filter id="m-lens" x="0" y="0" width="1" height="1" primitiveUnits="objectBoundingBox" color-interpolation-filters="sRGB">'+
-'<feImage href="'+canvas.toDataURL()+'" x="0" y="0" width="1" height="1" preserveAspectRatio="none" result="map"/>'+
+/* Sized in pixels to the lens on every frame (see drawPill): relative sizes place the map wrongly in Chrome. */
+'<filter id="m-lens" x="0" y="0" width="100" height="40" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">'+
+'<feImage href="'+canvas.toDataURL()+'" x="0" y="0" width="100" height="40" preserveAspectRatio="none" result="map"/>'+
 '<feDisplacementMap in="SourceGraphic" in2="map" scale="'+LENS_REST+'" xChannelSelector="R" yChannelSelector="G"/>'+
 '</filter></svg>';
 document.body.appendChild(holder.firstChild);
 }
 
+function sizeLens(width,height){
+var filter=document.getElementById("m-lens");
+if(!filter)return;
+var map=filter.querySelector("feImage");
+width=Math.ceil(width);height=Math.ceil(height);
+filter.setAttribute("width",width);filter.setAttribute("height",height);
+map.setAttribute("width",width);map.setAttribute("height",height);
+}
+
 function setLens(amount){
 var map=document.querySelector("#m-lens feDisplacementMap");
-if(map)map.setAttribute("scale",amount.toFixed(3));
+if(map)map.setAttribute("scale",amount.toFixed(1));
 }
 
 function addPill(nav){
@@ -227,7 +243,9 @@ pill.style.transform="translate("+x+"px,"+py+"px)";
 /* The copied text: lined up with the real text, magnified around the lens centre. */
 var items=pill.items,ox=items.offsetLeft,oy=items.offsetTop;
 var cx=w/2,cy=ph/2,scale=1+0.12*bulge;
-pill.track.style.transform="translate("+cx+"px,"+cy+"px) scale("+scale+") translate("+(ox-x-cx)+"px,"+(oy-py-cy)+"px)";
+pill.track.style.transform="translate("+(cx+LENS_BLEED)+"px,"+(cy+LENS_BLEED)+"px) scale("+scale+") translate("+(ox-x-cx)+"px,"+(oy-py-cy)+"px)";
+/* The refraction map covers the whole lens, including the part past its edge. */
+sizeLens(w+LENS_BLEED*2,ph+LENS_BLEED*2);
 /* Hide the real text under the lens. */
 items.style.setProperty("--cut-a",(x-ox+1)+"px");
 items.style.setProperty("--cut-b",(x-ox+w-1)+"px");
@@ -257,13 +275,25 @@ var duration=Math.min(650,320+distance*0.9);
 var started=performance.now();
 function frame(now){
 var t=Math.min(1,(now-started)/duration);
-/* Ease out with a small overshoot at the end, like a spring. */
-var e=1+1.9*Math.pow(t-1,3)+0.9*Math.pow(t-1,2);
-/* Stretch in the middle of the trip, staying centred. */
+/*
+ * Like a drop of liquid: the leading edge moves first and settles
+ * with a small spring, the trailing edge follows a little behind,
+ * so the lens stretches on the way (never more than 40px).
+ */
+var p=Math.min(1,t/0.8);
+var lead=1+1.9*Math.pow(p-1,3)+0.9*Math.pow(p-1,2);
+var trail=1-Math.pow(1-t,3);
+if(distance>0)trail=Math.max(trail,lead-40/distance);
 var bulge=Math.sin(Math.PI*t);
-var stretch=bulge*Math.min(28,distance*0.18);
-var x=fromX+(toX-fromX)*e-stretch/2;
-var w=fromW+(toW-fromW)*e+stretch;
+var left,right;
+if(toX>=fromX){
+right=fromX+fromW+(toX+toW-fromX-fromW)*lead;
+left=fromX+(toX-fromX)*trail;
+}else{
+left=fromX+(toX-fromX)*lead;
+right=fromX+fromW+(toX+toW-fromX-fromW)*trail;
+}
+var x=left,w=Math.max(item.offsetHeight,right-left);
 pillX=x;pillW=w;
 drawPill(x,w,item,bulge);
 setLens(LENS_REST+(LENS_MOVING-LENS_REST)*bulge);

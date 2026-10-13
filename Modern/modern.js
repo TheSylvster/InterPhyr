@@ -716,6 +716,36 @@ card.appendChild(details);
 return card;
 }
 
+/*
+ * Stories in two independent columns (newest first, left then right),
+ * so opening one only pushes down the stories under it. On narrow
+ * screens they become one column in reading order.
+ */
+var columnSets=[];
+
+function storyColumns(cards){
+var box=el("div","m-columns");
+box.cards=cards;
+columnSets.push(box);
+arrangeColumns(box);
+return box;
+}
+
+function arrangeColumns(box){
+var count=window.innerWidth>860?2:1;
+if(box.count===count)return;
+box.count=count;
+box.innerHTML="";
+var cols=[];
+for(var i=0;i<count;i++){cols.push(el("div","m-column"));box.appendChild(cols[i]);}
+box.cards.forEach(function(card,i){cols[i%count].appendChild(card);});
+}
+
+window.addEventListener("resize",function(){
+columnSets=columnSets.filter(function(box){return document.body.contains(box);});
+columnSets.forEach(arrangeColumns);
+});
+
 function renderNews(main,token,ready){
 Promise.all([fetchClassic("News/index.html"),ready]).then(function(results){
 if(takenOver()||token!==renderToken)return;
@@ -746,20 +776,14 @@ var important=Array.prototype.filter.call(articles,function(a){return a.classLis
 if(important.length){
 var top=el("section","m-section");
 top.innerHTML='<div class="m-section-head"><h2>Important News</h2></div>';
-var topGrid=el("div","m-grid m-grid-2");
-important.forEach(function(a){topGrid.appendChild(storyCard(a,r.url,true,false));});
-top.appendChild(topGrid);
+top.appendChild(storyColumns(important.map(function(a){return storyCard(a,r.url,true,false);})));
 main.appendChild(top);
 }
 
 var all=el("section","m-section");
 all.innerHTML='<div class="m-section-head"><h2>Latest Stories</h2><span class="m-small">'+articles.length+' stories</span></div>';
-var grid=el("div","m-grid m-grid-2");
-articles.forEach(function(a){
-if(a.classList.contains("news-important"))return;
-grid.appendChild(storyCard(a,r.url,false,false));
-});
-all.appendChild(grid);
+var rest=Array.prototype.filter.call(articles,function(a){return !a.classList.contains("news-important");});
+all.appendChild(storyColumns(rest.map(function(a){return storyCard(a,r.url,false,false);})));
 main.appendChild(all);
 }).catch(function(){if(token===renderToken)failed(main);});
 }

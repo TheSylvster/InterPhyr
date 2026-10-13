@@ -64,3 +64,11 @@ This file holds the owner's standing instructions. Follow them on every change. 
 - Test changes in a real browser (headless Chrome against a local server works) before pushing.
 - **Government logon tests:** the owner permits Claude to use **only the IT login** (the "IT" entry of the private credentials file) for automated Government logons, and only against a local test server, to check a rebuilt vault. Never use any other login. Never print, log, save or commit the IT login; feed it straight from the private file into the test, and delete the test file afterwards.
 - Check for script errors, broken images and links, and both the desktop and phone layouts.
+
+## InterPhyr Modern (/Modern/)
+
+- A modern "liquid glass" version of the site at `/Modern/`. It is open to anyone, but **nothing on the classic site may link to it**, and its pages carry `<meta name="robots" content="noindex, nofollow">`.
+- It has no content of its own: `Modern/modern.js` reads the classic pages (`index.html`, `News/index.html`, ...) and restyles them. Edit content on the classic pages only.
+- Pages so far: Home and News. To add one, create `Modern/<Page>/index.html` like the existing ones, add the path to `MODERN_PAGES` and `NAV` in `modern.js`, and write its renderer.
+- Styles live in `Modern/modern.css`, scoped to `body.modern`. Use the system font (no downloads) and keep a non-blur fallback for browsers without `backdrop-filter`.
+- Maintenance mode, the lockout and the emergency switch apply here too. Modern pages set `window.INTERPHYR_NO_DIALUP=true` before `emergency.js`, so the FEDCON 1 alert shows without a dial-up.

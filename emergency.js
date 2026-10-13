@@ -354,9 +354,14 @@ playSiren();
 return alert;
 }
 
-/* Only once the visitor has registered and connected (dial-up or the admin bypass). */
+/*
+ * Only once the visitor has registered and connected (dial-up or the
+ * admin bypass). Pages without a dial-up (InterPhyr Modern) set
+ * window.INTERPHYR_NO_DIALUP and show it straight away.
+ */
 function showPublicNuclear(){
-if(!nuclearOn()||getCookie("interphyr_connected")!=="1")return;
+if(!nuclearOn())return;
+if(getCookie("interphyr_connected")!=="1"&&!window.INTERPHYR_NO_DIALUP)return;
 if(getCookie("interphyr_fedcon1_ack")==="1"||document.querySelector(".ipx-nuke-alert"))return;
 showNuclear({onClose:function(){
 /* A session cookie: the alert comes back after the browser is closed. */

@@ -778,7 +778,7 @@ hero.innerHTML=
 '<div class="m-hero-orb" aria-hidden="true"></div>'+
 '<span class="m-eyebrow">InterPhyr.net</span>'+
 '<h1>Update Logs</h1>'+
-'<p class="m-lead">Every change to InterPhyr.net, newest first.</p>';
+'<p class="m-lead">Every change to InterPhyr Modern, newest first.</p>';
 main.appendChild(hero);
 
 var list=el("section","m-section m-log");
@@ -793,9 +793,14 @@ var head=el("div","m-log-head");
 head.appendChild(el("h3",null,escapeText(text(heading))));
 if(dateText)head.appendChild(el("span","m-log-date",escapeText(dateText)));
 card.appendChild(head);
-var items=adopt(entry,r.url).querySelectorAll("li");
+/* Only the changes to InterPhyr Modern (the classic site has its own log). */
+var items=Array.prototype.filter.call(adopt(entry,r.url).querySelectorAll("li"),function(li){return /Modern/.test(li.textContent);});
+if(!items.length)return;
 var ul=el("ul","m-log-items");
-items.forEach(function(li){ul.appendChild(el("li",null,li.innerHTML));});
+items.forEach(function(li){
+var html=li.innerHTML.replace(/^\s*InterPhyr Modern:\s*/,"");
+ul.appendChild(el("li",null,html.charAt(0).toUpperCase()+html.slice(1)));
+});
 card.appendChild(ul);
 list.appendChild(card);
 });

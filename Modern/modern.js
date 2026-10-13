@@ -26,7 +26,7 @@ var OUTSIDE=["Eisenreich","Pancake","Swissland","Luminara","MerchantsUnion","Fro
  * is Modern's own overview of the member nations; every other page is a
  * classic page restyled.
  */
-var MODERN_PAGES=["","News/","Nations/","ZPR/","Astralyia/","Rendale/","Doctrines/","Relations/","Projects/","Map/","ZapadTelecom/","About/","UpdateLogs/"].concat(OUTSIDE.map(function(n){return "Relations/"+n+"/";}));
+var MODERN_PAGES=["","News/","Nations/","ZPR/","Astralyia/","Rendale/","Doctrines/","Relations/","Projects/","Map/","Government/","ZapadTelecom/","About/","UpdateLogs/"].concat(OUTSIDE.map(function(n){return "Relations/"+n+"/";}));
 
 var NAV=[
 {label:"Home",path:""},
@@ -556,6 +556,13 @@ if(t<1)lens.anim=requestAnimationFrame(frame);
 else lens.place(item);
 }
 lens.anim=requestAnimationFrame(frame);
+};
+
+/* For lenses in windows that close (the FEDCON scale): removes the lens and its filter. */
+lens.destroy=function(){
+cancelAnimationFrame(lens.anim);
+svg.remove();
+glass.remove();
 };
 
 return lens;
@@ -1623,6 +1630,395 @@ if(related)main.appendChild(related);
 }
 
 /*
+ * ---------- Government Access ----------
+ *
+ * The same encrypted vault as the classic Government page (read from it,
+ * so a rebuilt vault works here too), the same logins, the same three-
+ * strikes lockout and the same FEDCON level, in glass. The documents are
+ * only ever decrypted in this browser. A logon lasts while you move around
+ * InterPhyr Modern and ends when the page is reloaded or you log off.
+ */
+
+var FEDCON_LEVELS={
+5:{name:"NORMAL READINESS",c:"#5b8cff",desc:"Lowest state of readiness. Peacetime conditions throughout the Federation.",when:"Used in peacetime, when there is no threat to the Federation or its member nations and no conflict near its borders."},
+4:{name:"INCREASED INTELLIGENCE WATCH",c:"#38d96b",desc:"Intelligence gathering is increased and security measures are strengthened.",when:"Used when unrest or conflict near the Federation's borders needs close watching, but there is no direct threat to the Federation, such as after a war between neighbouring nations."},
+3:{name:"INCREASED FORCE READINESS",c:"#ffd23f",desc:"Federation forces are on heightened alert. Air forces are ready to mobilise within fifteen minutes.",when:"Used when armed conflict breaks out on or near the Federation's borders, or when a hostile nation openly threatens or accuses a member nation."},
+2:{name:"WAR FOOTING",c:"#ff4d4d",desc:"Federation armed forces are mobilised and ready to deploy and engage within fifteen minutes. Strategic weapons are placed on standby, and civil defence measures begin in every member nation.",when:"Used when an enemy attack on the Federation is believed to be imminent, when a member nation is attacked by a foreign power, or when a hostile nation puts its nuclear or strategic weapons on alert."},
+1:{name:"MAXIMUM READINESS — NUCLEAR WAR",c:"#ffffff",desc:"Nuclear war is imminent or has already begun. All Federation forces, including strategic and nuclear forces, are ready for immediate use. Member governments move to protected shelters, and all citizens are ordered to the nearest fallout shelter.",when:"Used only when nuclear war is imminent or under way: when nuclear weapons have been launched at or used against the Federation, or when the survival of the member nations is directly threatened."},
+0:{name:"FEDERATION COLLAPSE",c:"#b44dff",desc:"The Phyrrian Astral Federation itself is collapsing. Federation government has failed or the member nations have lost contact with one another. Emergency continuity-of-government plans are in force, and each member nation must act alone to survive.",when:"Used only in the worst possible case: when the Federation faces imminent collapse, its member governments have fallen or can no longer function, the Federation has been overrun, or a nuclear war has destroyed its ability to govern."}
+};
+
+var gov={vault:null,base:null,session:null,real:null,state:null,history:[],alertPending:false};
+
+function govVault(doc){
+var scripts=doc.querySelectorAll("script");
+for(var i=0;i<scripts.length;i++){
+var s=scripts[i].textContent,a=s.indexOf("/*VAULT-START*/"),b=s.indexOf("/*VAULT-END*/");
+if(a>=0&&b>a){try{return JSON.parse(s.slice(a+15,b));}catch(e){return null;}}
+}
+return null;
+}
+
+function fromB64(s){
+var bin=atob(s),out=new Uint8Array(bin.length);
+for(var i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+return out;
+}
+
+/* Exactly the classic page's decryption: blocks above the login's clearance become redaction bars. */
+function unlockVault(vault,username,password){
+var enc=new TextEncoder();
+return crypto.subtle.digest("SHA-256",enc.encode("interphyr-gov:"+username.trim())).then(function(digest){
+var id=Array.prototype.map.call(new Uint8Array(digest),function(b){return ("0"+b.toString(16)).slice(-2);}).join("");
+var entry=vault&&vault.users[id];
+if(!entry)throw new Error("unknown user");
+return crypto.subtle.importKey("raw",enc.encode(password),"PBKDF2",false,["deriveKey"]).then(function(base){
+return crypto.subtle.deriveKey({name:"PBKDF2",salt:fromB64(entry.salt),iterations:vault.iter,hash:"SHA-256"},base,{name:"AES-GCM",length:256},false,["decrypt"]);
+}).then(function(kek){
+return crypto.subtle.decrypt({name:"AES-GCM",iv:fromB64(entry.iv)},kek,fromB64(entry.key));
+});
+}).then(function(raw){
+var keyring=JSON.parse(new TextDecoder().decode(raw));
+return Promise.all(vault.blocks.map(function(block){
+var rawKey=keyring.keys[block.level];
+if(!rawKey)return '<div class="gov-redacted">REDACTED &mdash; CLEARANCE '+(block.level==="OMNI"?"OMNI":"LEVEL "+block.level)+' REQUIRED</div>';
+return crypto.subtle.importKey("raw",fromB64(rawKey),"AES-GCM",false,["decrypt"]).then(function(key){
+return crypto.subtle.decrypt({name:"AES-GCM",iv:fromB64(block.iv)},key,fromB64(block.data));
+}).then(function(buf){return new TextDecoder().decode(buf);});
+})).then(function(parts){return {level:keyring.level,html:parts.join("")};});
+});
+}
+
+/* The FEDCON level and its history are lines inside the decrypted content. */
+function readFedcon(html){
+var holder=document.createElement("div");
+holder.innerHTML=html;
+var history=[];
+holder.querySelectorAll(".fedcon-past").forEach(function(past){
+var level=parseInt(past.getAttribute("data-level"),10);
+if(FEDCON_LEVELS[level])history.push({level:level,date:past.getAttribute("data-date")||"",reason:text(past)});
+past.remove();
+});
+var data=holder.querySelector(".fedcon-data");
+var fedcon=null;
+if(data){
+var level=parseInt(data.getAttribute("data-level"),10);
+if(FEDCON_LEVELS[level])fedcon={level:level,date:data.getAttribute("data-date")||"",reason:text(data)};
+data.remove();
+}
+return {fedcon:fedcon,history:history,html:holder.innerHTML};
+}
+
+function govFails(){var m=document.cookie.match(/(?:^|;\s*)interphyr_gov_fails=(\d+)/);return m?parseInt(m[1],10):0;}
+function setGovFails(n){document.cookie="interphyr_gov_fails="+n+"; max-age=31536000; path=/";}
+
+function govLockOut(){
+document.cookie="interphyr_lockout=1; max-age=31536000; path=/";
+document.cookie="interphyr_admin_session=; max-age=0; path=/";
+document.cookie="interphyr_connected=; max-age=0; path=/";
+notice("Access denied","This computer has been locked out of InterPhyr.net after too many failed Government Access logons.");
+}
+
+function renderGovernment(main,token,ready){
+Promise.all([fetchClassic("Government/index.html"),ready]).then(function(results){
+if(takenOver()||token!==renderToken)return;
+var r=results[0],doc=r.doc;
+gov.vault=govVault(doc);
+gov.base=r.url;
+enter(main);
+var intro=doc.querySelector("#gov-access > p:not(.gov-classified):not(.small)");
+var hero=heroPanel("Phyrrian Astral Federation","Government Access",intro?intro.innerHTML:"");
+var eyebrow=hero.querySelector(".m-eyebrow");
+eyebrow.insertAdjacentHTML("afterend",'<span class="m-badge m-badge-classified">'+escapeText(text(doc.querySelector(".gov-classified"))||"Classified")+'</span>');
+main.appendChild(hero);
+if(gov.session)govSessionView(main);
+else govLogon(main);
+var small=doc.querySelector("#gov-access > p.small");
+if(small)main.appendChild(el("p","m-small m-gov-note",small.innerHTML));
+var related=relatedChips(doc.querySelector("#related"),r.url);
+if(related)main.appendChild(related);
+if(gov.alertPending&&gov.state){
+gov.alertPending=false;
+setTimeout(function(){showFedconAlert(gov.state);},reducedMotion()?0:700);
+}
+}).catch(function(){if(token===renderToken)failed(main);});
+}
+
+function govLogon(main){
+var form=el("form","m-card glass m-gov-logon m-section");
+form.noValidate=true;
+form.innerHTML=
+'<span class="m-eyebrow">ZapadTelecom&copy; Secure Logon</span>'+
+'<h2>Log on</h2>'+
+'<label class="m-field"><span>Username</span><input type="text" class="m-masked" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"></label>'+
+'<label class="m-field"><span>Password</span><input type="password" autocomplete="current-password"></label>'+
+'<p class="m-form-error" role="alert"></p>'+
+'<div class="m-actions"><button type="submit" class="m-btn m-btn-primary">Log On</button></div>';
+var user=form.querySelector("input[type=text]"),pass=form.querySelector("input[type=password]");
+var error=form.querySelector(".m-form-error"),submit=form.querySelector("button");
+/* The username is shown as dots, like the classic page; where that isn't supported it becomes a password box. */
+if(!(window.CSS&&CSS.supports&&CSS.supports("-webkit-text-security","disc")))user.type="password";
+form.addEventListener("submit",function(event){
+event.preventDefault();
+error.textContent="";
+var username=user.value;
+if(!username.trim()||!pass.value){error.textContent="Please enter a username and password.";return;}
+if(!gov.vault||!window.crypto||!crypto.subtle){error.textContent="The Government network did not respond. Please try again.";return;}
+submit.disabled=true;
+submit.textContent="Verifying…";
+unlockVault(gov.vault,username,pass.value).then(function(result){
+setGovFails(0);
+var read=readFedcon(result.html);
+gov.session={who:username.trim(),level:result.level,html:read.html};
+gov.real=read.fedcon;
+gov.state=read.fedcon;
+gov.history=read.history;
+gov.alertPending=true;
+redraw();
+}).catch(function(){
+var fails=govFails()+1;
+setGovFails(fails);
+if(fails>=3){govLockOut();return;}
+var left=3-fails;
+error.textContent="Logon failed. The username or password is incorrect. "+left+(left===1?" attempt":" attempts")+" remaining before this terminal is locked out.";
+pass.focus();
+}).then(function(){
+pass.value="";
+submit.disabled=false;
+submit.textContent="Log On";
+});
+});
+main.appendChild(form);
+}
+
+function govSessionView(main){
+var s=gov.session;
+var bar=el("div","m-gov-session glass m-section");
+var who=el("div","m-gov-who");
+who.innerHTML='<span class="m-small">Logged on</span><b></b>';
+who.querySelector("b").textContent=s.who;
+var level=el("div","m-gov-who");
+level.innerHTML='<span class="m-small">Clearance</span><b></b>';
+level.querySelector("b").textContent=s.level==="OMNI"?"OMNI":"Level "+s.level;
+bar.appendChild(who);
+bar.appendChild(level);
+var off=el("button","m-btn m-gov-logoff","Log Off");
+off.type="button";
+off.addEventListener("click",function(){
+gov.session=null;gov.real=null;gov.state=null;gov.history=[];
+redraw();
+});
+bar.appendChild(off);
+main.appendChild(bar);
+var fedHost=el("div","m-gov-fedcon-host");
+gov.fedHost=fedHost;
+main.appendChild(fedHost);
+renderFedconBar();
+var holder=document.createElement("div");
+holder.innerHTML=s.html;
+var docs=adopt(holder,gov.base);
+docs.className="m-gov-docs";
+docs.querySelectorAll(".gov-doc-window,.gov-communique").forEach(function(d){d.classList.add("glass");});
+main.appendChild(docs);
+}
+
+function fedconInfo(fedcon){
+var info=FEDCON_LEVELS[fedcon.level];
+return '<p>'+info.desc+'</p>'+
+(fedcon.reason?'<p><b>'+(fedcon.preview?"Used when:":"Reason:")+'</b> '+escapeText(fedcon.reason)+'</p>':'')+
+(fedcon.preview
+?'<p class="m-small">Preview only. '+(gov.real?'The real level is FEDCON '+gov.real.level+'. ':'Log on to Government Access to see the real level. ')+'Type SETFEDCONREAL to go back.</p>'
+:'<p class="m-small">Issued'+(fedcon.date?" "+escapeText(fedcon.date):"")+' by the Governments of the Phyrrian Astral Federation.</p>');
+}
+
+function renderFedconBar(){
+var host=gov.fedHost;
+if(!host||!document.body.contains(host))return;
+host.innerHTML="";
+if(!gov.state)return;
+var f=gov.state,info=FEDCON_LEVELS[f.level];
+var bar=el("button","m-fedcon-bar glass"+(f.level<=2?" m-fedcon-severe":""));
+bar.type="button";
+bar.style.setProperty("--fc",info.c);
+bar.innerHTML='<span class="m-fedcon-lamp" aria-hidden="true"></span><span class="m-fedcon-text"><b>FEDCON '+f.level+'</b> '+info.name+(f.preview?' <span class="m-small">(preview)</span>':'')+'</span><span class="m-fedcon-more">Details</span>';
+bar.addEventListener("click",function(){showFedconWindow(f);});
+host.appendChild(bar);
+}
+
+/* The Defence Condition window: six levels, a clear glass lens on the one being read. */
+function showFedconWindow(fedcon){
+var body=el("div","m-dialog-body m-fedcon");
+var info=FEDCON_LEVELS[fedcon.level];
+var cells="";
+for(var n=5;n>=0;n--){
+cells+='<button type="button" class="m-fedcon-cell'+(n===fedcon.level?" current":"")+'" data-level="'+n+'" style="--fc:'+FEDCON_LEVELS[n].c+'" aria-label="FEDCON '+n+': '+FEDCON_LEVELS[n].name+'">'+n+'</button>';
+}
+var showHistory=!fedcon.preview&&gov.history.length>0;
+body.innerHTML=
+'<span class="m-eyebrow">Phyrrian Astral Federation</span>'+
+'<h2>Defence Condition</h2>'+
+'<div class="m-fedcon-scale"><div class="m-fedcon-cells">'+cells+'</div></div>'+
+'<div class="m-fedcon-current" style="--fc:'+info.c+'">FEDCON '+fedcon.level+'<small>'+info.name+'</small></div>'+
+'<div class="m-fedcon-info">'+fedconInfo(fedcon)+'</div>'+
+'<div class="m-actions">'+(showHistory?'<button type="button" class="m-btn m-fedcon-history-btn">History</button>':'')+'<button type="button" class="m-btn m-btn-primary" data-close data-focus>Acknowledge</button></div>';
+var lens=null;
+var dialog=openDialog(body,{onClose:function(){if(lens)lens.destroy();}});
+var scale=body.querySelector(".m-fedcon-scale"),row=body.querySelector(".m-fedcon-cells"),infoBox=body.querySelector(".m-fedcon-info");
+function swapInfo(html){
+infoBox.classList.add("m-swap");
+setTimeout(function(){infoBox.innerHTML=html;infoBox.classList.remove("m-swap");},reducedMotion()?0:140);
+}
+function select(n){
+var cell=row.querySelector('[data-level="'+n+'"]');
+if(lens)lens.move(cell);
+if(n===fedcon.level){swapInfo(fedconInfo(fedcon));return;}
+var l=FEDCON_LEVELS[n];
+swapInfo('<p><b>FEDCON '+n+' — '+l.name+'</b></p><p>'+l.desc+'</p><p><b>When it is used:</b> '+l.when+'</p><p class="m-small">The current level is FEDCON '+fedcon.level+'. Choose it to see the current reason.</p>');
+}
+requestAnimationFrame(function(){
+lens=makeLens(scale,row,"x");
+lens.place(row.querySelector(".current"));
+});
+row.addEventListener("click",function(event){
+var cell=event.target.closest(".m-fedcon-cell");
+if(cell)select(Number(cell.getAttribute("data-level")));
+});
+var historyButton=body.querySelector(".m-fedcon-history-btn");
+if(historyButton)historyButton.addEventListener("click",function(){
+var entries=[{level:fedcon.level,date:fedcon.date,reason:fedcon.reason,current:true}].concat(gov.history);
+var rows=entries.map(function(e){
+var l=FEDCON_LEVELS[e.level];
+return '<div class="m-fedcon-history-row"><span class="m-fedcon-chip" style="--fc:'+l.c+'">FEDCON '+e.level+'</span><div><span class="m-small">'+escapeText(e.date)+(e.current?" · current":"")+'</span><p>'+escapeText(e.reason)+'</p></div></div>';
+}).join("");
+if(lens)lens.move(row.querySelector(".current"));
+swapInfo('<p><b>FEDCON history</b></p><div class="m-fedcon-history">'+rows+'</div>');
+});
+return dialog;
+}
+
+function playAlertSound(){
+try{var a=new Audio(new URL("sounds/windows-98-error.mp3",siteRoot).href);var p=a.play();if(p&&p.catch)p.catch(function(){});}catch(e){}
+}
+
+/* FEDCON 2, 1 and 0 each have their own alert when you log on (and when previewed). */
+function showFedconAlert(fedcon){
+if(!fedcon||fedcon.level>2)return;
+if(fedcon.level===1){
+if(window.interphyrEmergency)window.interphyrEmergency.nuclear({details:function(){showFedconWindow(fedcon);}});
+return;
+}
+if(fedcon.level===2){
+var body=el("div","m-dialog-body m-alert");
+body.innerHTML=
+'<div class="m-alert-flash">FEDCON 2 — WAR FOOTING</div>'+
+'<span class="m-eyebrow">Emergency alert</span>'+
+'<h2>Attention all member governments</h2>'+
+'<p class="m-muted">The Phyrrian Astral Federation is on war footing. Federation forces are mobilised and ready to engage within fifteen minutes. Civil defence measures are in effect in every member nation.</p>'+
+'<p class="m-muted">Await further instructions through official channels.</p>'+
+'<div class="m-actions"><button type="button" class="m-btn m-alert-details">Details</button><button type="button" class="m-btn m-btn-primary m-btn-danger" data-close data-focus>Acknowledge</button></div>';
+var d=openDialog(body,{tone:"alert",alert:true});
+body.querySelector(".m-alert-details").addEventListener("click",function(){d.close();setTimeout(function(){showFedconWindow(fedcon);},280);});
+playAlertSound();
+return;
+}
+/* FEDCON 0: the Federation collapses, then the whole site becomes the Emergency Notice (emergency.js). */
+var touch=!!(window.matchMedia&&window.matchMedia("(pointer: coarse)").matches);
+var screen=el("div","m-collapse");
+screen.setAttribute("role","alertdialog");
+screen.setAttribute("aria-modal","true");
+screen.innerHTML=
+'<div class="m-collapse-panel glass">'+
+'<span class="m-eyebrow">FEDERATION.SYS</span>'+
+'<h1>The Federation has been terminated</h1>'+
+'<p>A fatal exception has occurred at PAF:00000000 in FEDERATION.SYS.</p>'+
+'<ul><li>Contact with Federation government has been lost.</li><li>Continuity-of-government protocol is now in effect.</li><li>Each member nation must now act alone to survive.</li></ul>'+
+'<p class="m-collapse-level">FEDCON 0 — '+FEDCON_LEVELS[0].name+'</p>'+
+'<p class="m-collapse-continue">'+(touch?"Tap the screen to continue":"Press Enter to continue")+'</p>'+
+'</div>';
+document.body.appendChild(screen);
+requestAnimationFrame(function(){requestAnimationFrame(function(){screen.classList.add("open");});});
+playAlertSound();
+var done=false;
+function next(){
+if(done)return;
+done=true;
+document.removeEventListener("keydown",onKey);
+screen.classList.remove("open");
+setTimeout(function(){
+screen.remove();
+if(window.interphyrEmergency)window.interphyrEmergency.show();
+},reducedMotion()?0:400);
+}
+function onKey(event){if(event.key==="Enter"){event.preventDefault();next();}}
+document.addEventListener("keydown",onKey);
+screen.addEventListener("pointerup",function(event){if(event.pointerType==="touch"||event.pointerType==="pen")next();});
+}
+
+/*
+ * Previews, exactly like the classic page: FEDCON = 1 (or SETFEDCON1) in the
+ * console, or SETFEDCON0..5 typed anywhere on the Government page;
+ * SETFEDCONREAL or FEDCON = null goes back. After a logon, or for the
+ * ZapTel_IT admin without one (then only the windows show).
+ */
+function previewState(n){return {level:n,date:"",reason:FEDCON_LEVELS[n].when,preview:true};}
+
+/* Any FEDCON window or alert already open fades away first. */
+function closeFedconOverlays(){
+document.querySelectorAll(".m-dialog-backdrop,.m-collapse").forEach(function(o){o.classList.remove("open");o.classList.add("closing");setTimeout(function(){o.remove();},260);});
+if(window.interphyrEmergency&&window.interphyrEmergency.closeNuclear)window.interphyrEmergency.closeNuclear();
+}
+
+function setFedcon(value){
+closeFedconOverlays();
+var reset=value===null||value===undefined;
+var n=Number(value);
+if(!reset&&!(n in FEDCON_LEVELS)){console.warn("FEDCON must be a number from 0 to 5.");return;}
+if(gov.real){
+gov.state=reset?gov.real:(n===gov.real.level?gov.real:previewState(n));
+renderFedconBar();
+showFedconAlert(gov.state);
+return;
+}
+if(isAdmin()){
+if(reset){gov.state=null;return;}
+gov.state=previewState(n);
+if(n<=2)showFedconAlert(gov.state);
+else showFedconWindow(gov.state);
+return;
+}
+console.info("FEDCON: log on to Government Access first.");
+}
+
+function runFedconCode(code){
+if(!gov.real&&!isAdmin()){console.info("FEDCON: log on to Government Access first.");return "Log on to Government Access first.";}
+if(code!=="0"&&window.interphyrEmergency)window.interphyrEmergency.clear();
+if(code==="REAL"){setFedcon(null);return gov.real?"FEDCON back to the real level: FEDCON "+gov.real.level+".":"FEDCON preview closed.";}
+setFedcon(Number(code));
+return "Previewing FEDCON "+code+". Type SETFEDCONREAL to go back.";
+}
+
+function installFedconControls(){
+if(window.interphyrModernFedcon)return;
+window.interphyrModernFedcon=true;
+try{
+Object.defineProperty(window,"FEDCON",{configurable:true,get:function(){return gov.state?gov.state.level:null;},set:setFedcon});
+["0","1","2","3","4","5","REAL"].forEach(function(code){
+Object.defineProperty(window,"SETFEDCON"+code,{configurable:true,get:function(){return runFedconCode(code);}});
+});
+}catch(e){}
+var typed="";
+document.addEventListener("keydown",function(event){
+if(currentPage!=="Government/")return;
+if(event.ctrlKey||event.metaKey||event.altKey||event.key.length!==1)return;
+var t=event.target;
+if(t&&(t.isContentEditable||/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)))return;
+typed=(typed+event.key.toUpperCase()).slice(-13);
+var match=/SETFEDCON([0-5])$/.exec(typed)||/SETFEDCON(REAL)$/.exec(typed);
+if(match){typed="";runFedconCode(match[1]);}
+});
+}
+
+/*
  * ---------- Glass dialogs ----------
  *
  * A glass panel over the page (the page behind dims and softens). It
@@ -2073,6 +2469,7 @@ return;
 currentPage=page;
 history.replaceState({page:page},"");
 document.addEventListener("click",onLinkClick);
+installFedconControls();
 window.addEventListener("popstate",function(){
 var back=pageOf(location);
 if(back!==null)navigate(back,false);

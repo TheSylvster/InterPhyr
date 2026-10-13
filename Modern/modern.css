@@ -490,6 +490,101 @@ body.modern .m-dialog-body h2{margin-bottom:10px}
 @media (max-width:600px){.m-map-card{padding:10px}.m-map{border-radius:16px}.m-map-controls{right:8px;top:8px}}
 @media (prefers-reduced-motion:reduce){.m-map-canvas.m-animate,.m-map-canvas.m-animate .m-map-pin,.m-map-pin,.m-map-tip{transition:none}.m-map-pin::after{animation:none}}
 
+/* ---------- Government Access ---------- */
+
+/* The eyebrow keeps the gap, so the badge lines up with the text when it wraps on a phone. */
+.m-hero-copy .m-eyebrow:has(+ .m-badge-classified){margin-right:12px}
+.m-badge-classified{margin:0 0 14px;vertical-align:top;letter-spacing:.18em}
+.m-gov-logon{max-width:480px;margin-left:auto;margin-right:auto}
+body.modern .m-gov-logon h2{margin-bottom:6px}
+.m-gov-logon .m-field{margin-top:14px}
+.m-gov-logon .m-form-error{margin-top:10px}
+.m-gov-logon .m-actions{margin-top:6px;justify-content:flex-end}
+body.modern .m-masked{-webkit-text-security:disc}
+.m-gov-note{margin:26px 6px 0;text-align:center}
+/* Who is logged on, their clearance, and Log Off. */
+.m-gov-session{display:flex;flex-wrap:wrap;align-items:center;gap:14px 32px;padding:16px 18px 16px 26px;border-radius:24px}
+.m-gov-who{display:flex;flex-direction:column;line-height:1.3}
+.m-gov-who b{font-size:16px}
+.m-gov-logoff{margin-left:auto}
+/* The FEDCON bar: a glass strip with a glowing lamp in the level's colour. */
+.m-gov-fedcon-host{margin-top:16px}
+body.modern .m-fedcon-bar{display:flex;align-items:center;gap:14px;width:100%;padding:14px 22px;border:0;border-radius:20px;font:inherit;font-size:15px;color:#fff;text-align:left;cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+body.modern .m-fedcon-bar:hover{transform:translateY(-2px)}
+.m-fedcon-bar::after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,color-mix(in srgb,var(--fc) 30%,transparent),transparent 65%);pointer-events:none}
+.m-fedcon-lamp{flex-shrink:0;width:12px;height:12px;border-radius:50%;background:var(--fc);box-shadow:0 0 0 3px color-mix(in srgb,var(--fc) 25%,transparent),0 0 16px var(--fc);animation:m-lamp 2s ease-in-out infinite}
+.m-fedcon-severe .m-fedcon-lamp{animation-duration:.9s}
+@keyframes m-lamp{50%{opacity:.45;box-shadow:0 0 0 6px color-mix(in srgb,var(--fc) 10%,transparent),0 0 6px var(--fc)}}
+.m-fedcon-text{flex:1;min-width:0;position:relative;z-index:1;letter-spacing:.04em}
+.m-fedcon-text b{margin-right:8px;letter-spacing:.06em}
+.m-fedcon-more{position:relative;z-index:1;font-size:13px;font-weight:600;color:var(--m-muted)}
+.m-fedcon-more::after{content:" \203A"}
+/* The decrypted documents, in glass. */
+.m-gov-docs{display:flex;flex-direction:column;gap:18px;margin-top:22px}
+.m-gov-docs .gov-doc-window,.m-gov-docs .gov-communique{padding:22px 26px}
+.m-gov-docs .title-bar{display:flex;align-items:center;margin-bottom:12px}
+.m-gov-docs .title-bar-text{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--m-muted)}
+.m-gov-docs .title-bar-text img{width:18px;height:18px;image-rendering:pixelated}
+.m-gov-docs .title-bar-controls{display:none}
+.m-gov-docs .gov-doc-banner{display:inline-block;margin:0 0 12px;padding:4px 14px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.16em;color:#fff;background:linear-gradient(135deg,#c0283a,#ff5a3c);box-shadow:0 0 16px rgba(255,90,60,.35)}
+.m-gov-docs .gov-doc{padding:20px 22px;border-radius:18px;background:rgba(0,0,10,.28);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),inset 0 0 0 1px rgba(255,255,255,.08);font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;font-size:14px;line-height:1.6}
+.m-gov-docs .gov-doc p,.m-gov-docs .gov-communique p{margin:8px 0}
+.m-gov-docs .gov-doc h4{margin:16px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--m-line);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.m-gov-docs .gov-doc-head{display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--m-line)}
+.m-gov-docs .gov-doc-head img{width:44px;height:44px;object-fit:contain}
+.m-gov-docs .gov-doc-class{font-family:var(--m-font);font-size:16px;font-weight:800;letter-spacing:.16em;color:#ff7a68}
+.m-gov-docs .gov-doc-class small{display:block;margin-top:2px;font-size:12px;font-weight:500;letter-spacing:.02em;color:var(--m-muted)}
+.m-gov-docs table{border-collapse:collapse;margin:4px 0 10px}
+.m-gov-docs td{padding:2px 14px 2px 0;vertical-align:top}
+.m-gov-docs td:first-child{font-weight:700;white-space:nowrap;color:var(--m-muted)}
+.m-gov-docs .gov-doc-quote{margin:10px 0 10px 4px;padding:4px 14px;border-left:3px solid #ff7a68;font-style:italic;color:var(--m-muted)}
+.m-gov-docs .gov-doc-foot{margin-top:14px;padding-top:8px;border-top:1px dashed var(--m-line);font-size:12px;color:var(--m-faint)}
+body.modern .m-gov-docs .gov-communique{border-left:0;font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;font-size:14px;line-height:1.6;box-shadow:inset 4px 0 0 #7b8cff,inset 0 1.5px 0 rgba(255,255,255,.42),0 30px 70px -30px rgba(0,0,0,.75)}
+.m-gov-docs .gov-redacted{padding:14px 18px;border-radius:16px;background:#05060c;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);font-family:ui-monospace,"SF Mono","Cascadia Mono",Consolas,monospace;font-size:13px;font-weight:700;letter-spacing:.2em;text-align:center;color:rgba(255,255,255,.75)}
+/* The Defence Condition window. */
+.m-fedcon h2{margin-bottom:16px}
+.m-fedcon-scale{position:relative;margin:0 -8px;padding:8px}
+.m-fedcon-cells{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+body.modern .m-fedcon-cell{position:relative;height:52px;border:0;border-radius:16px;font:inherit;font-size:22px;font-weight:800;color:var(--fc);background:color-mix(in srgb,var(--fc) 12%,rgba(255,255,255,.03));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--fc) 40%,transparent);cursor:pointer;transition:background .2s ease}
+body.modern .m-fedcon-cell:hover{background:color-mix(in srgb,var(--fc) 22%,rgba(255,255,255,.03))}
+body.modern .m-fedcon-cell.current{background:color-mix(in srgb,var(--fc) 30%,rgba(255,255,255,.04));box-shadow:inset 0 0 0 1.5px var(--fc),0 0 22px color-mix(in srgb,var(--fc) 45%,transparent)}
+.m-fedcon-scale .m-lens{border-radius:16px}
+.m-fedcon-current{margin:16px 0 4px;font-size:30px;font-weight:800;letter-spacing:.04em;color:var(--fc);text-shadow:0 0 22px color-mix(in srgb,var(--fc) 50%,transparent)}
+.m-fedcon-current small{display:block;margin-top:2px;font-size:12px;letter-spacing:.14em;color:var(--m-muted);text-shadow:none}
+.m-fedcon-info{margin-top:12px;transition:opacity .14s ease,transform .14s ease}
+.m-fedcon-info.m-swap{opacity:0;transform:translateY(4px)}
+.m-fedcon-info p{margin:0 0 10px;color:var(--m-text)}
+.m-fedcon .m-actions{justify-content:flex-end;margin-top:14px}
+.m-fedcon-history{display:flex;flex-direction:column;gap:10px}
+.m-fedcon-history-row{display:flex;gap:12px;align-items:flex-start;padding-top:10px;border-top:1px solid var(--m-line)}
+.m-fedcon-history-row p{margin:2px 0 0}
+.m-fedcon-chip{flex-shrink:0;padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800;color:var(--fc);background:color-mix(in srgb,var(--fc) 16%,transparent);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--fc) 45%,transparent)}
+/* The FEDCON 2 alert: the page behind turns red. */
+.m-dialog-alert.open{background:rgba(70,0,10,.5)}
+.m-alert-flash{margin:0 0 18px;padding:12px;border-radius:16px;font-size:18px;font-weight:800;letter-spacing:.12em;text-align:center;color:#fff;background:linear-gradient(135deg,#a3162a,#ff4d4d);box-shadow:0 0 30px rgba(255,60,60,.5);animation:m-alert-pulse 1.4s ease-in-out infinite}
+@keyframes m-alert-pulse{50%{box-shadow:0 0 6px rgba(255,60,60,.2);opacity:.85}}
+.m-alert .m-actions{justify-content:flex-end}
+.m-btn-danger{background:linear-gradient(135deg,#d32f3f,#ff6a4d)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 10px 30px -10px rgba(255,80,60,.8)!important}
+/* FEDCON 0: the Federation collapses. */
+.m-collapse{position:fixed;inset:0;z-index:70;display:grid;place-items:center;padding:20px;background:radial-gradient(circle at 50% 40%,rgba(120,40,200,.55),rgba(10,0,30,.96) 70%);opacity:0;transition:opacity .5s ease;font-family:var(--m-font);color:#fff}
+.m-collapse.open{opacity:1}
+.m-collapse-panel{max-width:620px;padding:40px 44px;transform:scale(.96);transition:transform .7s cubic-bezier(.2,.8,.2,1)}
+.m-collapse.open .m-collapse-panel{transform:none}
+body.modern .m-collapse h1{margin-bottom:14px;font-size:clamp(28px,5vw,40px)}
+.m-collapse ul{margin:0 0 14px;padding-left:20px;color:var(--m-muted)}
+.m-collapse-level{font-weight:800;letter-spacing:.1em;color:#d9a6ff}
+.m-collapse-continue{margin:20px 0 0;font-size:14px;color:var(--m-muted);animation:m-alert-pulse 1.6s ease-in-out infinite}
+@media (max-width:600px){
+.m-fedcon-cells{gap:5px}
+body.modern .m-fedcon-cell{height:44px;font-size:18px;border-radius:12px}
+.m-gov-session{padding:14px 16px}
+.m-collapse-panel{padding:28px 24px}
+}
+@media (prefers-reduced-motion:reduce){
+.m-fedcon-lamp,.m-alert-flash,.m-collapse-continue{animation:none}
+.m-collapse,.m-collapse-panel,.m-fedcon-info,.m-fedcon-bar{transition:none}
+}
+
 /* Footer links. */
 .m-footer-links{display:flex;gap:16px}
 

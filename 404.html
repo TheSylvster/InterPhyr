@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <base href="/InterPhyr/">
+<script>
+/* Missing addresses under /Modern/ get InterPhyr Modern's own "page not found" page (the address bar keeps the address). */
+if(location.pathname.indexOf("/InterPhyr/Modern/")===0&&location.pathname.indexOf("/InterPhyr/Modern/404/")!==0){document.documentElement.style.visibility="hidden";location.replace("/InterPhyr/Modern/404/?from="+encodeURIComponent(location.pathname+location.search+location.hash));}
+</script>
 
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

@@ -601,3 +601,8 @@ body.modern .m-fedcon-cell{height:44px;font-size:18px;border-radius:12px}
 @media (prefers-reduced-motion:reduce){
 .m-dialog-backdrop,.m-dialog,a.m-relation,.m-chip,.m-card-more span{transition:none}
 }
+
+/* "Page not found": a big floating glass 404. */
+.m-404-num{font-size:clamp(110px,22vw,230px);font-weight:800;line-height:.9;letter-spacing:-.06em;margin:-10px 0 18px;background:linear-gradient(135deg,rgba(255,255,255,.95),rgba(201,212,255,.55) 45%,rgba(231,201,255,.35));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 12px 30px rgba(91,124,255,.35));animation:m-float 6s ease-in-out infinite}
+@keyframes m-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@media (prefers-reduced-motion:reduce){.m-404-num{animation:none}}

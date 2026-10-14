@@ -2255,6 +2255,7 @@ menu.anim=requestAnimationFrame(frame);
 
 var TITLES={
 "":"InterPhyr — The Phyrrian Astral Federation",
+"404/":"Page not found — InterPhyr",
 "News/":"The Zapadiyan Daily — InterPhyr",
 "Nations/":"Member Nations — InterPhyr",
 "ZPR/":"The Zapadiyan People's Republic — InterPhyr",
@@ -2297,6 +2298,23 @@ setTimeout(function(){main.classList.remove("m-enter");},1400);
 });
 }
 
+/* "Page not found": shown for any /Modern/ address that doesn't exist (see 404.html). */
+function render404(main,token,ready){
+ready.then(function(){
+if(takenOver()||token!==renderToken)return;
+enter(main);
+var hero=el("section","m-hero glass m-404");
+hero.innerHTML=
+'<div class="m-hero-orb" aria-hidden="true"></div>'+
+'<div class="m-404-num" aria-hidden="true">404</div>'+
+'<span class="m-eyebrow">Error 404 &middot; People\x27s Information Ministry</span>'+
+'<h1>This page does not exist</h1>'+
+'<p class="m-lead">The page you asked for has not been approved by the People\x27s Information Ministry. It may have been moved or withdrawn, or it never existed. Citizens are reminded that there is no need to ask about it again.</p>'+
+'<div class="m-actions"><a class="m-btn m-btn-primary" href="'+modernRoot+'">Back to InterPhyr</a><a class="m-btn" href="'+new URL("News/",modernRoot).href+'">Read The Zapadiyan Daily</a></div>';
+main.appendChild(hero);
+});
+}
+
 function render(page,ready){
 renderToken++;
 document.title=TITLES[page]||TITLES[""];
@@ -2314,6 +2332,7 @@ else if(page==="ZapadTelecom/")renderInfoPage(mainEl,t,ready,page,"Hosting provi
 else if(page==="About/")renderInfoPage(mainEl,t,ready,page,"InterPhyr.net","About InterPhyr.net");
 else if(page==="Map/")renderMap(mainEl,t,ready);
 else if(page==="Government/")renderGovernment(mainEl,t,ready);
+else if(page==="404/")render404(mainEl,t,ready);
 else renderHome(mainEl,t,ready);
 }
 
@@ -2438,6 +2457,11 @@ toggleStory(summary.parentNode);
 function start(){
 if(takenOver())return;
 var page=document.body.getAttribute("data-page")||"";
+/* The "page not found" page puts the address that was asked for back in the address bar. */
+if(page==="404/"){
+var asked=new URLSearchParams(location.search).get("from");
+if(asked&&asked.indexOf(new URL(modernRoot).pathname)===0)history.replaceState(null,"",asked);
+}
 document.body.insertBefore(backdrop(),document.body.firstChild);
 var shell=el("div","m-shell");
 shell.appendChild(topbar(page));

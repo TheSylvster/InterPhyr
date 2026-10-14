@@ -1124,6 +1124,31 @@ render(page,ready);
  * registered a nation yet can do it here (it is the same registration
  * as the classic site); other nations see the classic "blocked" line.
  */
+/*
+ * The public view of an Outside Relations page, for registered visitors
+ * from nations outside the Federation: what the PAF thinks of a nation
+ * (the relation, the Ministry's assessment, the report form) is left out.
+ */
+function publicView(doc){
+doc.querySelectorAll(".notice,#report-lie").forEach(function(n){n.remove();});
+doc.querySelectorAll(".nation-info p").forEach(function(p){
+var label=p.querySelector("b");
+if(label&&/relation to the paf/i.test(label.textContent))p.innerHTML="<b>Relation to the PAF:</b> Not available in your region";
+});
+var table=doc.querySelector(".relations-table");
+if(table){
+var column=-1;
+table.querySelectorAll("thead th").forEach(function(th,i){if(/relation/i.test(th.textContent))column=i;});
+if(column>=0)table.querySelectorAll("tbody tr").forEach(function(tr){if(tr.cells[column])tr.cells[column].textContent="Not available in your region";});
+}
+var info=doc.querySelector("#information");
+if(info){
+var note=doc.createElement("p");
+note.textContent="Some information on this page is only available to the member nations of the Phyrrian Astral Federation.";
+info.appendChild(note);
+}
+}
+
 function relationsGate(main){
 enter(main);
 if(registeredNation()){
@@ -1196,8 +1221,10 @@ main.appendChild(doc);
 function renderProfilePage(main,token,ready,path,outside){
 Promise.all([fetchClassic(path+"index.html"),ready]).then(function(results){
 if(takenOver()||token!==renderToken)return;
-if(outside&&!seesRelations()){relationsGate(main);return;}
+/* Not registered yet: register first. Registered outside the Federation: the public profile. */
+if(outside&&!seesRelations()&&!registeredNation()){relationsGate(main);return;}
 var r=results[0],doc=r.doc;
+if(outside&&!seesRelations())publicView(doc);
 enter(main);
 var profile=doc.querySelector("#nation-profile");
 var copy=profile?adopt(profile,r.url):null;
@@ -1264,8 +1291,9 @@ if(related)main.appendChild(related);
 function renderRelations(main,token,ready){
 Promise.all([fetchClassic("Relations/index.html"),ready]).then(function(results){
 if(takenOver()||token!==renderToken)return;
-if(!seesRelations()){relationsGate(main);return;}
+if(!seesRelations()&&!registeredNation()){relationsGate(main);return;}
 var r=results[0],doc=r.doc;
+if(!seesRelations())publicView(doc);
 enter(main);
 var info=doc.querySelector("#information p");
 main.appendChild(heroPanel("Ministry of Outside Relations","Outside Relations",info?info.innerHTML:""));

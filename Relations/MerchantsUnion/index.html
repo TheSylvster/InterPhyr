@@ -75,10 +75,10 @@ document.cookie="interphyr_connected=; max-age=0; path=/";
 }
 
 /*
- * Outside Relations and Projects are for citizens of
- * PAF member nations only. Anyone else (except the
- * admin session) sees a "blocked in your region" notice
- * instead - see the restriction script in the body.
+ * Outside Relations is fully shown to citizens of PAF
+ * member nations only. Anyone else (except the admin
+ * session) sees the public profile, without what the
+ * PAF thinks of the nation - see the script in the body.
  * Swissland never gets this far: it is blocked from
  * the whole site on the home page.
  */
@@ -479,32 +479,42 @@ Hosted by <a href="../../ZapadTelecom/">ZapadTelecom</a>&copy;
 <script>
 (function(){
 
-/*
- * Restricted section: if the login gate decided this
- * visitor's nation isn't a PAF member, swap the page
- * content for a "blocked in your region" notice.
- */
-
 if(!window.interphyrRestricted)return;
 
+/*
+ * Visitors from nations outside the Federation see the public
+ * profile only: what the PAF thinks of a nation (the relation, the
+ * Ministry's assessment, the report form) is not shown to them.
+ */
+
 var page=document.querySelector(".webpage");
-var header=page.querySelector(".site-header");
 
-Array.prototype.slice.call(page.children).forEach(function(el){
-if(el!==header&&el.tagName!=="HR"&&!el.classList.contains("small"))el.parentNode.removeChild(el);
-});
-
-Array.prototype.slice.call(document.querySelectorAll(".ie-explorer .explorer-box")).forEach(function(el){
+Array.prototype.slice.call(page.querySelectorAll(".notice,#report-lie")).forEach(function(el){
 el.parentNode.removeChild(el);
 });
 
-var notice=document.createElement("section");
-notice.id="information";
-notice.className="content-section";
-notice.innerHTML='<h2>This page is blocked in your region</h2>';
+Array.prototype.slice.call(page.querySelectorAll(".nation-info p")).forEach(function(p){
+var label=p.querySelector("b");
+if(label&&/relation to the paf/i.test(label.textContent))p.innerHTML="<b>Relation to the PAF:</b> Not available in your region";
+});
 
-header.parentNode.insertBefore(notice,header.nextSibling);
+/* The overview table: the relation column. */
+var table=page.querySelector(".relations-table");
+if(table){
+var column=-1;
+Array.prototype.forEach.call(table.querySelectorAll("thead th"),function(th,i){if(/relation/i.test(th.textContent))column=i;});
+if(column>=0)Array.prototype.forEach.call(table.querySelectorAll("tbody tr"),function(tr){
+if(tr.cells[column])tr.cells[column].textContent="Not available in your region";
+});
+}
 
+var info=page.querySelector("#information");
+if(info){
+var note=document.createElement("p");
+note.className="small";
+note.textContent="Some information on this page is only available to the member nations of the Phyrrian Astral Federation.";
+info.appendChild(note);
+}
 })();
 </script>
 </main>

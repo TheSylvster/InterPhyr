@@ -1482,9 +1482,17 @@ doc.querySelectorAll(".map-pin").forEach(function(classic){
 var member=classic.getAttribute("data-status")==="Member nation";
 var status=restricted&&!member?"":classic.getAttribute("data-status");
 var name=classic.getAttribute("data-name");
-var pin=adopt(classic,r.url);
+var pin;
+/* Nations not identified yet have no page: their pin isn't a link. */
+if(!classic.getAttribute("href")){
+pin=el("span");
+pin.tabIndex=0;
+status=classic.getAttribute("data-status");
+}else{
+pin=adopt(classic,r.url);
 var target=new URL(classic.getAttribute("href"),r.url);
 pin.href=modernHref(target.pathname.slice(new URL(siteRoot).pathname.length));
+}
 pin.className="m-map-pin m-pin-"+(status?(relationTone("Relation",status)||"none"):"none");
 pin.style.left=classic.style.left;
 pin.style.top=classic.style.top;

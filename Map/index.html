@@ -419,16 +419,22 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 </div>
 <div class="window-body">
 <div class="map-frame">
-<img class="map-image" src="../images/map/federation-map.webp" alt="Map of the world" width="838" height="832">
-<a class="map-pin" style="left:27.7%;top:79.9%;--pin:#0000a8" href="../Astralyia/" data-name="The Astralyian Republic" data-status="Member nation"></a>
-<a class="map-pin" style="left:30.4%;top:68.3%;--pin:#0000a8" href="../ZPR/" data-name="The Zapadiyan People's Republic" data-status="Member nation"></a>
-<a class="map-pin" style="left:37.9%;top:82.3%;--pin:#0000a8" href="../Rendale/" data-name="The Kingdom of Rendale" data-status="Member nation"></a>
-<a class="map-pin" style="left:73%;top:22.8%;--pin:#00a000" href="../Relations/Eisenreich/" data-name="The Eisenreich" data-status="Good"></a>
-<a class="map-pin" style="left:60.3%;top:42.9%;--pin:#d4a000" href="../Relations/Luminara/" data-name="Luminara" data-status="Neutral"></a>
-<a class="map-pin" style="left:53.3%;top:48.4%;--pin:#006400" href="../Relations/MerchantsUnion/" data-name="Merchants' Union" data-status="Excellent"></a>
-<a class="map-pin" style="left:59.7%;top:64.8%;--pin:#00a000" href="../Relations/Pancake/" data-name="The Royal Kingdom of Pancake" data-status="Good"></a>
-<a class="map-pin" style="left:87.7%;top:75.6%;--pin:#808080" href="../Relations/Swissland/" data-name="Former Swissland" data-status="Dissolved"></a>
-<a class="map-pin" style="left:7.9%;top:9.4%;--pin:#8cb400" href="../Relations/Frostborn/" data-name="The Frostborn" data-status="Neutral&ndash;Positive"></a>
+<img class="map-image" src="../images/map/federation-map.webp" alt="Map of the world" width="969" height="971">
+<a class="map-pin" style="left:28.3%;top:79.1%;--pin:#0000a8" href="../Astralyia/" data-name="The Astralyian Republic" data-status="Member nation"></a>
+<a class="map-pin" style="left:30.9%;top:67.8%;--pin:#0000a8" href="../ZPR/" data-name="The Zapadiyan People's Republic" data-status="Member nation"></a>
+<a class="map-pin" style="left:38.2%;top:81.4%;--pin:#0000a8" href="../Rendale/" data-name="The Kingdom of Rendale" data-status="Member nation"></a>
+<a class="map-pin" style="left:72.4%;top:23.4%;--pin:#00a000" href="../Relations/Eisenreich/" data-name="The Eisenreich" data-status="Good"></a>
+<a class="map-pin" style="left:60.0%;top:43.0%;--pin:#d4a000" href="../Relations/Luminara/" data-name="Luminara" data-status="Neutral"></a>
+<a class="map-pin" style="left:53.2%;top:48.4%;--pin:#006400" href="../Relations/MerchantsUnion/" data-name="Merchants' Union" data-status="Excellent"></a>
+<a class="map-pin" style="left:59.5%;top:64.4%;--pin:#00a000" href="../Relations/Pancake/" data-name="The Royal Kingdom of Pancake" data-status="Good"></a>
+<a class="map-pin" style="left:86.8%;top:74.9%;--pin:#808080" href="../Relations/Swissland/" data-name="Former Swissland" data-status="Dissolved"></a>
+<a class="map-pin" style="left:8.9%;top:10.4%;--pin:#8cb400" href="../Relations/Frostborn/" data-name="The Frostborn" data-status="Neutral&ndash;Positive"></a>
+<!-- New nations on the map, not identified yet: no page to link to, so they are not links. -->
+<span class="map-pin map-pin-soon" tabindex="0" style="left:14.4%;top:27.6%;--pin:#c8c8c8" data-name="Unidentified nation" data-status="Will be added soon"></span>
+<span class="map-pin map-pin-soon" tabindex="0" style="left:53.5%;top:31.1%;--pin:#c8c8c8" data-name="Unidentified nation" data-status="Will be added soon"></span>
+<span class="map-pin map-pin-soon" tabindex="0" style="left:90.8%;top:9.1%;--pin:#c8c8c8" data-name="Unidentified nation" data-status="Will be added soon"></span>
+<span class="map-pin map-pin-soon" tabindex="0" style="left:13.1%;top:51.5%;--pin:#c8c8c8" data-name="Unidentified nation" data-status="Will be added soon"></span>
+<span class="map-pin map-pin-soon" tabindex="0" style="left:65.6%;top:73.7%;--pin:#c8c8c8" data-name="Unidentified nation" data-status="Will be added soon"></span>
 <div class="map-tip" role="tooltip" hidden></div>
 </div>
 </div>
@@ -461,6 +467,7 @@ svg.ie-toolbar-icon{height:17px;fill:#000}
 <tr class="map-relation"><td><span class="map-key" style="--pin:#8cb400"></span></td><td><a href="../Relations/Frostborn/">The Frostborn</a></td><td>Neutral&ndash;Positive</td></tr>
 <tr class="map-relation"><td><span class="map-key" style="--pin:#d4a000"></span></td><td><a href="../Relations/Luminara/">Luminara</a></td><td>Neutral</td></tr>
 <tr class="map-relation"><td><span class="map-key" style="--pin:#808080"></span></td><td><a href="../Relations/Swissland/">Former Swissland</a></td><td>Dissolved</td></tr>
+<tr><td><span class="map-key" style="--pin:#c8c8c8"></span></td><td>Unidentified nations (5)</td><td>Will be added soon</td></tr>
 </tbody>
 </table>
 
@@ -666,7 +673,7 @@ restricted=getCookie("interphyr_admin_session")!=="1"&&!isPafMember(getCookie("i
 
 if(restricted){
 frame.querySelectorAll(".map-pin").forEach(function(pin){
-if(pin.getAttribute("data-status")!=="Member nation"){
+if(pin.getAttribute("data-status")!=="Member nation"&&!pin.classList.contains("map-pin-soon")){
 pin.style.setProperty("--pin","#808080");
 pin.setAttribute("data-status","");
 }
